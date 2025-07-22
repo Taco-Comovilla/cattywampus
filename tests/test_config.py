@@ -33,7 +33,7 @@ class TestConfig:
             with patch("mcconfig.Config._get_config_path", return_value=temp_dir):
                 config = Config("test_config.toml")
 
-                assert config.get("logLevel") == 30
+                assert config.get("logLevel") == 20
                 assert config.get("mkvmergePath") == ""
                 assert config.get("mkvpropeditPath") == ""
                 assert config.get("atomicParsleyPath") == ""
@@ -54,7 +54,7 @@ class TestConfig:
                 config = Config("test_config.toml")
 
                 assert config.get("nonexistent", "default") == "default"
-                assert config.get("logLevel", 10) == 30  # Should return actual value
+                assert config.get("logLevel", 10) == 20  # Should return actual value
 
     def test_config_file_generation(self):
         """Test that default config file is generated with correct content"""
@@ -68,8 +68,74 @@ class TestConfig:
                 # Read the generated file and verify it contains expected content
                 with open(config_file) as f:
                     content = f.read()
-                    assert "logLevel = 30" in content
+                    assert "logLevel = 20" in content
                     assert "useSystemLocale = true" in content
+
+    def test_config_file_copied_from_example(self):
+        """Test that config file is copied from example and contains comments"""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            with patch("mcconfig.Config._get_config_path", return_value=temp_dir):
+                config = Config("test_config.toml")
+
+                config_file = os.path.join(temp_dir, "test_config.toml")
+                assert os.path.exists(config_file)
+
+                # Read the generated file and verify it contains example file content
+                with open(config_file) as f:
+                    content = f.read()
+                    # Verify it contains helpful comments from example file
+                    assert "# Copy this file to your local config folder" in content
+                    assert "# Log level as an integer" in content
+                    assert "# Direct paths to binaries" in content
+                    assert "logLevel = 20" in content
+                    assert "useSystemLocale = true" in content
+                    assert "onlyMkv = false" in content
+                    assert "onlyMp4 = false" in content
+
+    def test_config_file_fallback_when_example_missing(self):
+        """Test fallback to old behavior when example config file is missing"""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Create a config instance and test _generate_default_config_file directly
+            config = Config.__new__(Config)
+            config.config = {
+                "logLevel": 20,
+                "mkvmergePath": "",
+                "useSystemLocale": True,
+            }
+            
+            config_file_path = os.path.join(temp_dir, "test_config.toml")
+            
+            # Test the fallback behavior by temporarily moving the example file
+            import shutil
+            from pathlib import Path
+            
+            # Find the real example file and temporarily rename it
+            example_path = Path(__file__).parent.parent / "src" / "config.example.toml"
+            backup_path = example_path.with_suffix(".toml.backup")
+            
+            try:
+                # Temporarily rename the example file so it's not found
+                if example_path.exists():
+                    shutil.move(str(example_path), str(backup_path))
+                
+                # Call the method - should fallback to old behavior
+                config._generate_default_config_file(config_file_path)
+
+                assert os.path.exists(config_file_path)
+
+                # Read the generated file and verify it contains minimal content (no comments)
+                with open(config_file_path) as f:
+                    content = f.read()
+                    # Should not contain example file comments
+                    assert "# Copy this file to your local config folder" not in content
+                    assert "# Log level as an integer" not in content
+                    # Should contain the basic values
+                    assert "logLevel = 20" in content
+                    assert "useSystemLocale = true" in content
+            finally:
+                # Restore the example file
+                if backup_path.exists():
+                    shutil.move(str(backup_path), str(example_path))
 
     @patch("mcconfig.platform.system")
     def test_get_config_path_windows(self, mock_system):

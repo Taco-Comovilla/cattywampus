@@ -111,8 +111,21 @@ class Config:
         raise NotImplementedError(f"Unsupported platform: {system}")
 
     def _generate_default_config_file(self, config_file_path):
-        with open(config_file_path, "wb") as f:
-            f.write(tomli_w.dumps(self.config).encode("utf-8"))
+        # Copy example config file instead of generating from scratch
+        import shutil
+        from pathlib import Path
+        
+        # Find the example config file relative to this module
+        current_dir = Path(__file__).parent
+        example_config_path = current_dir / "config.example.toml"
+        
+        if example_config_path.exists():
+            # Copy the example config file
+            shutil.copy2(example_config_path, config_file_path)
+        else:
+            # Fallback to old behavior if example file not found
+            with open(config_file_path, "wb") as f:
+                f.write(tomli_w.dumps(self.config).encode("utf-8"))
 
     def _ensure_config_exists(self, config_dir, config_file_path):
         os.makedirs(config_dir, exist_ok=True)

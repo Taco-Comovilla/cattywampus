@@ -28,14 +28,14 @@ body:
     id: version
     attributes:
       label: Version
-      description: What version of our software are you running? Run the command 'mkvcleaner -v' and paste the output here.
+      description: What version of our software are you running? Run the command 'cattywampus -v' and paste the output here.
     validations:
       required: true
   - type: textarea
     id: logs
     attributes:
       label: Relevant log output
-      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks. For best results, set log-level to 10 (DEBUG.)
+      description: Please copy and paste any relevant command or log output. This will be automatically formatted into code, so no need for backticks. For best results, set log-level to 10 (DEBUG.)
       render: shell
   - type: checkboxes
     id: terms

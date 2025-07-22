@@ -7,15 +7,21 @@ import shutil
 import sys
 from pathlib import Path
 
+# Add src to path for local imports
+sys.path.insert(0, "src")
+try:
+    from version import __app_name__
+    from mcconfig import Config
+except ImportError:
+    # Will be handled in functions that use these imports
+    pass
+
 
 def get_app_name():
     """Get application name from version.py."""
-    sys.path.insert(0, "src")
     try:
-        from version import __app_name__
-
         return __app_name__
-    except ImportError:
+    except NameError:
         print("Error: Could not import application name from src/version.py")
         sys.exit(1)
 
@@ -185,11 +191,7 @@ def prompt_remove_app_folder(app_name, dry_run=False):
     """Prompt user to remove application folder with logs and config."""
     print(f"📁 Application folder removal for {app_name}")
 
-    # Import config module to get paths
-    sys.path.insert(0, "src")
     try:
-        from mcconfig import Config
-
         config = Config("config.toml")
 
         app_folder = Path(config.config_path)
@@ -237,7 +239,7 @@ def prompt_remove_app_folder(app_name, dry_run=False):
         else:
             print("⏭️  Application folder kept (user choice)")
 
-    except ImportError as e:
+    except NameError as e:
         print(f"⚠️  Could not access application configuration: {e}")
         print("   Application folder location unknown, skipping removal")
 

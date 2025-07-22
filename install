@@ -12,6 +12,22 @@ import sys
 from pathlib import Path
 from string import Template
 
+# Add src to path for local imports
+sys.path.insert(0, "src")
+try:
+    from version import (
+        __app_description__,
+        __app_name__,
+        __copyright__,
+        __organization__,
+        __repo_base_url__,
+        __version__,
+    )
+    from mcconfig import Config, initialize_config
+except ImportError:
+    # Will be handled in functions that use these imports
+    pass
+
 
 def calculate_file_checksum(file_path):
     """Calculate SHA256 checksum of a file."""
@@ -26,12 +42,9 @@ def calculate_file_checksum(file_path):
 
 def get_app_name():
     """Get application name from version.py."""
-    sys.path.insert(0, "src")
     try:
-        from version import __app_name__
-
         return __app_name__
-    except ImportError:
+    except NameError:
         print("Error: Could not import application name from src/version.py")
         sys.exit(1)
 
@@ -340,17 +353,7 @@ def get_finder_extensions_instructions():
 
 def get_metadata():
     """Get application metadata from version.py."""
-    sys.path.insert(0, "src")
     try:
-        from version import (
-            __app_description__,
-            __app_name__,
-            __copyright__,
-            __organization__,
-            __repo_base_url__,
-            __version__,
-        )
-
         return {
             "app_name": __app_name__,
             "version": __version__,
@@ -359,7 +362,7 @@ def get_metadata():
             "copyright": __copyright__,
             "repo_base_url": __repo_base_url__,
         }
-    except ImportError as e:
+    except NameError as e:
         print(f"Error: Could not import metadata from src/version.py: {e}")
         sys.exit(1)
 
@@ -505,11 +508,7 @@ def create_app_folder_and_config(app_name, dry_run=False):
     """Create application folder and config.toml if they don't exist."""
     print(f"📁 Setting up application folder and configuration for {app_name}")
 
-    # Import config module to get paths and create config
-    sys.path.insert(0, "src")
     try:
-        from mcconfig import initialize_config
-
         if not dry_run:
             config = initialize_config()
             print(f"✅ Application folder created at: {config.config_path}")
@@ -517,19 +516,15 @@ def create_app_folder_and_config(app_name, dry_run=False):
             print(f"✅ Log file location: {config.log_file_path}")
         else:
             print("🔍 DRY RUN: Would create application folder and config.toml")
-    except ImportError as e:
+    except NameError as e:
         print(f"❌ Error: Could not set up application configuration: {e}")
         if not dry_run:
             sys.exit(1)
 
 
-def check_and_warn_about_preserved_config(app_name):
+def check_and_warn_about_preserved_config():
     """Check if user has local config and warn them it was preserved during uninstall."""
-    # Import config module to get paths
-    sys.path.insert(0, "src")
     try:
-        from mcconfig import Config
-
         config = Config("config.toml")
 
         config_file = Path(config.config_file_path)
@@ -545,15 +540,13 @@ def check_and_warn_about_preserved_config(app_name):
             if config_file.exists():
                 print(f"   Configuration file: {config_file}")
             print("   The new installation will use your existing settings.")
-    except ImportError:
+    except NameError:
         # If we can't import config, we can't check - just skip the warning
         pass
 
 
-def run_uninstall_if_needed(app_name, system, dry_run=False, force=False):
+def run_uninstall_if_needed(dry_run=False, force=False):
     """Run uninstall if existing installation is detected."""
-    import subprocess
-    import sys
 
     # Get the path to the uninstall script
     uninstall_script = Path(__file__).parent / "uninstall"
@@ -660,13 +653,13 @@ def run_uninstall_if_needed(app_name, system, dry_run=False, force=False):
             print("✅ Previous version uninstalled successfully")
 
             # Check if user has local config and warn them it was preserved
-            check_and_warn_about_preserved_config(app_name)
+            check_and_warn_about_preserved_config()
 
             return True
         print(f"⚠️  Uninstall completed with warnings: {result.stderr}")
 
         # Check if user has local config and warn them it was preserved
-        check_and_warn_about_preserved_config(app_name)
+        check_and_warn_about_preserved_config()
 
         return True
     except Exception as e:
@@ -719,7 +712,7 @@ def main():
         print("🔍 DRY RUN MODE - no changes will be made")
 
     # Step 0: Check for existing installation and uninstall if needed
-    if not args.skip_uninstall and run_uninstall_if_needed(app_name, system, args.dry_run, args.force):
+    if not args.skip_uninstall and run_uninstall_if_needed(args.dry_run, args.force):
             print()  # Add spacing after uninstall
 
     # Step 1: Setup application folder and config (unless --integrations flag is used)

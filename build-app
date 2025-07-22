@@ -11,22 +11,27 @@ import zipfile
 from pathlib import Path
 from string import Template
 
+# Add src to path for local imports
+src_path = Path(__file__).parent / "src"
+sys.path.insert(0, str(src_path))
+
+try:
+    from version import (
+        __version__,
+        __app_name__,
+        __app_description__,
+        __repo_base_url__,
+        __organization__,
+        __copyright__,
+    )
+except ImportError:
+    # Will be handled in functions that use these imports
+    pass
+
 
 def get_metadata():
     """Get metadata from version.py."""
-    # Add src to path and import version info
-    src_path = Path(__file__).parent / "src"
-    sys.path.insert(0, str(src_path))
-
     try:
-        from version import (
-            __version__,
-            __app_name__,
-            __app_description__,
-            __repo_base_url__,
-            __organization__,
-            __copyright__,
-        )
         return {
             'version': __version__,
             'app_name': __app_name__,
@@ -35,7 +40,7 @@ def get_metadata():
             'organization': __organization__,
             'copyright': __copyright__,
         }
-    except ImportError as e:
+    except NameError as e:
         print(f"Error: Could not import version information: {e}")
         sys.exit(1)
 
@@ -371,7 +376,6 @@ def process_template_string(template_content, metadata, binary_path=None):
         'BINARY_PATH': binary_path or '',
     }
     
-    from string import Template
     template = Template(template_content)
     return template.safe_substitute(template_vars)
 

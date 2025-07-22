@@ -2,20 +2,38 @@
 """Unified installation script for Linux and macOS file manager integrations."""
 
 import argparse
+import hashlib
 import os
 import platform
+import re
 import shutil
 import subprocess
 import sys
 from pathlib import Path
+from string import Template
+
+# Add src to path for local imports
+sys.path.insert(0, "src")
+try:
+    from version import (
+        __app_description__,
+        __app_name__,
+        __copyright__,
+        __organization__,
+        __repo_base_url__,
+        __version__,
+    )
+    from mcconfig import Config, initialize_config
+except ImportError:
+    # Will be handled in functions that use these imports
+    pass
 
 
 def calculate_file_checksum(file_path):
     """Calculate SHA256 checksum of a file."""
-    import hashlib
-    
+
     sha256_hash = hashlib.sha256()
-    with open(file_path, "rb") as f:
+    with Path(file_path).open("rb") as f:
         # Read file in chunks to handle large files efficiently
         for byte_block in iter(lambda: f.read(4096), b""):
             sha256_hash.update(byte_block)
@@ -24,11 +42,9 @@ def calculate_file_checksum(file_path):
 
 def get_app_name():
     """Get application name from version.py."""
-    sys.path.insert(0, 'src')
     try:
-        from version import __app_name__
         return __app_name__
-    except ImportError:
+    except NameError:
         print("Error: Could not import application name from src/version.py")
         sys.exit(1)
 
@@ -39,16 +55,16 @@ def find_binary(app_name):
     binary_path = shutil.which(app_name)
     if binary_path and os.access(binary_path, os.X_OK):
         return binary_path
-    
+
     # Check local dist directory
     system_name = platform.system().lower()
     if system_name == "darwin":
         system_name = "macos"
-    
-    local_binary = f"dist/{system_name}/{app_name}"
-    if os.path.exists(local_binary) and os.access(local_binary, os.X_OK):
-        return os.path.abspath(local_binary)
-    
+
+    local_binary_path = Path(f"dist/{system_name}/{app_name}")
+    if local_binary_path.exists() and os.access(local_binary_path, os.X_OK):
+        return str(local_binary_path.resolve())
+
     return None
 
 
@@ -56,74 +72,84 @@ def install_binary_linux(app_name, binary_path):
     """Install binary to ~/.local/bin on Linux."""
     target_dir = Path.home() / ".local" / "bin"
     target_dir.mkdir(parents=True, exist_ok=True)
-    
+
     target_path = target_dir / app_name
-    
+
     # Check if source and destination are the same file
     if Path(binary_path).resolve() == target_path.resolve():
-        print(f"✅ Using existing {app_name} executable at {target_path} (source and target are the same file)")
+        print(
+            f"✅ Using existing {app_name} executable at {target_path} (source and target are the same file)"
+        )
         return str(target_path)
-    
+
     # Check if target already exists and compare checksums
     if target_path.exists():
         try:
             source_checksum = calculate_file_checksum(binary_path)
             target_checksum = calculate_file_checksum(target_path)
-            
+
             if source_checksum == target_checksum:
-                print(f"✅ Checksums match. Skipping {app_name} executable at {target_path} (already up to date)")
+                print(
+                    f"✅ Checksums match. Skipping {app_name} executable at {target_path} (already up to date)"
+                )
                 return str(target_path)
-            else:
-                print(f"🔄 Checksums differ. Overwriting {app_name} executable at {target_path} (different version)")
+            print(
+                f"🔄 Checksums differ. Overwriting {app_name} executable at {target_path} (different version)"
+            )
         except Exception as e:
             print(f"⚠️  Could not compare checksums: {e}, proceeding with overwrite")
             print(f"🔄 Overwriting {app_name} executable at {target_path}")
     else:
         print(f"✅ Installing {app_name} executable to {target_path}")
-    
+
     shutil.copy2(binary_path, target_path)
-    os.chmod(target_path, 0o755)
-    
+    target_path.chmod(0o755)
+
     return str(target_path)
 
 
 def install_binary_macos(app_name, binary_path):
     """Install binary to /usr/local/bin on macOS."""
     target_dir = Path("/usr/local/bin")
-    
+
     # Check if /usr/local/bin exists and is writable
     if not target_dir.exists():
         print(f"❌ Error: {target_dir} does not exist")
         print("   Please create it first: sudo mkdir -p /usr/local/bin")
         return None
-    
+
     target_path = target_dir / app_name
-    
+
     # Check if source and destination are the same file
     if Path(binary_path).resolve() == target_path.resolve():
-        print(f"✅ Using existing {app_name} executable at {target_path} (source and target are the same file)")
+        print(
+            f"✅ Using existing {app_name} executable at {target_path} (source and target are the same file)"
+        )
         return str(target_path)
-    
+
     # Check if target already exists and compare checksums
     if target_path.exists():
         try:
             source_checksum = calculate_file_checksum(binary_path)
             target_checksum = calculate_file_checksum(target_path)
-            
+
             if source_checksum == target_checksum:
-                print(f"✅ Checksums match. Skipping {app_name} executable at {target_path} (already up to date)")
+                print(
+                    f"✅ Checksums match. Skipping {app_name} executable at {target_path} (already up to date)"
+                )
                 return str(target_path)
-            else:
-                print(f"🔄 Checksums differ. Overwriting {app_name} executable at {target_path} (different version)")
+            print(
+                f"🔄 Checksums differ. Overwriting {app_name} executable at {target_path} (different version)"
+            )
         except Exception as e:
             print(f"⚠️  Could not compare checksums: {e}, proceeding with overwrite")
             print(f"🔄 Overwriting {app_name} executable at {target_path}")
     else:
         print(f"✅ Installing {app_name} executable to {target_path}")
-    
+
     try:
         shutil.copy2(binary_path, target_path)
-        os.chmod(target_path, 0o755)
+        target_path.chmod(0o755)
         return str(target_path)
     except PermissionError:
         print(f"❌ Error: Permission denied when copying to {target_path}")
@@ -136,38 +162,39 @@ def install_nautilus_integration(app_name, binary_path):
     if not shutil.which("nautilus"):
         print("⏭️  Nautilus not found, skipping integration")
         return
-    
+
     print("🐚 Installing Nautilus integration...")
-    
+
     # Get Nautilus version
     try:
-        result = subprocess.run(["nautilus", "--version"], 
-                              capture_output=True, text=True, check=True)
+        result = subprocess.run(
+            ["nautilus", "--version"], capture_output=True, text=True, check=True
+        )
         version_str = result.stdout.strip()
         # Extract first number from version string
-        import re
-        version_match = re.search(r'(\d+)', version_str)
+
+        version_match = re.search(r"(\d+)", version_str)
         version = int(version_match.group(1)) if version_match else 44
         print(f"🔍 Nautilus version: {version}")
     except (subprocess.CalledProcessError, ValueError):
         version = 44  # Default to modern version
-    
+
     # Legacy Python extension for older Nautilus
     if version < 44:
         print("📦 Installing legacy nautilus-python extension...")
         ext_dir = Path.home() / ".local" / "share" / "nautilus-python" / "extensions"
         ext_dir.mkdir(parents=True, exist_ok=True)
-        
+
         nautilus_ext = Path("src/nautilus_extension.py")
         if nautilus_ext.exists():
             shutil.copy2(nautilus_ext, ext_dir)
-    
+
     # Desktop action for modern Nautilus
     else:
         print("🧩 Installing Nautilus .desktop action...")
         actions_dir = Path.home() / ".local" / "share" / "file-manager" / "actions"
         actions_dir.mkdir(parents=True, exist_ok=True)
-        
+
         desktop_content = f"""[Desktop Entry]
 Type=Action
 Name=Clean with {app_name}
@@ -181,18 +208,18 @@ MimeTypes=video/x-matroska;
 """
         desktop_file = actions_dir / f"{app_name}.desktop"
         desktop_file.write_text(desktop_content)
-    
+
     # Fallback script for all versions
     print("📄 Installing fallback Nautilus script...")
     scripts_dir = Path.home() / ".local" / "share" / "nautilus" / "scripts"
     scripts_dir.mkdir(parents=True, exist_ok=True)
-    
+
     script_content = f"""#!/bin/bash
 {binary_path} "$@"
 """
     script_file = scripts_dir / f"Clean with {app_name}"
     script_file.write_text(script_content)
-    os.chmod(script_file, 0o755)
+    script_file.chmod(0o755)
 
 
 def install_kde_integration(app_name, binary_path):
@@ -200,15 +227,15 @@ def install_kde_integration(app_name, binary_path):
     kde_dirs = [
         Path.home() / ".local" / "share" / "kservices5" / "ServiceMenus",
         Path.home() / ".kde" / "share" / "kde4" / "services" / "ServiceMenus",
-        Path.home() / ".kde4" / "share" / "kde4" / "services" / "ServiceMenus"
+        Path.home() / ".kde4" / "share" / "kde4" / "services" / "ServiceMenus",
     ]
-    
+
     if not any(shutil.which(cmd) for cmd in ["dolphin", "konqueror"]):
         print("⏭️  KDE not found, skipping Dolphin integration")
         return
-    
+
     print("🐬 Installing KDE/Dolphin service menus...")
-    
+
     service_content = f"""[Desktop Entry]
 Type=Service
 ServiceTypes=KonqPopupMenu/Plugin
@@ -220,7 +247,7 @@ Name=Clean with {app_name}
 Icon=video-x-generic
 Exec={binary_path} %F
 """
-    
+
     for kde_dir in kde_dirs:
         if kde_dir.parent.parent.exists():  # Check if .kde or .local exists
             kde_dir.mkdir(parents=True, exist_ok=True)
@@ -234,14 +261,14 @@ def install_xfce_integration(app_name, binary_path):
     if not shutil.which("thunar"):
         print("⏭️  Thunar not found, skipping XFCE integration")
         return
-    
+
     print("🐭 Installing XFCE/Thunar custom actions...")
-    
+
     thunar_dir = Path.home() / ".config" / "Thunar"
     thunar_dir.mkdir(parents=True, exist_ok=True)
-    
+
     uca_file = thunar_dir / "uca.xml"
-    
+
     # Read existing UCA file or create new one
     if uca_file.exists():
         content = uca_file.read_text()
@@ -274,7 +301,7 @@ def install_xfce_integration(app_name, binary_path):
     <video-files/>
   </action>
 </actions>"""
-    
+
     uca_file.write_text(content)
 
 
@@ -283,29 +310,29 @@ def install_mate_integration(app_name, binary_path):
     if not shutil.which("caja"):
         print("⏭️  Caja not found, skipping MATE integration")
         return
-    
+
     print("🦘 Installing MATE/Caja scripts...")
-    
+
     scripts_dir = Path.home() / ".config" / "caja" / "scripts"
     scripts_dir.mkdir(parents=True, exist_ok=True)
-    
+
     script_content = f"""#!/bin/bash
 {binary_path} "$@"
 """
     script_file = scripts_dir / f"Clean with {app_name}"
     script_file.write_text(script_content)
-    os.chmod(script_file, 0o755)
+    script_file.chmod(0o755)
 
 
 def get_macos_version():
     """Get macOS version for version-specific instructions."""
     try:
-        result = subprocess.run(["sw_vers", "-productVersion"], 
-                              capture_output=True, text=True, check=True)
+        result = subprocess.run(
+            ["sw_vers", "-productVersion"], capture_output=True, text=True, check=True
+        )
         version_str = result.stdout.strip()
         # Parse version like "15.5" or "14.2.1"
-        major = int(version_str.split('.')[0])
-        return major
+        return int(version_str.split(".")[0])
     except (subprocess.CalledProcessError, ValueError, IndexError):
         return 15  # Default to recent version
 
@@ -313,88 +340,88 @@ def get_macos_version():
 def get_finder_extensions_instructions():
     """Get appropriate instructions for enabling Finder extensions based on macOS version."""
     macos_version = get_macos_version()
-    
+
     if macos_version >= 13:  # macOS 13 Ventura and later
         return (
             "📝 To enable the Quick Action:\n"
             "   • System Settings > General > Login Items & Extensions > Extensions > Finder (click ⓘ)\n"
             "   • Or right-click any file/folder > Quick Actions > Customize..."
         )
-    else:  # macOS 12 Monterey and earlier
-        return "📝 Enable the Quick Action in System Settings > Privacy & Security > Extensions > Finder Extensions"
+    # macOS 12 Monterey and earlier
+    return "📝 Enable the Quick Action in System Settings > Privacy & Security > Extensions > Finder Extensions"
 
 
 def get_metadata():
     """Get application metadata from version.py."""
-    sys.path.insert(0, 'src')
     try:
-        from version import (
-            __app_name__, __version__, __app_description__, 
-            __organization__, __copyright__, __repo_base_url__
-        )
         return {
-            'app_name': __app_name__,
-            'version': __version__,
-            'description': __app_description__,
-            'organization': __organization__,
-            'copyright': __copyright__,
-            'repo_base_url': __repo_base_url__,
+            "app_name": __app_name__,
+            "version": __version__,
+            "description": __app_description__,
+            "organization": __organization__,
+            "copyright": __copyright__,
+            "repo_base_url": __repo_base_url__,
         }
-    except ImportError as e:
+    except NameError as e:
         print(f"Error: Could not import metadata from src/version.py: {e}")
         sys.exit(1)
 
 
 def process_template_file(template_path, metadata, binary_path):
     """Process a template file with metadata variables."""
-    from string import Template
-    
+
     template_file = Path(template_path)
     if not template_file.exists():
         raise FileNotFoundError(f"Template file not found: {template_path}")
-    
+
     # Parse version for major/minor/patch components
-    version_parts = metadata['version'].split('.')
-    major, minor, patch = int(version_parts[0]), int(version_parts[1]), int(version_parts[2])
-    
+    version_parts = metadata["version"].split(".")
+    major, minor, patch = (
+        int(version_parts[0]),
+        int(version_parts[1]),
+        int(version_parts[2]),
+    )
+
     template_vars = {
-        'APP_NAME': metadata['app_name'],
-        'VERSION': metadata['version'], 
-        'VERSION_MAJOR': str(major),
-        'VERSION_MINOR': str(minor),
-        'VERSION_PATCH': str(patch),
-        'REPO_BASE_URL': metadata['repo_base_url'],
-        'APP_DESCRIPTION': metadata['description'],
-        'ORGANIZATION': metadata['organization'],
-        'COPYRIGHT': metadata['copyright'],
-        'BINARY_PATH': binary_path,
+        "APP_NAME": metadata["app_name"],
+        "VERSION": metadata["version"],
+        "VERSION_MAJOR": str(major),
+        "VERSION_MINOR": str(minor),
+        "VERSION_PATCH": str(patch),
+        "REPO_BASE_URL": metadata["repo_base_url"],
+        "APP_DESCRIPTION": metadata["description"],
+        "ORGANIZATION": metadata["organization"],
+        "COPYRIGHT": metadata["copyright"],
+        "BINARY_PATH": binary_path,
     }
-    
-    with open(template_file, 'r', encoding='utf-8') as f:
+
+    with template_file.open(encoding="utf-8") as f:
         template = Template(f.read())
-    
+
     return template.safe_substitute(template_vars)
 
 
 def install_macos_quick_action(app_name, binary_path):
     """Install macOS Finder Quick Action."""
     print("🍎 Installing macOS Finder Quick Action...")
-    
+
     metadata = get_metadata()
-    
+
     workflow_dir = Path.home() / "Library" / "Services"
     workflow_name = f"Clean with {app_name}.workflow"
     workflow_path = workflow_dir / workflow_name
-    
+
     print(f"Creating Automator Quick Action at: {workflow_path}")
-    
+
     # Create workflow directory structure
     contents_dir = workflow_path / "Contents"
     contents_dir.mkdir(parents=True, exist_ok=True)
-    
+
     # Process info.plist template
     try:
-        info_plist_content = process_template_file('templates/macos/info.plist.template', metadata, binary_path)
+        info_plist_content = process_template_file(
+            "templates/macos/info.plist.template", metadata, binary_path
+        )
         info_plist_file = contents_dir / "info.plist"
         info_plist_file.write_text(info_plist_content)
     except FileNotFoundError:
@@ -429,10 +456,12 @@ def install_macos_quick_action(app_name, binary_path):
 </plist>"""
         info_plist_file = contents_dir / "info.plist"
         info_plist_file.write_text(info_plist_content)
-    
+
     # Process document.wflow template
     try:
-        document_wflow_content = process_template_file('templates/macos/document.wflow.template', metadata, binary_path)
+        document_wflow_content = process_template_file(
+            "templates/macos/document.wflow.template", metadata, binary_path
+        )
         document_wflow_file = contents_dir / "document.wflow"
         document_wflow_file.write_text(document_wflow_content)
     except FileNotFoundError:
@@ -470,19 +499,16 @@ def install_macos_quick_action(app_name, binary_path):
 </plist>"""
         document_wflow_file = contents_dir / "document.wflow"
         document_wflow_file.write_text(document_wflow_content)
-    
-    print(f"✅ Quick Action installed successfully!")
+
+    print("✅ Quick Action installed successfully!")
     print(get_finder_extensions_instructions())
 
 
 def create_app_folder_and_config(app_name, dry_run=False):
     """Create application folder and config.toml if they don't exist."""
     print(f"📁 Setting up application folder and configuration for {app_name}")
-    
-    # Import config module to get paths and create config
-    sys.path.insert(0, 'src')
+
     try:
-        from mcconfig import initialize_config
         if not dry_run:
             config = initialize_config()
             print(f"✅ Application folder created at: {config.config_path}")
@@ -490,110 +516,121 @@ def create_app_folder_and_config(app_name, dry_run=False):
             print(f"✅ Log file location: {config.log_file_path}")
         else:
             print("🔍 DRY RUN: Would create application folder and config.toml")
-    except ImportError as e:
+    except NameError as e:
         print(f"❌ Error: Could not set up application configuration: {e}")
         if not dry_run:
             sys.exit(1)
 
 
-
-def check_and_warn_about_preserved_config(app_name):
+def check_and_warn_about_preserved_config():
     """Check if user has local config and warn them it was preserved during uninstall."""
-    # Import config module to get paths
-    sys.path.insert(0, 'src')
     try:
-        from mcconfig import Config
         config = Config("config.toml")
-        
+
         config_file = Path(config.config_file_path)
         app_folder = Path(config.config_path)
-        
+
         if config_file.exists() or app_folder.exists():
             print()
-            print("💡 Note: Your personal configuration and settings were preserved during uninstall.")
+            print(
+                "💡 Note: Your personal configuration and settings were preserved during uninstall."
+            )
             if app_folder.exists():
                 print(f"   Configuration folder: {app_folder}")
             if config_file.exists():
                 print(f"   Configuration file: {config_file}")
             print("   The new installation will use your existing settings.")
-    except ImportError:
+    except NameError:
         # If we can't import config, we can't check - just skip the warning
         pass
 
 
-def run_uninstall_if_needed(app_name, system, dry_run=False, force=False):
+def run_uninstall_if_needed(dry_run=False, force=False):
     """Run uninstall if existing installation is detected."""
-    import sys
-    import subprocess
-    import os
-    
+
     # Get the path to the uninstall script
     uninstall_script = Path(__file__).parent / "uninstall"
-    
+
     if not uninstall_script.exists():
         print("⚠️  Uninstall script not found.")
-        print("💡 Please run './uninstall' to manually remove the existing installation,")
+        print(
+            "💡 Please run './uninstall' to manually remove the existing installation,"
+        )
         print("   then run the installer again.")
         sys.exit(1)
-    
+
     # Check for existing installation using the uninstall script's dry-run mode
     try:
-        result = subprocess.run([
-            sys.executable, str(uninstall_script), "--dry-run", "--integrations"
-        ], capture_output=True, text=True)
-        
+        result = subprocess.run(
+            [sys.executable, str(uninstall_script), "--dry-run", "--integrations"],
+            check=False, capture_output=True,
+            text=True,
+        )
+
         # Extract the list of items that would be removed
-        lines = result.stdout.split('\n')
+        lines = result.stdout.split("\n")
         integration_lines = []
         capture_integrations = False
-        
+
         for line in lines:
             if "Would remove the following integrations:" in line:
                 capture_integrations = True
                 continue
-            elif capture_integrations and line.strip().startswith("- "):
+            if capture_integrations and line.strip().startswith("- "):
                 integration_lines.append(line.strip())
-        
+
         # If no integrations found, there's no existing installation
         if not integration_lines:
             return False  # No existing installation found
-            
+
         # Show what was detected
-        print(f"🔍 Existing installation detected:")
+        print("🔍 Existing installation detected:")
         for item in integration_lines:
             print(f"   • {item[2:]}")  # Remove "- " prefix and add bullet
         print()
-        
+
     except Exception as e:
         print(f"⚠️  Could not check for existing installation: {e}")
         return False
-    
+
     if dry_run:
-        print("🔍 DRY RUN: Would prompt to uninstall existing version before proceeding")
+        print(
+            "🔍 DRY RUN: Would prompt to uninstall existing version before proceeding"
+        )
         return True
-    
+
     # Skip prompt if force is enabled
     if not force:
         # Prompt user for confirmation
-        print("⚠️  An existing installation was found. It should be uninstalled before installing the new version")
+        print(
+            "⚠️  An existing installation was found. It should be uninstalled before installing the new version"
+        )
         print("   to avoid conflicts and ensure a clean installation.")
         print()
-        
+
         while True:
             try:
-                response = input("Do you want to uninstall the existing version now? [Y/n]: ").strip().lower()
-                
+                response = (
+                    input("Do you want to uninstall the existing version now? [Y/n]: ")
+                    .strip()
+                    .lower()
+                )
+
                 # Default to Yes if user just presses Enter
                 if response == "" or response in ["y", "yes"]:
                     break  # Proceed with uninstall
-                elif response in ["n", "no"]:
+                if response in ["n", "no"]:
                     print()
                     print("❌ Installation cancelled.")
-                    print(f"💡 Please run './uninstall' to manually remove the existing installation,")
+                    print(
+                        "💡 Please run './uninstall' to manually remove the existing installation,"
+                    )
                     print("   then run the installer again.")
                     sys.exit(0)
                 else:
-                    print("Please enter 'y' for yes, 'n' for no, or press Enter for the default (yes)")
+                    print(
+                        "Please enter 'y' for yes, 'n' for no, or press Enter for the default (yes)"
+                    )
                     continue
             except KeyboardInterrupt:
                 print("\n")
@@ -601,29 +638,30 @@ def run_uninstall_if_needed(app_name, system, dry_run=False, force=False):
                 sys.exit(0)
     else:
         print("🔄 Force-uninstalling existing version...")
-    
+
     print("📦 Uninstalling previous version...")
-    
+
     # Run the uninstall script with --integrations flag to preserve user config
     try:
-        result = subprocess.run([
-            sys.executable, str(uninstall_script), "--integrations"
-        ], capture_output=True, text=True)
-        
+        result = subprocess.run(
+            [sys.executable, str(uninstall_script), "--integrations"],
+            check=False, capture_output=True,
+            text=True,
+        )
+
         if result.returncode == 0:
             print("✅ Previous version uninstalled successfully")
-            
+
             # Check if user has local config and warn them it was preserved
-            check_and_warn_about_preserved_config(app_name)
-            
+            check_and_warn_about_preserved_config()
+
             return True
-        else:
-            print(f"⚠️  Uninstall completed with warnings: {result.stderr}")
-            
-            # Check if user has local config and warn them it was preserved
-            check_and_warn_about_preserved_config(app_name)
-            
-            return True
+        print(f"⚠️  Uninstall completed with warnings: {result.stderr}")
+
+        # Check if user has local config and warn them it was preserved
+        check_and_warn_about_preserved_config()
+
+        return True
     except Exception as e:
         print(f"❌ Error running uninstall script: {e}")
         print("💡 You may want to run './uninstall' manually and try installing again.")
@@ -632,42 +670,56 @@ def run_uninstall_if_needed(app_name, system, dry_run=False, force=False):
 
 def main():
     """Main installation function."""
-    parser = argparse.ArgumentParser(description="Install application and file manager integrations")
-    parser.add_argument("--dry-run", action="store_true", 
-                       help="Show what would be done without making changes")
-    parser.add_argument("--integrations", action="store_true",
-                       help="Only install file manager integrations (skip app folder setup)")
-    parser.add_argument("--skip-uninstall", action="store_true",
-                       help="Skip automatic uninstall of existing version")
-    parser.add_argument("-f", "--force", action="store_true",
-                       help="Force uninstall existing version without prompting")
+    parser = argparse.ArgumentParser(
+        description="Install application and file manager integrations"
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Show what would be done without making changes",
+    )
+    parser.add_argument(
+        "--integrations",
+        action="store_true",
+        help="Only install file manager integrations (skip app folder setup)",
+    )
+    parser.add_argument(
+        "--skip-uninstall",
+        action="store_true",
+        help="Skip automatic uninstall of existing version",
+    )
+    parser.add_argument(
+        "-f",
+        "--force",
+        action="store_true",
+        help="Force uninstall existing version without prompting",
+    )
     args = parser.parse_args()
-    
+
     system = platform.system()
     if system not in ["Linux", "Darwin"]:
         print(f"❌ Unsupported operating system: {system}")
         sys.exit(1)
-    
+
     app_name = get_app_name()
-    
+
     if args.integrations:
         print(f"🚀 Installing file manager integrations for {app_name}")
     else:
         print(f"🚀 Installing {app_name} application and file manager integrations")
-    
+
     if args.dry_run:
         print("🔍 DRY RUN MODE - no changes will be made")
-    
+
     # Step 0: Check for existing installation and uninstall if needed
-    if not args.skip_uninstall:
-        if run_uninstall_if_needed(app_name, system, args.dry_run, args.force):
+    if not args.skip_uninstall and run_uninstall_if_needed(args.dry_run, args.force):
             print()  # Add spacing after uninstall
-    
+
     # Step 1: Setup application folder and config (unless --integrations flag is used)
     if not args.integrations:
         create_app_folder_and_config(app_name, args.dry_run)
         print()  # Add spacing
-    
+
     # Step 2: Install file manager integrations
     # Find binary
     binary_path = find_binary(app_name)
@@ -675,23 +727,23 @@ def main():
         print(f"❌ Error: {app_name} executable not found in PATH or dist/ directory")
         print("   Build the application first or ensure it's in your PATH")
         sys.exit(1)
-    
+
     print(f"📍 Using {app_name} at: {binary_path}")
-    
+
     if args.dry_run:
         print("✅ Dry run completed - binary found and ready for installation")
         return
-    
+
     if system == "Linux":
         # Install binary to ~/.local/bin
         installed_binary = install_binary_linux(app_name, binary_path)
-        
+
         # Install file manager integrations
         install_nautilus_integration(app_name, installed_binary)
         install_kde_integration(app_name, installed_binary)
         install_xfce_integration(app_name, installed_binary)
         install_mate_integration(app_name, installed_binary)
-        
+
         print()
         if args.integrations:
             print("🎉 Linux file manager integrations installed!")
@@ -700,15 +752,15 @@ def main():
             print("📁 Application folder and configuration set up")
         print(f"📂 Binary installed to: {installed_binary}")
         print("🔄 You may need to restart your file manager to see the new options")
-        
+
     elif system == "Darwin":
         # Install binary to /usr/local/bin
         installed_binary = install_binary_macos(app_name, binary_path)
-        
+
         # Install Quick Action (use original binary_path if install failed)
         action_binary_path = installed_binary if installed_binary else binary_path
         install_macos_quick_action(app_name, action_binary_path)
-        
+
         print()
         if args.integrations:
             print("🎉 macOS file manager integrations installed!")

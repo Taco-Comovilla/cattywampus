@@ -102,22 +102,22 @@ class TestConfig:
                 "mkvmergePath": "",
                 "useSystemLocale": True,
             }
-            
+
             config_file_path = os.path.join(temp_dir, "test_config.toml")
-            
+
             # Test the fallback behavior by temporarily moving the example file
             import shutil
             from pathlib import Path
-            
+
             # Find the real example file and temporarily rename it
             example_path = Path(__file__).parent.parent / "src" / "config.example.toml"
             backup_path = example_path.with_suffix(".toml.backup")
-            
+
             try:
                 # Temporarily rename the example file so it's not found
                 if example_path.exists():
                     shutil.move(str(example_path), str(backup_path))
-                
+
                 # Call the method - should fallback to old behavior
                 config._generate_default_config_file(config_file_path)
 

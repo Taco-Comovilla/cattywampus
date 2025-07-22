@@ -6,6 +6,7 @@ import shutil
 import subprocess
 import sys
 import time
+from pathlib import Path
 
 from mclogger import logger
 from mcoptions import parse_options
@@ -18,27 +19,33 @@ def find_tool_in_common_locations(tool_name):
     but aren't in the PATH available to Quick Actions or other restricted contexts.
     """
     # If it's already a full path and exists, return it
-    if os.path.isabs(tool_name) and os.path.isfile(tool_name) and os.access(tool_name, os.X_OK):
+    tool_path_obj = Path(tool_name)
+    if (
+        tool_path_obj.is_absolute()
+        and tool_path_obj.is_file()
+        and os.access(tool_name, os.X_OK)
+    ):
         return tool_name
-    
+
     # First try the standard PATH lookup
     tool_path = shutil.which(tool_name)
     if tool_path:
         return tool_path
-    
+
     # Common installation locations on macOS and Linux
     common_paths = [
         "/opt/homebrew/bin",  # Apple Silicon Homebrew
-        "/usr/local/bin",     # Intel Homebrew and other installations
-        "/usr/bin",           # System installations
-        "/opt/local/bin",     # MacPorts
+        "/usr/local/bin",  # Intel Homebrew and other installations
+        "/usr/bin",  # System installations
+        "/opt/local/bin",  # MacPorts
     ]
-    
+
     for path in common_paths:
-        full_path = os.path.join(path, tool_name)
-        if os.path.isfile(full_path) and os.access(full_path, os.X_OK):
+        full_path_obj = Path(path) / tool_name
+        full_path = str(full_path_obj)
+        if full_path_obj.is_file() and os.access(full_path, os.X_OK):
             return full_path
-    
+
     return None
 
 

@@ -467,6 +467,10 @@ def check_existing_installation(app_name, system):
 
 def run_uninstall_if_needed(app_name, system, dry_run=False, force=False):
     """Run uninstall if existing installation is detected."""
+    import sys
+    import subprocess
+    import os
+    
     existing_items = check_existing_installation(app_name, system)
     
     if not existing_items:
@@ -512,11 +516,6 @@ def run_uninstall_if_needed(app_name, system, dry_run=False, force=False):
         print("🔄 Force-uninstalling existing version...")
     
     print("📦 Uninstalling previous version...")
-    
-    # Import and run uninstall functionality
-    import sys
-    import subprocess
-    import os
     
     # Get the path to the uninstall script
     uninstall_script = Path(__file__).parent / "uninstall"

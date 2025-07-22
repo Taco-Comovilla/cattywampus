@@ -3,6 +3,7 @@ Tests for audio track name clearing functionality
 """
 
 import tempfile
+from pathlib import Path
 from unittest.mock import patch
 
 from src.main import has_audio_tracks, process_mkv_file
@@ -51,10 +52,9 @@ class TestAudioTrackClearing:
 
         finally:
             # Clean up
-            import os
-
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            tmp_path = Path(tmp_file_path)
+            if tmp_path.exists():
+                tmp_path.unlink()
 
     def test_clear_audio_track_names_disabled(self):
         """Test that audio track names are preserved when option is disabled"""
@@ -96,10 +96,9 @@ class TestAudioTrackClearing:
 
         finally:
             # Clean up
-            import os
-
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            tmp_path = Path(tmp_file_path)
+            if tmp_path.exists():
+                tmp_path.unlink()
 
     def test_no_audio_tracks_found(self):
         """Test behavior when no audio tracks are present"""
@@ -141,10 +140,9 @@ class TestAudioTrackClearing:
 
         finally:
             # Clean up
-            import os
-
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            tmp_path = Path(tmp_file_path)
+            if tmp_path.exists():
+                tmp_path.unlink()
 
     def test_has_audio_tracks_function(self):
         """Test the has_audio_tracks helper function"""

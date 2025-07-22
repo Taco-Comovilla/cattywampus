@@ -15,6 +15,7 @@ from string import Template
 # Add src to path for local imports
 sys.path.insert(0, "src")
 try:
+    from mcconfig import Config, initialize_config
     from version import (
         __app_description__,
         __app_name__,
@@ -23,7 +24,6 @@ try:
         __repo_base_url__,
         __version__,
     )
-    from mcconfig import Config, initialize_config
 except ImportError:
     # Will be handled in functions that use these imports
     pass

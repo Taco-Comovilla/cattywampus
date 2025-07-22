@@ -71,10 +71,10 @@ def install_binary_linux(app_name, binary_path):
             target_checksum = calculate_file_checksum(target_path)
             
             if source_checksum == target_checksum:
-                print(f"✅ {app_name} executable at {target_path} is already up to date")
+                print(f"✅ Checksums match. Skipping {app_name} executable at {target_path} (already up to date)")
                 return str(target_path)
             else:
-                print(f"🔄 Overwriting {app_name} executable at {target_path} (different version)")
+                print(f"🔄 Checksums differ. Overwriting {app_name} executable at {target_path} (different version)")
         except Exception as e:
             print(f"⚠️  Could not compare checksums: {e}, proceeding with overwrite")
             print(f"🔄 Overwriting {app_name} executable at {target_path}")
@@ -111,10 +111,10 @@ def install_binary_macos(app_name, binary_path):
             target_checksum = calculate_file_checksum(target_path)
             
             if source_checksum == target_checksum:
-                print(f"✅ {app_name} executable at {target_path} is already up to date")
+                print(f"✅ Checksums match. Skipping {app_name} executable at {target_path} (already up to date)")
                 return str(target_path)
             else:
-                print(f"🔄 Overwriting {app_name} executable at {target_path} (different version)")
+                print(f"🔄 Checksums differ. Overwriting {app_name} executable at {target_path} (different version)")
         except Exception as e:
             print(f"⚠️  Could not compare checksums: {e}, proceeding with overwrite")
             print(f"🔄 Overwriting {app_name} executable at {target_path}")

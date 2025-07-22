@@ -134,7 +134,9 @@ class TestInstallScript:
         # Verify checksum comparison logic exists in both platforms
         assert "source_checksum = calculate_file_checksum" in content
         assert "target_checksum = calculate_file_checksum" in content
-        assert "is already up to date" in content
+        assert "Checksums match. Skipping" in content
+        assert "Checksums differ. Overwriting" in content
+        assert "already up to date" in content
         assert "different version" in content
         
         # Should have the function in both Linux and macOS binary install functions

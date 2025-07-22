@@ -64,6 +64,39 @@ def install_binary_linux(app_name, binary_path):
     return str(target_path)
 
 
+def install_binary_macos(app_name, binary_path):
+    """Install binary to /usr/local/bin on macOS."""
+    target_dir = Path("/usr/local/bin")
+    
+    # Check if /usr/local/bin exists and is writable
+    if not target_dir.exists():
+        print(f"❌ Error: {target_dir} does not exist")
+        print("   Please create it first: sudo mkdir -p /usr/local/bin")
+        return None
+    
+    target_path = target_dir / app_name
+    
+    # Check if source and destination are the same file
+    if Path(binary_path).resolve() == target_path.resolve():
+        print(f"✅ {app_name} executable already installed at {target_path}")
+        return str(target_path)
+    
+    # Check if target already exists and show appropriate message
+    if target_path.exists():
+        print(f"🔄 Overwriting {app_name} executable at {target_path}")
+    else:
+        print(f"✅ Installing {app_name} executable to {target_path}")
+    
+    try:
+        shutil.copy2(binary_path, target_path)
+        os.chmod(target_path, 0o755)
+        return str(target_path)
+    except PermissionError:
+        print(f"❌ Error: Permission denied when copying to {target_path}")
+        print("   You may need to run: sudo cp <binary> /usr/local/bin/")
+        return None
+
+
 def install_nautilus_integration(app_name, binary_path):
     """Install Nautilus file manager integration."""
     if not shutil.which("nautilus"):
@@ -462,6 +495,11 @@ def check_existing_installation(app_name, system):
                 existing_items.append(f"KDE Integration: {kde_file}")
     
     elif system == "Darwin":
+        # Check for binary in /usr/local/bin
+        binary_path = Path("/usr/local/bin") / app_name
+        if binary_path.exists():
+            existing_items.append(f"Binary: {binary_path}")
+        
         # Check for macOS Quick Action
         workflow_path = Path.home() / "Library" / "Services" / f"Clean with {app_name}.workflow"
         if workflow_path.exists():
@@ -653,7 +691,12 @@ def main():
         print("🔄 You may need to restart your file manager to see the new options")
         
     elif system == "Darwin":
-        install_macos_quick_action(app_name, binary_path)
+        # Install binary to /usr/local/bin
+        installed_binary = install_binary_macos(app_name, binary_path)
+        
+        # Install Quick Action (use original binary_path if install failed)
+        action_binary_path = installed_binary if installed_binary else binary_path
+        install_macos_quick_action(app_name, action_binary_path)
         
         print()
         if args.integrations:
@@ -661,6 +704,8 @@ def main():
         else:
             print("🎉 macOS installation completed!")
             print("📁 Application folder and configuration set up")
+        if installed_binary:
+            print(f"📂 Binary installed to: {installed_binary}")
         print(get_finder_extensions_instructions())
 
 

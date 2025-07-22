@@ -52,7 +52,12 @@ def install_binary_linux(app_name, binary_path):
         print(f"✅ {app_name} executable already installed at {target_path}")
         return str(target_path)
     
-    print(f"✅ Installing {app_name} executable to {target_path}")
+    # Check if target already exists and show appropriate message
+    if target_path.exists():
+        print(f"🔄 Overwriting {app_name} executable at {target_path}")
+    else:
+        print(f"✅ Installing {app_name} executable to {target_path}")
+    
     shutil.copy2(binary_path, target_path)
     os.chmod(target_path, 0o755)
     

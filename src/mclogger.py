@@ -47,10 +47,11 @@ class Logger:
             try:
                 # Ensure directory exists before creating file handler
                 import os
+
                 log_dir = os.path.dirname(log_file_path)
                 if log_dir and not os.path.exists(log_dir):
                     os.makedirs(log_dir, exist_ok=True)
-                
+
                 file_handler = logging.FileHandler(log_file_path)
                 file_handler.setLevel(log_level)
                 file_formatter = logging.Formatter(
@@ -58,10 +59,10 @@ class Logger:
                 )
                 file_handler.setFormatter(file_formatter)
                 self.logger.addHandler(file_handler)
-                
+
                 # Test write to ensure the handler is working
                 self.logger.info("Logger initialized successfully")
-                
+
             except (OSError, PermissionError) as e:
                 # If file logging fails, fall back to stderr and continue
                 # This ensures the application doesn't fail silently in file manager contexts
@@ -70,7 +71,9 @@ class Logger:
                 stderr_formatter = logging.Formatter("%(levelname)s: %(message)s")
                 stderr_handler.setFormatter(stderr_formatter)
                 self.logger.addHandler(stderr_handler)
-                self.logger.error(f"Failed to initialize file logging to {log_file_path}: {e}")
+                self.logger.error(
+                    f"Failed to initialize file logging to {log_file_path}: {e}"
+                )
                 self.logger.error("Falling back to stderr logging")
 
         # Add stdout handler if requested or if stdout_only is enabled

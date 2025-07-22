@@ -114,11 +114,11 @@ class Config:
         # Copy example config file instead of generating from scratch
         import shutil
         from pathlib import Path
-        
+
         # Find the example config file relative to this module
         current_dir = Path(__file__).parent
         example_config_path = current_dir / "config.example.toml"
-        
+
         if example_config_path.exists():
             # Copy the example config file
             shutil.copy2(example_config_path, config_file_path)

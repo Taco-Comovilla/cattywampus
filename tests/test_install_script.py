@@ -25,6 +25,7 @@ class TestInstallScript:
         assert "--dry-run" in result.stdout
         assert "--integrations" in result.stdout
         assert "--skip-uninstall" in result.stdout
+        assert "--force" in result.stdout or "-f" in result.stdout
 
     def test_install_script_dry_run(self):
         """Test install script dry run mode"""
@@ -63,3 +64,15 @@ class TestInstallScript:
         # Should detect existing installation if one exists, or proceed if none
         assert ("Existing installation detected" in result.stdout or 
                 "Dry run completed" in result.stdout)
+
+    def test_install_script_force_flag(self):
+        """Test install script with --force flag"""
+        install_script = Path(__file__).parent.parent / "install"
+        
+        result = subprocess.run([
+            sys.executable, str(install_script), "--dry-run", "--integrations", "--force"
+        ], capture_output=True, text=True)
+        
+        assert result.returncode == 0
+        assert "DRY RUN MODE" in result.stdout
+        # Force flag should work in dry run mode

@@ -465,7 +465,7 @@ def check_existing_installation(app_name, system):
     return existing_items
 
 
-def run_uninstall_if_needed(app_name, system, dry_run=False):
+def run_uninstall_if_needed(app_name, system, dry_run=False, force=False):
     """Run uninstall if existing installation is detected."""
     existing_items = check_existing_installation(app_name, system)
     
@@ -478,8 +478,38 @@ def run_uninstall_if_needed(app_name, system, dry_run=False):
     print()
     
     if dry_run:
-        print("🔍 DRY RUN: Would uninstall existing version before proceeding")
+        print("🔍 DRY RUN: Would prompt to uninstall existing version before proceeding")
         return True
+    
+    # Skip prompt if force is enabled
+    if not force:
+        # Prompt user for confirmation
+        print("⚠️  An existing installation was found. It should be uninstalled before installing the new version")
+        print("   to avoid conflicts and ensure a clean installation.")
+        print()
+        
+        while True:
+            try:
+                response = input("Do you want to uninstall the existing version now? [Y/n]: ").strip().lower()
+                
+                # Default to Yes if user just presses Enter
+                if response == "" or response in ["y", "yes"]:
+                    break  # Proceed with uninstall
+                elif response in ["n", "no"]:
+                    print()
+                    print("❌ Installation cancelled.")
+                    print(f"💡 Please run './uninstall' to manually remove the existing installation,")
+                    print("   then run the installer again.")
+                    sys.exit(0)
+                else:
+                    print("Please enter 'y' for yes, 'n' for no, or press Enter for the default (yes)")
+                    continue
+            except KeyboardInterrupt:
+                print("\n")
+                print("❌ Installation cancelled by user.")
+                sys.exit(0)
+    else:
+        print("🔄 Force-uninstalling existing version...")
     
     print("📦 Uninstalling previous version...")
     
@@ -506,11 +536,13 @@ def run_uninstall_if_needed(app_name, system, dry_run=False):
                 return True
         except Exception as e:
             print(f"❌ Error running uninstall script: {e}")
-            # Continue anyway - we'll overwrite what we can
-            return True
+            print("💡 You may want to run './uninstall' manually and try installing again.")
+            sys.exit(1)
     else:
-        print("⚠️  Uninstall script not found, proceeding with installation (will overwrite existing files)")
-        return True
+        print("⚠️  Uninstall script not found.")
+        print("💡 Please run './uninstall' to manually remove the existing installation,")
+        print("   then run the installer again.")
+        sys.exit(1)
 
 
 def main():
@@ -522,6 +554,8 @@ def main():
                        help="Only install file manager integrations (skip app folder setup)")
     parser.add_argument("--skip-uninstall", action="store_true",
                        help="Skip automatic uninstall of existing version")
+    parser.add_argument("-f", "--force", action="store_true",
+                       help="Force uninstall existing version without prompting")
     args = parser.parse_args()
     
     system = platform.system()
@@ -541,7 +575,7 @@ def main():
     
     # Step 0: Check for existing installation and uninstall if needed
     if not args.skip_uninstall:
-        if run_uninstall_if_needed(app_name, system, args.dry_run):
+        if run_uninstall_if_needed(app_name, system, args.dry_run, args.force):
             print()  # Add spacing after uninstall
     
     # Step 1: Setup application folder and config (unless --integrations flag is used)

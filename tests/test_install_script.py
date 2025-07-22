@@ -119,3 +119,23 @@ class TestInstallScript:
         # Check that config warning function is called after warning message  
         warning_section = content[warning_index:warning_index + 500]
         assert "check_and_warn_about_preserved_config" in warning_section
+
+    def test_install_script_contains_checksum_functionality(self):
+        """Test that install script contains checksum comparison functionality"""
+        install_script = Path(__file__).parent.parent / "install"
+        
+        # Read the install script content
+        content = install_script.read_text()
+        
+        # Verify checksum function exists
+        assert "def calculate_file_checksum" in content
+        assert "hashlib.sha256()" in content
+        
+        # Verify checksum comparison logic exists in both platforms
+        assert "source_checksum = calculate_file_checksum" in content
+        assert "target_checksum = calculate_file_checksum" in content
+        assert "is already up to date" in content
+        assert "different version" in content
+        
+        # Should have the function in both Linux and macOS binary install functions
+        assert content.count("source_checksum = calculate_file_checksum") >= 2

@@ -10,6 +10,18 @@ import sys
 from pathlib import Path
 
 
+def calculate_file_checksum(file_path):
+    """Calculate SHA256 checksum of a file."""
+    import hashlib
+    
+    sha256_hash = hashlib.sha256()
+    with open(file_path, "rb") as f:
+        # Read file in chunks to handle large files efficiently
+        for byte_block in iter(lambda: f.read(4096), b""):
+            sha256_hash.update(byte_block)
+    return sha256_hash.hexdigest()
+
+
 def get_app_name():
     """Get application name from version.py."""
     sys.path.insert(0, 'src')
@@ -52,9 +64,20 @@ def install_binary_linux(app_name, binary_path):
         print(f"✅ {app_name} executable already installed at {target_path}")
         return str(target_path)
     
-    # Check if target already exists and show appropriate message
+    # Check if target already exists and compare checksums
     if target_path.exists():
-        print(f"🔄 Overwriting {app_name} executable at {target_path}")
+        try:
+            source_checksum = calculate_file_checksum(binary_path)
+            target_checksum = calculate_file_checksum(target_path)
+            
+            if source_checksum == target_checksum:
+                print(f"✅ {app_name} executable at {target_path} is already up to date")
+                return str(target_path)
+            else:
+                print(f"🔄 Overwriting {app_name} executable at {target_path} (different version)")
+        except Exception as e:
+            print(f"⚠️  Could not compare checksums: {e}, proceeding with overwrite")
+            print(f"🔄 Overwriting {app_name} executable at {target_path}")
     else:
         print(f"✅ Installing {app_name} executable to {target_path}")
     
@@ -81,9 +104,20 @@ def install_binary_macos(app_name, binary_path):
         print(f"✅ {app_name} executable already installed at {target_path}")
         return str(target_path)
     
-    # Check if target already exists and show appropriate message
+    # Check if target already exists and compare checksums
     if target_path.exists():
-        print(f"🔄 Overwriting {app_name} executable at {target_path}")
+        try:
+            source_checksum = calculate_file_checksum(binary_path)
+            target_checksum = calculate_file_checksum(target_path)
+            
+            if source_checksum == target_checksum:
+                print(f"✅ {app_name} executable at {target_path} is already up to date")
+                return str(target_path)
+            else:
+                print(f"🔄 Overwriting {app_name} executable at {target_path} (different version)")
+        except Exception as e:
+            print(f"⚠️  Could not compare checksums: {e}, proceeding with overwrite")
+            print(f"🔄 Overwriting {app_name} executable at {target_path}")
     else:
         print(f"✅ Installing {app_name} executable to {target_path}")
     

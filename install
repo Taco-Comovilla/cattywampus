@@ -465,6 +465,30 @@ def check_existing_installation(app_name, system):
     return existing_items
 
 
+def check_and_warn_about_preserved_config(app_name):
+    """Check if user has local config and warn them it was preserved during uninstall."""
+    # Import config module to get paths
+    sys.path.insert(0, 'src')
+    try:
+        from mcconfig import Config
+        config = Config("config.toml")
+        
+        config_file = Path(config.config_file_path)
+        app_folder = Path(config.config_path)
+        
+        if config_file.exists() or app_folder.exists():
+            print()
+            print("💡 Note: Your personal configuration and settings were preserved during uninstall.")
+            if app_folder.exists():
+                print(f"   Configuration folder: {app_folder}")
+            if config_file.exists():
+                print(f"   Configuration file: {config_file}")
+            print("   The new installation will use your existing settings.")
+    except ImportError:
+        # If we can't import config, we can't check - just skip the warning
+        pass
+
+
 def run_uninstall_if_needed(app_name, system, dry_run=False, force=False):
     """Run uninstall if existing installation is detected."""
     import sys
@@ -529,9 +553,17 @@ def run_uninstall_if_needed(app_name, system, dry_run=False, force=False):
             
             if result.returncode == 0:
                 print("✅ Previous version uninstalled successfully")
+                
+                # Check if user has local config and warn them it was preserved
+                check_and_warn_about_preserved_config(app_name)
+                
                 return True
             else:
                 print(f"⚠️  Uninstall completed with warnings: {result.stderr}")
+                
+                # Check if user has local config and warn them it was preserved
+                check_and_warn_about_preserved_config(app_name)
+                
                 return True
         except Exception as e:
             print(f"❌ Error running uninstall script: {e}")

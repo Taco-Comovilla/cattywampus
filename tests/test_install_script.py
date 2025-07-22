@@ -76,3 +76,46 @@ class TestInstallScript:
         assert result.returncode == 0
         assert "DRY RUN MODE" in result.stdout
         # Force flag should work in dry run mode
+
+    def test_install_script_contains_config_warning_function(self):
+        """Test that the install script contains the config preservation warning function"""
+        install_script = Path(__file__).parent.parent / "install"
+        
+        # Read the install script content
+        content = install_script.read_text()
+        
+        # Verify the function exists in the script
+        assert "def check_and_warn_about_preserved_config" in content
+        assert "Your personal configuration and settings were preserved" in content
+        assert "Configuration folder:" in content
+        assert "Configuration file:" in content
+        assert "The new installation will use your existing settings" in content
+
+    def test_install_script_calls_config_warning_after_uninstall(self):
+        """Test that install script calls config warning function after successful uninstall"""
+        install_script = Path(__file__).parent.parent / "install"
+        
+        # Read the install script content
+        content = install_script.read_text()
+        
+        # Verify the function is called after successful uninstall
+        assert "check_and_warn_about_preserved_config(app_name)" in content
+        
+        # Verify it's called in both success and warning code paths
+        success_pattern = "Previous version uninstalled successfully"
+        warning_pattern = "Uninstall completed with warnings"
+        
+        # Find both patterns and ensure the config warning call comes after each
+        success_index = content.find(success_pattern)
+        warning_index = content.find(warning_pattern)
+        
+        assert success_index != -1, "Success message not found"
+        assert warning_index != -1, "Warning message not found"
+        
+        # Check that config warning function is called after success message
+        success_section = content[success_index:success_index + 500]
+        assert "check_and_warn_about_preserved_config" in success_section
+        
+        # Check that config warning function is called after warning message  
+        warning_section = content[warning_index:warning_index + 500]
+        assert "check_and_warn_about_preserved_config" in warning_section

@@ -123,6 +123,15 @@ This script will install context menu integrations for multiple file managers:
 * **Dolphin** (KDE) - Service menus
 * **Thunar** (XFCE) - Custom actions  
 * **Caja** (MATE) - Scripts
++
+**Upgrade Behavior**: If you already have ${APP_NAME} installed, the script will detect the existing installation and prompt you to uninstall it first. This ensures a clean upgrade without conflicts. You can:
++
+* Press **Enter** or type **y** to proceed with automatic uninstall (recommended)
+* Type **n** to cancel and manually uninstall first using `./uninstall`
+* Use `./install --force` to skip the prompt in automated scenarios
+* Use `./install --skip-uninstall` to bypass uninstall detection entirely
++
+Your personal configuration will be preserved during upgrades.
 
 ++++
 </details>
@@ -161,6 +170,8 @@ cd ${APP_NAME}
 ----
 +
 This script will install a Finder Quick Action that adds "Clean with ${APP_NAME}" to the right-click context menu for video files and folders in Finder.
++
+**Upgrade Behavior**: If you already have ${APP_NAME} installed, the script will detect the existing installation and prompt you to uninstall it first. This ensures a clean upgrade without conflicts. Your personal configuration will be preserved during upgrades.
 +
 NOTE: You may need to enable the Quick Action in System Settings > Privacy & Security > Extensions > Finder Extensions after installation.
 
@@ -211,18 +222,24 @@ If you installed the application on Linux or macOS using `./install`, you can re
 ./uninstall
 ----
 
-This script will remove the application folder, configuration, logs, and file manager integrations. Use `--integrations` to only remove file manager integrations, or `--dry-run` to see what would be removed without making changes:
+This script will remove the application folder, configuration, logs, and file manager integrations. Use `--integrations` to only remove file manager integrations, `--preserve-config` to keep your personal settings, or `--dry-run` to see what would be removed without making changes:
 
 [source,shell]
 ----
-# Remove everything (app folder + integrations)
+# Remove everything (app folder + integrations) - prompts before removing config
 ./uninstall
 
 # Remove integrations only (keep app folder and config)
 ./uninstall --integrations
 
+# Remove integrations and binary, but preserve configuration and logs
+./uninstall --preserve-config
+
 # Preview what would be removed
 ./uninstall --dry-run
+
+# Preview preserving config
+./uninstall --dry-run --preserve-config
 ----
 
 The uninstall script removes:

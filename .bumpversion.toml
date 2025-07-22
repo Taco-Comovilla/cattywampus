@@ -1,6 +1,6 @@
 [tool.bumpversion]
 # DO NOT EDIT THE NEXT LINE! It will be updated automatically by bump-my-version
-current_version = "1.0.0"
+current_version = "0.0.0"
 parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
 serialize = ["{major}.{minor}.{patch}"]
 search = "{current_version}"

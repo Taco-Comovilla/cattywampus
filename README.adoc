@@ -127,6 +127,15 @@ This script will install context menu integrations for multiple file managers:
 * **Dolphin** (KDE) - Service menus
 * **Thunar** (XFCE) - Custom actions  
 * **Caja** (MATE) - Scripts
++
+**Upgrade Behavior**: If you already have cattywampus installed, the script will detect the existing installation and prompt you to uninstall it first. This ensures a clean upgrade without conflicts. You can:
++
+* Press **Enter** or type **y** to proceed with automatic uninstall (recommended)
+* Type **n** to cancel and manually uninstall first using `./uninstall`
+* Use `./install --force` to skip the prompt in automated scenarios
+* Use `./install --skip-uninstall` to bypass uninstall detection entirely
++
+Your personal configuration will be preserved during upgrades.
 
 ++++
 </details>
@@ -165,6 +174,8 @@ cd cattywampus
 ----
 +
 This script will install a Finder Quick Action that adds "Clean with cattywampus" to the right-click context menu for video files and folders in Finder.
++
+**Upgrade Behavior**: If you already have cattywampus installed, the script will detect the existing installation and prompt you to uninstall it first. This ensures a clean upgrade without conflicts. Your personal configuration will be preserved during upgrades.
 +
 NOTE: You may need to enable the Quick Action in System Settings > Privacy & Security > Extensions > Finder Extensions after installation.
 

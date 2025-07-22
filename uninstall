@@ -222,6 +222,8 @@ def main():
                        help="Show what would be removed without making changes")
     parser.add_argument("--integrations", action="store_true",
                        help="Only remove file manager integrations (skip app folder removal)")
+    parser.add_argument("--preserve-config", action="store_true",
+                       help="Preserve user configuration and logs (skip config folder removal)")
     args = parser.parse_args()
     
     system = platform.system()
@@ -239,9 +241,12 @@ def main():
     if args.dry_run:
         print("🔍 DRY RUN MODE - no changes will be made")
         
-        # Show app folder removal (unless --integrations flag is used)
-        if not args.integrations:
+        # Show app folder removal (unless --integrations or --preserve-config flag is used)
+        if not args.integrations and not args.preserve_config:
             prompt_remove_app_folder(app_name, dry_run=True)
+            print()
+        elif args.preserve_config:
+            print("💾 DRY RUN: Would preserve user configuration and logs (--preserve-config specified)")
             print()
         
         print("Would remove the following integrations:")
@@ -271,10 +276,13 @@ def main():
         
         return
     
-    # Step 1: Remove application folder and config (unless --integrations flag is used)
-    if not args.integrations:
+    # Step 1: Remove application folder and config (unless --integrations or --preserve-config flag is used)
+    if not args.integrations and not args.preserve_config:
         prompt_remove_app_folder(app_name, args.dry_run)
         print()  # Add spacing
+    elif args.preserve_config:
+        print("💾 Preserving user configuration and logs (--preserve-config specified)")
+        print()
     
     # Step 2: Remove file manager integrations
     if system == "Linux":

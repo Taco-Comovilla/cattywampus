@@ -226,18 +226,24 @@ If you installed the application on Linux or macOS using `./install`, you can re
 ./uninstall
 ----
 
-This script will remove the application folder, configuration, logs, and file manager integrations. Use `--integrations` to only remove file manager integrations, or `--dry-run` to see what would be removed without making changes:
+This script will remove the application folder, configuration, logs, and file manager integrations. Use `--integrations` to only remove file manager integrations, `--preserve-config` to keep your personal settings, or `--dry-run` to see what would be removed without making changes:
 
 [source,shell]
 ----
-# Remove everything (app folder + integrations)
+# Remove everything (app folder + integrations) - prompts before removing config
 ./uninstall
 
 # Remove integrations only (keep app folder and config)
 ./uninstall --integrations
 
+# Remove integrations and binary, but preserve configuration and logs
+./uninstall --preserve-config
+
 # Preview what would be removed
 ./uninstall --dry-run
+
+# Preview preserving config
+./uninstall --dry-run --preserve-config
 ----
 
 The uninstall script removes:

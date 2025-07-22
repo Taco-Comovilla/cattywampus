@@ -157,3 +157,52 @@ class TestInstallScript:
         assert "Remove application folder and all data? [y/N]" in content
         assert "The following personal files will be removed:" in content
         assert "Personal configuration:" in content
+
+    def test_uninstall_script_preserve_config_option(self):
+        """Test that uninstall script has --preserve-config option"""
+        uninstall_script = Path(__file__).parent.parent / "uninstall"
+        
+        # Test that help includes the option
+        result = subprocess.run([
+            sys.executable, str(uninstall_script), "--help"
+        ], capture_output=True, text=True)
+        
+        assert result.returncode == 0
+        assert "--preserve-config" in result.stdout
+        assert "Preserve user configuration and logs" in result.stdout
+
+    def test_uninstall_script_preserve_config_dry_run(self):
+        """Test uninstall script with --preserve-config in dry-run mode"""
+        uninstall_script = Path(__file__).parent.parent / "uninstall"
+        
+        result = subprocess.run([
+            sys.executable, str(uninstall_script), "--dry-run", "--preserve-config"
+        ], capture_output=True, text=True)
+        
+        assert result.returncode == 0
+        assert "DRY RUN MODE" in result.stdout
+        assert "Would preserve user configuration and logs" in result.stdout
+        assert "preserve-config specified" in result.stdout
+        # Should not show config removal prompts
+        assert "The following personal files will be removed:" not in result.stdout
+
+    def test_uninstall_script_preserve_config_conflicts(self):
+        """Test that --preserve-config works with other flags"""
+        uninstall_script = Path(__file__).parent.parent / "uninstall"
+        
+        # Test --preserve-config alone
+        result = subprocess.run([
+            sys.executable, str(uninstall_script), "--dry-run", "--preserve-config"
+        ], capture_output=True, text=True)
+        
+        assert result.returncode == 0
+        assert "Would preserve user configuration" in result.stdout
+        
+        # Test that --integrations still skips config (should not conflict)
+        result = subprocess.run([
+            sys.executable, str(uninstall_script), "--dry-run", "--integrations"
+        ], capture_output=True, text=True)
+        
+        assert result.returncode == 0
+        # With --integrations, should not mention config preservation at all
+        assert "preserve" not in result.stdout.lower()

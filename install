@@ -61,7 +61,7 @@ def install_binary_linux(app_name, binary_path):
     
     # Check if source and destination are the same file
     if Path(binary_path).resolve() == target_path.resolve():
-        print(f"✅ {app_name} executable already installed at {target_path}")
+        print(f"✅ Using existing {app_name} executable at {target_path} (source and target are the same file)")
         return str(target_path)
     
     # Check if target already exists and compare checksums
@@ -101,7 +101,7 @@ def install_binary_macos(app_name, binary_path):
     
     # Check if source and destination are the same file
     if Path(binary_path).resolve() == target_path.resolve():
-        print(f"✅ {app_name} executable already installed at {target_path}")
+        print(f"✅ Using existing {app_name} executable at {target_path} (source and target are the same file)")
         return str(target_path)
     
     # Check if target already exists and compare checksums

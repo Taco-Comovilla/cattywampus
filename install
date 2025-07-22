@@ -496,51 +496,6 @@ def create_app_folder_and_config(app_name, dry_run=False):
             sys.exit(1)
 
 
-def check_existing_installation(app_name, system):
-    """Check if the application is already installed."""
-    existing_items = []
-    
-    if system == "Linux":
-        # Check for binary in ~/.local/bin
-        binary_path = Path.home() / ".local" / "bin" / app_name
-        if binary_path.exists():
-            existing_items.append(f"Binary: {binary_path}")
-        
-        # Check for integrations
-        integrations = [
-            Path.home() / ".local" / "share" / "nautilus-python" / "extensions" / "nautilus_extension.py",
-            Path.home() / ".local" / "share" / "file-manager" / "actions" / f"{app_name}.desktop",
-            Path.home() / ".local" / "share" / "nautilus" / "scripts" / f"Clean with {app_name}",
-        ]
-        
-        for integration in integrations:
-            if integration.exists():
-                existing_items.append(f"Integration: {integration}")
-        
-        # Check KDE integrations
-        kde_dirs = [
-            Path.home() / ".local" / "share" / "kservices5" / "ServiceMenus",
-            Path.home() / ".kde" / "share" / "kde4" / "services" / "ServiceMenus",
-            Path.home() / ".kde4" / "share" / "kde4" / "services" / "ServiceMenus"
-        ]
-        for kde_dir in kde_dirs:
-            kde_file = kde_dir / f"{app_name}.desktop"
-            if kde_file.exists():
-                existing_items.append(f"KDE Integration: {kde_file}")
-    
-    elif system == "Darwin":
-        # Check for binary in /usr/local/bin
-        binary_path = Path("/usr/local/bin") / app_name
-        if binary_path.exists():
-            existing_items.append(f"Binary: {binary_path}")
-        
-        # Check for macOS Quick Action
-        workflow_path = Path.home() / "Library" / "Services" / f"Clean with {app_name}.workflow"
-        if workflow_path.exists():
-            existing_items.append(f"Quick Action: {workflow_path}")
-    
-    return existing_items
-
 
 def check_and_warn_about_preserved_config(app_name):
     """Check if user has local config and warn them it was preserved during uninstall."""
@@ -572,15 +527,46 @@ def run_uninstall_if_needed(app_name, system, dry_run=False, force=False):
     import subprocess
     import os
     
-    existing_items = check_existing_installation(app_name, system)
+    # Get the path to the uninstall script
+    uninstall_script = Path(__file__).parent / "uninstall"
     
-    if not existing_items:
-        return False  # No existing installation found
+    if not uninstall_script.exists():
+        print("⚠️  Uninstall script not found.")
+        print("💡 Please run './uninstall' to manually remove the existing installation,")
+        print("   then run the installer again.")
+        sys.exit(1)
     
-    print(f"🔍 Existing installation detected:")
-    for item in existing_items:
-        print(f"   • {item}")
-    print()
+    # Check for existing installation using the uninstall script's dry-run mode
+    try:
+        result = subprocess.run([
+            sys.executable, str(uninstall_script), "--dry-run", "--integrations"
+        ], capture_output=True, text=True)
+        
+        # Extract the list of items that would be removed
+        lines = result.stdout.split('\n')
+        integration_lines = []
+        capture_integrations = False
+        
+        for line in lines:
+            if "Would remove the following integrations:" in line:
+                capture_integrations = True
+                continue
+            elif capture_integrations and line.strip().startswith("- "):
+                integration_lines.append(line.strip())
+        
+        # If no integrations found, there's no existing installation
+        if not integration_lines:
+            return False  # No existing installation found
+            
+        # Show what was detected
+        print(f"🔍 Existing installation detected:")
+        for item in integration_lines:
+            print(f"   • {item[2:]}")  # Remove "- " prefix and add bullet
+        print()
+        
+    except Exception as e:
+        print(f"⚠️  Could not check for existing installation: {e}")
+        return False
     
     if dry_run:
         print("🔍 DRY RUN: Would prompt to uninstall existing version before proceeding")
@@ -618,38 +604,29 @@ def run_uninstall_if_needed(app_name, system, dry_run=False, force=False):
     
     print("📦 Uninstalling previous version...")
     
-    # Get the path to the uninstall script
-    uninstall_script = Path(__file__).parent / "uninstall"
-    
-    if uninstall_script.exists():
-        # Run the uninstall script with --integrations flag to preserve user config
-        try:
-            result = subprocess.run([
-                sys.executable, str(uninstall_script), "--integrations"
-            ], capture_output=True, text=True)
+    # Run the uninstall script with --integrations flag to preserve user config
+    try:
+        result = subprocess.run([
+            sys.executable, str(uninstall_script), "--integrations"
+        ], capture_output=True, text=True)
+        
+        if result.returncode == 0:
+            print("✅ Previous version uninstalled successfully")
             
-            if result.returncode == 0:
-                print("✅ Previous version uninstalled successfully")
-                
-                # Check if user has local config and warn them it was preserved
-                check_and_warn_about_preserved_config(app_name)
-                
-                return True
-            else:
-                print(f"⚠️  Uninstall completed with warnings: {result.stderr}")
-                
-                # Check if user has local config and warn them it was preserved
-                check_and_warn_about_preserved_config(app_name)
-                
-                return True
-        except Exception as e:
-            print(f"❌ Error running uninstall script: {e}")
-            print("💡 You may want to run './uninstall' manually and try installing again.")
-            sys.exit(1)
-    else:
-        print("⚠️  Uninstall script not found.")
-        print("💡 Please run './uninstall' to manually remove the existing installation,")
-        print("   then run the installer again.")
+            # Check if user has local config and warn them it was preserved
+            check_and_warn_about_preserved_config(app_name)
+            
+            return True
+        else:
+            print(f"⚠️  Uninstall completed with warnings: {result.stderr}")
+            
+            # Check if user has local config and warn them it was preserved
+            check_and_warn_about_preserved_config(app_name)
+            
+            return True
+    except Exception as e:
+        print(f"❌ Error running uninstall script: {e}")
+        print("💡 You may want to run './uninstall' manually and try installing again.")
         sys.exit(1)
 
 

@@ -53,7 +53,7 @@ class TestInstallScript:
         assert "Existing installation detected" not in result.stdout
 
     def test_install_script_detects_existing(self):
-        """Test that install script detects existing installations"""
+        """Test that install script detects existing installations using uninstall script"""
         install_script = Path(__file__).parent.parent / "install"
         
         result = subprocess.run([
@@ -64,6 +64,10 @@ class TestInstallScript:
         # Should detect existing installation if one exists, or proceed if none
         assert ("Existing installation detected" in result.stdout or 
                 "Dry run completed" in result.stdout)
+        
+        # If existing installation detected, should show details from uninstall script
+        if "Existing installation detected" in result.stdout:
+            assert "Binary:" in result.stdout or "Integration:" in result.stdout or "Quick Action:" in result.stdout
 
     def test_install_script_force_flag(self):
         """Test install script with --force flag"""

@@ -1,0 +1,40 @@
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+# Local History for Visual Studio Code
+.history/
+
+# Built Visual Studio Code Extensions
+*.vsix
+
+*.code-workspace
+
+.pyinstaller/*
+build/*
+!build/windows/
+!build/windows/setup.iss
+!build/windows/file_version_info.txt
+dist/
+src/logo_pack
+
+.venv
+*.pyc
+src/__pycache__/
+
+test/tomodify.*
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# if using pyenv to manage pythons
+.python-version
+
+# Generated files for InnoSetup
+appname.ini
+
+
+TODO.md

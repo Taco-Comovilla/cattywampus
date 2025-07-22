@@ -1,0 +1,88 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # Trigger on version tags like v1.10.0
+
+permissions:
+  contents: write  # Required to create releases and upload assets
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch all history and tags for proper changelog generation
+      
+    - name: Extract version from tag
+      id: version
+      run: |
+        VERSION=${GITHUB_REF#refs/tags/v}
+        echo "version=${VERSION}" >> $GITHUB_OUTPUT
+        echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        
+    - name: Get app name from version.py
+      id: app-info
+      run: |
+        APP_NAME=$(python -c "import sys; sys.path.insert(0, 'src'); from version import __app_name__; print(__app_name__)")
+        echo "app_name=${APP_NAME}" >> $GITHUB_OUTPUT
+        
+    - name: Generate changelog since last release
+      id: changelog
+      run: |
+        # Get the previous release tag
+        PREVIOUS_TAG=$(git tag --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sed -n '2p')
+        CURRENT_TAG=${{ steps.version.outputs.tag }}
+        
+        echo "Previous tag: $PREVIOUS_TAG"
+        echo "Current tag: $CURRENT_TAG"
+        
+        # Generate changelog
+        if [ -n "$PREVIOUS_TAG" ]; then
+          echo "## What's Changed" > changelog.md
+          echo "" >> changelog.md
+          
+          # Get commit messages between tags
+          git log --pretty=format:"- %s" "$PREVIOUS_TAG..$CURRENT_TAG" | grep -v "^- Bump version:" >> changelog.md
+          
+          # If no commits (only version bump), add a note
+          if [ ! -s changelog.md ] || [ "$(wc -l < changelog.md)" -eq 2 ]; then
+            echo "- Maintenance release" >> changelog.md
+          fi
+          
+          echo "" >> changelog.md
+          echo "**Full Changelog**: ${{ github.server_url }}/${{ github.repository }}/compare/$PREVIOUS_TAG...$CURRENT_TAG" >> changelog.md
+        else
+          echo "## What's Changed" > changelog.md
+          echo "" >> changelog.md
+          echo "- Initial release" >> changelog.md
+        fi
+        
+        echo "" >> changelog.md
+        echo "---" >> changelog.md
+        echo "" >> changelog.md
+        echo "${{ steps.app-info.outputs.app_name }} is a tool for cleaning metadata from MKV and MP4 files. See the [README](${{ github.server_url }}/${{ github.repository }}/blob/main/README.adoc) for usage instructions." >> changelog.md
+        
+        echo "Generated changelog:"
+        cat changelog.md
+        
+    - name: Prepare release assets
+      run: |
+        # Create empty release assets directory
+        # Assets will be manually uploaded to the release
+        mkdir -p release_assets
+        echo "Release assets directory created (manual upload required)"
+        
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ steps.version.outputs.tag }}
+        name: ${{ steps.app-info.outputs.app_name }} ${{ steps.version.outputs.version }}
+        body_path: changelog.md
+        draft: true
+        prerelease: false
+        token: ${{ secrets.GITHUB_TOKEN }}

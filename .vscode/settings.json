@@ -1,0 +1,73 @@
+{
+    // Python settings
+    "python.defaultInterpreterPath": "./.venv/bin/python",
+    "python.terminal.activateEnvironment": true,
+    
+    // Linting settings
+    "python.linting.enabled": true,
+    "python.linting.lintOnSave": true,
+    "python.linting.flake8Enabled": false,
+    "python.linting.pylintEnabled": false,
+    
+    // Ruff settings (modern fast linter)
+    "ruff.enable": true,
+    "ruff.lint.enable": true,
+    "ruff.lint.run": "onSave",
+    "ruff.showNotifications": "always",
+    
+    // MyPy type checking
+    "python.linting.mypyEnabled": true,
+    "python.linting.mypyArgs": [
+        "--config-file=mypy.ini"
+    ],
+    
+    // Black formatter
+    "python.formatting.provider": "black",
+    "python.formatting.blackArgs": [
+        "--line-length=88"
+    ],
+    
+    // Format on save
+    "editor.formatOnSave": true,
+    "editor.formatOnType": false,
+    "editor.formatOnPaste": false,
+    
+    // Auto-fix imports and other issues on save
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit",
+        "source.fixAll.ruff": "explicit"
+    },
+    
+    // Test discovery
+    "python.testing.pytestEnabled": true,
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    "python.testing.unittestEnabled": false,
+    
+    // Editor settings for Python
+    "editor.rulers": [88],
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    
+    // AsciiDoc settings
+    "asciidoc.antora.enableAntoraSupport": true,
+    "asciidoc.preview.refreshInterval": 2000,
+    "asciidoc.useWorkspaceRootAsBaseDirectory": true,
+    
+    // File associations
+    "files.associations": {
+        "*.adoc": "asciidoc",
+        "*.template": "plaintext"
+    },
+    
+    // Exclude patterns for file explorer
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/*.pyc": true,
+        "**/htmlcov": true,
+        "**/.pytest_cache": true,
+        "**/dist": true,
+        "**/build": true
+    }
+}

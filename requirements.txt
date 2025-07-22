@@ -1,0 +1,22 @@
+# pip install -r requirements.txt
+
+# mkv language support
+langcodes>=3.3.0
+
+# reading and writing config files
+tomli>=1.2.3; python_version < "3.11" # for older pythons
+tomli-w>=1.0.0
+
+# development
+pyinstaller>=6.14.2 # for building the binary rom source
+bump-my-version>=1.2.0  # for version management
+
+# code quality
+black>=24.0.0  # code formatter
+ruff>=0.1.0    # fast linter
+mypy>=1.0.0    # type checker
+
+# testing
+pytest>=7.0.0
+pytest-mock>=3.8.0
+pytest-cov>=4.0.0

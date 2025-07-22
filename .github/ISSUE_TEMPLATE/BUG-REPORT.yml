@@ -1,0 +1,47 @@
+name: Bug Report
+description: File a bug report.
+title: "[Bug]: "
+labels: ["bug", "triage"]
+projects: ["cattywampus"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: textarea
+    id: os
+    attributes:
+      label: Operating System
+      description: What OS, version and architecture are you running? For macOS, run 'system_profiler SPSoftwareDataType'. For Linux, run 'uname -a'. For Windows, run 'wmic os get oasarchitecture'.  
+      placeholder: ex. macOS 15.5, Darwin Kernel Version 24.5.0 root:xnu-11417.121.6~2/RELEASE_X86_64 x86_64
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Please list the steps to reproduce the issue.
+      description: Include full command, expected results, actual results.
+      placeholder: ex. tbd
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: What version of our software are you running? Run the command 'mkvcleaner -v' and paste the output here.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks. For best results, set log-level to 10 (DEBUG.)
+      render: shell
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/Taco-Comovilla/.github/blob/main/CODE_OF_CONDUCT.md). 
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true

@@ -1,0 +1,502 @@
+#!/usr/bin/env python3
+"""Unified installation script for Linux and macOS file manager integrations."""
+
+import argparse
+import os
+import platform
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+
+def get_app_name():
+    """Get application name from version.py."""
+    sys.path.insert(0, 'src')
+    try:
+        from version import __app_name__
+        return __app_name__
+    except ImportError:
+        print("Error: Could not import application name from src/version.py")
+        sys.exit(1)
+
+
+def find_binary(app_name):
+    """Find the application binary in PATH or dist directory."""
+    # First check PATH
+    binary_path = shutil.which(app_name)
+    if binary_path and os.access(binary_path, os.X_OK):
+        return binary_path
+    
+    # Check local dist directory
+    system_name = platform.system().lower()
+    if system_name == "darwin":
+        system_name = "macos"
+    
+    local_binary = f"dist/{system_name}/{app_name}"
+    if os.path.exists(local_binary) and os.access(local_binary, os.X_OK):
+        return os.path.abspath(local_binary)
+    
+    return None
+
+
+def install_binary_linux(app_name, binary_path):
+    """Install binary to ~/.local/bin on Linux."""
+    target_dir = Path.home() / ".local" / "bin"
+    target_dir.mkdir(parents=True, exist_ok=True)
+    
+    target_path = target_dir / app_name
+    
+    # Check if source and destination are the same file
+    if Path(binary_path).resolve() == target_path.resolve():
+        print(f"✅ {app_name} executable already installed at {target_path}")
+        return str(target_path)
+    
+    print(f"✅ Installing {app_name} executable to {target_path}")
+    shutil.copy2(binary_path, target_path)
+    os.chmod(target_path, 0o755)
+    
+    return str(target_path)
+
+
+def install_nautilus_integration(app_name, binary_path):
+    """Install Nautilus file manager integration."""
+    if not shutil.which("nautilus"):
+        print("⏭️  Nautilus not found, skipping integration")
+        return
+    
+    print("🐚 Installing Nautilus integration...")
+    
+    # Get Nautilus version
+    try:
+        result = subprocess.run(["nautilus", "--version"], 
+                              capture_output=True, text=True, check=True)
+        version_str = result.stdout.strip()
+        # Extract first number from version string
+        import re
+        version_match = re.search(r'(\d+)', version_str)
+        version = int(version_match.group(1)) if version_match else 44
+        print(f"🔍 Nautilus version: {version}")
+    except (subprocess.CalledProcessError, ValueError):
+        version = 44  # Default to modern version
+    
+    # Legacy Python extension for older Nautilus
+    if version < 44:
+        print("📦 Installing legacy nautilus-python extension...")
+        ext_dir = Path.home() / ".local" / "share" / "nautilus-python" / "extensions"
+        ext_dir.mkdir(parents=True, exist_ok=True)
+        
+        nautilus_ext = Path("src/nautilus_extension.py")
+        if nautilus_ext.exists():
+            shutil.copy2(nautilus_ext, ext_dir)
+    
+    # Desktop action for modern Nautilus
+    else:
+        print("🧩 Installing Nautilus .desktop action...")
+        actions_dir = Path.home() / ".local" / "share" / "file-manager" / "actions"
+        actions_dir.mkdir(parents=True, exist_ok=True)
+        
+        desktop_content = f"""[Desktop Entry]
+Type=Action
+Name=Clean with {app_name}
+Icon=video-x-generic
+Exec={binary_path} %F
+MimeType=video/x-matroska;
+Profiles=on-files;
+
+[X-Action-Profile on-files]
+MimeTypes=video/x-matroska;
+"""
+        desktop_file = actions_dir / f"{app_name}.desktop"
+        desktop_file.write_text(desktop_content)
+    
+    # Fallback script for all versions
+    print("📄 Installing fallback Nautilus script...")
+    scripts_dir = Path.home() / ".local" / "share" / "nautilus" / "scripts"
+    scripts_dir.mkdir(parents=True, exist_ok=True)
+    
+    script_content = f"""#!/bin/bash
+{binary_path} "$@"
+"""
+    script_file = scripts_dir / f"Clean with {app_name}"
+    script_file.write_text(script_content)
+    os.chmod(script_file, 0o755)
+
+
+def install_kde_integration(app_name, binary_path):
+    """Install KDE/Dolphin service menus."""
+    kde_dirs = [
+        Path.home() / ".local" / "share" / "kservices5" / "ServiceMenus",
+        Path.home() / ".kde" / "share" / "kde4" / "services" / "ServiceMenus",
+        Path.home() / ".kde4" / "share" / "kde4" / "services" / "ServiceMenus"
+    ]
+    
+    if not any(shutil.which(cmd) for cmd in ["dolphin", "konqueror"]):
+        print("⏭️  KDE not found, skipping Dolphin integration")
+        return
+    
+    print("🐬 Installing KDE/Dolphin service menus...")
+    
+    service_content = f"""[Desktop Entry]
+Type=Service
+ServiceTypes=KonqPopupMenu/Plugin
+MimeType=video/x-matroska;
+Actions=clean_with_{app_name.replace('-', '_')};
+
+[Desktop Action clean_with_{app_name.replace('-', '_')}]
+Name=Clean with {app_name}
+Icon=video-x-generic
+Exec={binary_path} %F
+"""
+    
+    for kde_dir in kde_dirs:
+        if kde_dir.parent.parent.exists():  # Check if .kde or .local exists
+            kde_dir.mkdir(parents=True, exist_ok=True)
+            service_file = kde_dir / f"{app_name}.desktop"
+            service_file.write_text(service_content)
+            print(f"  Created: {service_file}")
+
+
+def install_xfce_integration(app_name, binary_path):
+    """Install XFCE/Thunar custom actions."""
+    if not shutil.which("thunar"):
+        print("⏭️  Thunar not found, skipping XFCE integration")
+        return
+    
+    print("🐭 Installing XFCE/Thunar custom actions...")
+    
+    thunar_dir = Path.home() / ".config" / "Thunar"
+    thunar_dir.mkdir(parents=True, exist_ok=True)
+    
+    uca_file = thunar_dir / "uca.xml"
+    
+    # Read existing UCA file or create new one
+    if uca_file.exists():
+        content = uca_file.read_text()
+        if f"Clean with {app_name}" in content:
+            print("  Action already exists, skipping")
+            return
+        # Insert before closing </actions> tag
+        action_xml = f"""
+  <action>
+    <icon>video-x-generic</icon>
+    <name>Clean with {app_name}</name>
+    <unique-id>clean-with-{app_name}</unique-id>
+    <command>{binary_path} %F</command>
+    <description>Remove unwanted metadata</description>
+    <patterns>*.mkv</patterns>
+    <video-files/>
+  </action>
+</actions>"""
+        content = content.replace("</actions>", action_xml)
+    else:
+        content = f"""<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+  <action>
+    <icon>video-x-generic</icon>
+    <name>Clean with {app_name}</name>
+    <unique-id>clean-with-{app_name}</unique-id>
+    <command>{binary_path} %F</command>
+    <description>Remove unwanted metadata</description>
+    <patterns>*.mkv</patterns>
+    <video-files/>
+  </action>
+</actions>"""
+    
+    uca_file.write_text(content)
+
+
+def install_mate_integration(app_name, binary_path):
+    """Install MATE/Caja scripts."""
+    if not shutil.which("caja"):
+        print("⏭️  Caja not found, skipping MATE integration")
+        return
+    
+    print("🦘 Installing MATE/Caja scripts...")
+    
+    scripts_dir = Path.home() / ".config" / "caja" / "scripts"
+    scripts_dir.mkdir(parents=True, exist_ok=True)
+    
+    script_content = f"""#!/bin/bash
+{binary_path} "$@"
+"""
+    script_file = scripts_dir / f"Clean with {app_name}"
+    script_file.write_text(script_content)
+    os.chmod(script_file, 0o755)
+
+
+def get_macos_version():
+    """Get macOS version for version-specific instructions."""
+    try:
+        result = subprocess.run(["sw_vers", "-productVersion"], 
+                              capture_output=True, text=True, check=True)
+        version_str = result.stdout.strip()
+        # Parse version like "15.5" or "14.2.1"
+        major = int(version_str.split('.')[0])
+        return major
+    except (subprocess.CalledProcessError, ValueError, IndexError):
+        return 15  # Default to recent version
+
+
+def get_finder_extensions_instructions():
+    """Get appropriate instructions for enabling Finder extensions based on macOS version."""
+    macos_version = get_macos_version()
+    
+    if macos_version >= 13:  # macOS 13 Ventura and later
+        return (
+            "📝 To enable the Quick Action:\n"
+            "   • System Settings > General > Login Items & Extensions > Extensions > Finder (click ⓘ)\n"
+            "   • Or right-click any file/folder > Quick Actions > Customize..."
+        )
+    else:  # macOS 12 Monterey and earlier
+        return "📝 Enable the Quick Action in System Settings > Privacy & Security > Extensions > Finder Extensions"
+
+
+def get_metadata():
+    """Get application metadata from version.py."""
+    sys.path.insert(0, 'src')
+    try:
+        from version import (
+            __app_name__, __version__, __app_description__, 
+            __organization__, __copyright__, __repo_base_url__
+        )
+        return {
+            'app_name': __app_name__,
+            'version': __version__,
+            'description': __app_description__,
+            'organization': __organization__,
+            'copyright': __copyright__,
+            'repo_base_url': __repo_base_url__,
+        }
+    except ImportError as e:
+        print(f"Error: Could not import metadata from src/version.py: {e}")
+        sys.exit(1)
+
+
+def process_template_file(template_path, metadata, binary_path):
+    """Process a template file with metadata variables."""
+    from string import Template
+    
+    template_file = Path(template_path)
+    if not template_file.exists():
+        raise FileNotFoundError(f"Template file not found: {template_path}")
+    
+    # Parse version for major/minor/patch components
+    version_parts = metadata['version'].split('.')
+    major, minor, patch = int(version_parts[0]), int(version_parts[1]), int(version_parts[2])
+    
+    template_vars = {
+        'APP_NAME': metadata['app_name'],
+        'VERSION': metadata['version'], 
+        'VERSION_MAJOR': str(major),
+        'VERSION_MINOR': str(minor),
+        'VERSION_PATCH': str(patch),
+        'REPO_BASE_URL': metadata['repo_base_url'],
+        'APP_DESCRIPTION': metadata['description'],
+        'ORGANIZATION': metadata['organization'],
+        'COPYRIGHT': metadata['copyright'],
+        'BINARY_PATH': binary_path,
+    }
+    
+    with open(template_file, 'r', encoding='utf-8') as f:
+        template = Template(f.read())
+    
+    return template.safe_substitute(template_vars)
+
+
+def install_macos_quick_action(app_name, binary_path):
+    """Install macOS Finder Quick Action."""
+    print("🍎 Installing macOS Finder Quick Action...")
+    
+    metadata = get_metadata()
+    
+    workflow_dir = Path.home() / "Library" / "Services"
+    workflow_name = f"Clean with {app_name}.workflow"
+    workflow_path = workflow_dir / workflow_name
+    
+    print(f"Creating Automator Quick Action at: {workflow_path}")
+    
+    # Create workflow directory structure
+    contents_dir = workflow_path / "Contents"
+    contents_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Process info.plist template
+    try:
+        info_plist_content = process_template_file('templates/macos/info.plist.template', metadata, binary_path)
+        info_plist_file = contents_dir / "info.plist"
+        info_plist_file.write_text(info_plist_content)
+    except FileNotFoundError:
+        print("⚠️  Template file not found, using fallback content")
+        # Fallback to minimal content if template not found
+        info_plist_content = f"""<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSServices</key>
+	<array>
+		<dict>
+			<key>NSMenuItem</key>
+			<dict>
+				<key>default</key>
+				<string>Clean with {app_name}</string>
+			</dict>
+			<key>NSMessage</key>
+			<string>runWorkflowAsService</string>
+			<key>NSRequiredContext</key>
+			<dict>
+				<key>NSApplicationIdentifier</key>
+				<string>com.apple.finder</string>
+			</dict>
+			<key>NSSendFileTypes</key>
+			<array>
+				<string>NSFilenamesPboardType</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>"""
+        info_plist_file = contents_dir / "info.plist"
+        info_plist_file.write_text(info_plist_content)
+    
+    # Process document.wflow template
+    try:
+        document_wflow_content = process_template_file('templates/macos/document.wflow.template', metadata, binary_path)
+        document_wflow_file = contents_dir / "document.wflow"
+        document_wflow_file.write_text(document_wflow_content)
+    except FileNotFoundError:
+        print("⚠️  Template file not found, using fallback content")
+        # Fallback to minimal workflow content
+        document_wflow_content = f"""<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>actions</key>
+	<array>
+		<dict>
+			<key>action</key>
+			<dict>
+				<key>ActionParameters</key>
+				<dict>
+					<key>COMMAND_STRING</key>
+					<string>{binary_path} "$@"</string>
+					<key>inputMethod</key>
+					<integer>1</integer>
+					<key>shell</key>
+					<string>/bin/bash</string>
+				</dict>
+				<key>BundleIdentifier</key>
+				<string>com.apple.RunShellScript</string>
+			</dict>
+		</dict>
+	</array>
+	<key>workflowMetaData</key>
+	<dict>
+		<key>workflowTypeIdentifier</key>
+		<string>com.apple.Automator.servicesMenu</string>
+	</dict>
+</dict>
+</plist>"""
+        document_wflow_file = contents_dir / "document.wflow"
+        document_wflow_file.write_text(document_wflow_content)
+    
+    print(f"✅ Quick Action installed successfully!")
+    print(get_finder_extensions_instructions())
+
+
+def create_app_folder_and_config(app_name, dry_run=False):
+    """Create application folder and config.toml if they don't exist."""
+    print(f"📁 Setting up application folder and configuration for {app_name}")
+    
+    # Import config module to get paths and create config
+    sys.path.insert(0, 'src')
+    try:
+        from mcconfig import initialize_config
+        if not dry_run:
+            config = initialize_config()
+            print(f"✅ Application folder created at: {config.config_path}")
+            print(f"✅ Configuration file ready at: {config.config_file_path}")
+            print(f"✅ Log file location: {config.log_file_path}")
+        else:
+            print("🔍 DRY RUN: Would create application folder and config.toml")
+    except ImportError as e:
+        print(f"❌ Error: Could not set up application configuration: {e}")
+        if not dry_run:
+            sys.exit(1)
+
+
+def main():
+    """Main installation function."""
+    parser = argparse.ArgumentParser(description="Install application and file manager integrations")
+    parser.add_argument("--dry-run", action="store_true", 
+                       help="Show what would be done without making changes")
+    parser.add_argument("--integrations", action="store_true",
+                       help="Only install file manager integrations (skip app folder setup)")
+    args = parser.parse_args()
+    
+    system = platform.system()
+    if system not in ["Linux", "Darwin"]:
+        print(f"❌ Unsupported operating system: {system}")
+        sys.exit(1)
+    
+    app_name = get_app_name()
+    
+    if args.integrations:
+        print(f"🚀 Installing file manager integrations for {app_name}")
+    else:
+        print(f"🚀 Installing {app_name} application and file manager integrations")
+    
+    if args.dry_run:
+        print("🔍 DRY RUN MODE - no changes will be made")
+    
+    # Step 1: Setup application folder and config (unless --integrations flag is used)
+    if not args.integrations:
+        create_app_folder_and_config(app_name, args.dry_run)
+        print()  # Add spacing
+    
+    # Step 2: Install file manager integrations
+    # Find binary
+    binary_path = find_binary(app_name)
+    if not binary_path:
+        print(f"❌ Error: {app_name} executable not found in PATH or dist/ directory")
+        print("   Build the application first or ensure it's in your PATH")
+        sys.exit(1)
+    
+    print(f"📍 Using {app_name} at: {binary_path}")
+    
+    if args.dry_run:
+        print("✅ Dry run completed - binary found and ready for installation")
+        return
+    
+    if system == "Linux":
+        # Install binary to ~/.local/bin
+        installed_binary = install_binary_linux(app_name, binary_path)
+        
+        # Install file manager integrations
+        install_nautilus_integration(app_name, installed_binary)
+        install_kde_integration(app_name, installed_binary)
+        install_xfce_integration(app_name, installed_binary)
+        install_mate_integration(app_name, installed_binary)
+        
+        print()
+        if args.integrations:
+            print("🎉 Linux file manager integrations installed!")
+        else:
+            print("🎉 Linux installation completed!")
+            print("📁 Application folder and configuration set up")
+        print(f"📂 Binary installed to: {installed_binary}")
+        print("🔄 You may need to restart your file manager to see the new options")
+        
+    elif system == "Darwin":
+        install_macos_quick_action(app_name, binary_path)
+        
+        print()
+        if args.integrations:
+            print("🎉 macOS file manager integrations installed!")
+        else:
+            print("🎉 macOS installation completed!")
+            print("📁 Application folder and configuration set up")
+        print(get_finder_extensions_instructions())
+
+
+if __name__ == "__main__":
+    main()

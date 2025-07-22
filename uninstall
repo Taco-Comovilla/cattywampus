@@ -182,12 +182,12 @@ def prompt_remove_app_folder(app_name, dry_run=False):
         # List what will be removed
         files_to_remove = []
         if config_file.exists():
-            files_to_remove.append(f"  • Configuration: {config_file}")
+            files_to_remove.append(f"  • Personal configuration: {config_file}")
         if log_file.exists():
             files_to_remove.append(f"  • Log file: {log_file}")
         
         if files_to_remove:
-            print("📋 The following files will be removed:")
+            print("📋 The following personal files will be removed:")
             for file_desc in files_to_remove:
                 print(file_desc)
         
@@ -196,7 +196,9 @@ def prompt_remove_app_folder(app_name, dry_run=False):
             return
         
         # Prompt user for confirmation
-        print("\n⚠️  This will permanently delete your configuration and logs.")
+        print("\n⚠️  This will permanently delete your personal configuration and logs.")
+        print("   Your customized settings, preferences, and log history will be lost.")
+        print("💡 Choose 'N' (default) to keep your settings for future reinstallation.")
         response = input("❓ Remove application folder and all data? [y/N]: ").strip().lower()
         
         if response in ['y', 'yes']:

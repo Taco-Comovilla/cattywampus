@@ -141,3 +141,19 @@ class TestInstallScript:
         
         # Should have the function in both Linux and macOS binary install functions
         assert content.count("source_checksum = calculate_file_checksum") >= 2
+
+    def test_uninstall_script_contains_config_prompts(self):
+        """Test that uninstall script contains proper config removal prompts"""
+        uninstall_script = Path(__file__).parent.parent / "uninstall"
+        
+        # Read the uninstall script content
+        content = uninstall_script.read_text()
+        
+        # Verify config removal prompting exists
+        assert "def prompt_remove_app_folder" in content
+        assert "personal configuration and logs" in content
+        assert "customized settings, preferences, and log history will be lost" in content
+        assert "Choose 'N' (default) to keep your settings for future reinstallation" in content
+        assert "Remove application folder and all data? [y/N]" in content
+        assert "The following personal files will be removed:" in content
+        assert "Personal configuration:" in content

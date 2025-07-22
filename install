@@ -424,6 +424,95 @@ def create_app_folder_and_config(app_name, dry_run=False):
             sys.exit(1)
 
 
+def check_existing_installation(app_name, system):
+    """Check if the application is already installed."""
+    existing_items = []
+    
+    if system == "Linux":
+        # Check for binary in ~/.local/bin
+        binary_path = Path.home() / ".local" / "bin" / app_name
+        if binary_path.exists():
+            existing_items.append(f"Binary: {binary_path}")
+        
+        # Check for integrations
+        integrations = [
+            Path.home() / ".local" / "share" / "nautilus-python" / "extensions" / "nautilus_extension.py",
+            Path.home() / ".local" / "share" / "file-manager" / "actions" / f"{app_name}.desktop",
+            Path.home() / ".local" / "share" / "nautilus" / "scripts" / f"Clean with {app_name}",
+        ]
+        
+        for integration in integrations:
+            if integration.exists():
+                existing_items.append(f"Integration: {integration}")
+        
+        # Check KDE integrations
+        kde_dirs = [
+            Path.home() / ".local" / "share" / "kservices5" / "ServiceMenus",
+            Path.home() / ".kde" / "share" / "kde4" / "services" / "ServiceMenus",
+            Path.home() / ".kde4" / "share" / "kde4" / "services" / "ServiceMenus"
+        ]
+        for kde_dir in kde_dirs:
+            kde_file = kde_dir / f"{app_name}.desktop"
+            if kde_file.exists():
+                existing_items.append(f"KDE Integration: {kde_file}")
+    
+    elif system == "Darwin":
+        # Check for macOS Quick Action
+        workflow_path = Path.home() / "Library" / "Services" / f"Clean with {app_name}.workflow"
+        if workflow_path.exists():
+            existing_items.append(f"Quick Action: {workflow_path}")
+    
+    return existing_items
+
+
+def run_uninstall_if_needed(app_name, system, dry_run=False):
+    """Run uninstall if existing installation is detected."""
+    existing_items = check_existing_installation(app_name, system)
+    
+    if not existing_items:
+        return False  # No existing installation found
+    
+    print(f"🔍 Existing installation detected:")
+    for item in existing_items:
+        print(f"   • {item}")
+    print()
+    
+    if dry_run:
+        print("🔍 DRY RUN: Would uninstall existing version before proceeding")
+        return True
+    
+    print("📦 Uninstalling previous version...")
+    
+    # Import and run uninstall functionality
+    import sys
+    import subprocess
+    import os
+    
+    # Get the path to the uninstall script
+    uninstall_script = Path(__file__).parent / "uninstall"
+    
+    if uninstall_script.exists():
+        # Run the uninstall script with --integrations flag to preserve user config
+        try:
+            result = subprocess.run([
+                sys.executable, str(uninstall_script), "--integrations"
+            ], capture_output=True, text=True)
+            
+            if result.returncode == 0:
+                print("✅ Previous version uninstalled successfully")
+                return True
+            else:
+                print(f"⚠️  Uninstall completed with warnings: {result.stderr}")
+                return True
+        except Exception as e:
+            print(f"❌ Error running uninstall script: {e}")
+            # Continue anyway - we'll overwrite what we can
+            return True
+    else:
+        print("⚠️  Uninstall script not found, proceeding with installation (will overwrite existing files)")
+        return True
+
+
 def main():
     """Main installation function."""
     parser = argparse.ArgumentParser(description="Install application and file manager integrations")
@@ -431,6 +520,8 @@ def main():
                        help="Show what would be done without making changes")
     parser.add_argument("--integrations", action="store_true",
                        help="Only install file manager integrations (skip app folder setup)")
+    parser.add_argument("--skip-uninstall", action="store_true",
+                       help="Skip automatic uninstall of existing version")
     args = parser.parse_args()
     
     system = platform.system()
@@ -447,6 +538,11 @@ def main():
     
     if args.dry_run:
         print("🔍 DRY RUN MODE - no changes will be made")
+    
+    # Step 0: Check for existing installation and uninstall if needed
+    if not args.skip_uninstall:
+        if run_uninstall_if_needed(app_name, system, args.dry_run):
+            print()  # Add spacing after uninstall
     
     # Step 1: Setup application folder and config (unless --integrations flag is used)
     if not args.integrations:

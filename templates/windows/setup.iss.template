@@ -17,6 +17,8 @@ UninstallDisplayIcon={app}\{#MyAppName}.exe
 OutputDir=dist\windows
 OutputBaseFilename=Setup-{#MyAppName}-{#MyVersion}
 ArchitecturesInstallIn64BitMode=x64compatible
+; Automatically uninstall previous versions during upgrade
+VersionInfoVersion={#MyVersion}
 
 [CustomMessages]
 DeleteUserData=Delete user configuration and log files

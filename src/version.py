@@ -1,7 +1,7 @@
 """Version and application metadata"""
 
 # DO NOT EDIT THIS NEXT LINE! It will be updated automatically by bump-my-version
-__version__ = "1.0.0"
+__version__ = "0.0.0"
 
 # Application name - single source of truth
 __app_name__ = "cattywampus"

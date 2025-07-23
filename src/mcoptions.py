@@ -445,8 +445,12 @@ def parse_options() -> Options:
         stdout_only = False
         sources["stdout_only"] = "default"
 
-    # Log level
-    if args.loglevel is not None:
+    # Log level - stdout options override all other settings
+    if stdout or stdout_only:
+        # Stdout options force DEBUG level logging
+        log_level = 10  # DEBUG
+        sources["log_level"] = "stdout option"
+    elif args.loglevel is not None:
         log_level = args.loglevel
         sources["log_level"] = "cli"
     elif mcconfig and mcconfig.get("logLevel") is not None:

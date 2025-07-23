@@ -114,7 +114,8 @@ class Options:
     stdout: bool
     stdout_only: bool
     set_default_sub_track: bool
-    force_default_first_sub_track: bool
+    force_default_first_subtitle: bool
+    set_default_audio_track: bool
     clear_audio_track_names: bool
 
     # Source tracking - maps option name to source
@@ -190,7 +191,7 @@ def _create_argument_parser() -> argparse.ArgumentParser:
     )
 
     parser.add_argument(
-        "-A",
+        "-T",
         "--atomicparsley-path",
         type=str,
         help="Override atomicParsleyPath - path to AtomicParsley binary",
@@ -198,16 +199,16 @@ def _create_argument_parser() -> argparse.ArgumentParser:
 
     parser.add_argument(
         "-s",
-        "--set-default",
+        "--set-default-subtitle",
         action="store_true",
-        help="Override setDefaultSubTrack - enable default subtitle track setting",
+        help="Override setDefaultSubtitle - enable default subtitle track setting",
     )
 
     parser.add_argument(
         "-f",
-        "--default-first",
+        "--force-default-first-subtitle",
         action="store_true",
-        help="Override forceDefaultFirstSubTrack - force first subtitle track as default",
+        help="Override forceDefaultFirstSubtitle - force first subtitle track as default",
     )
 
     parser.add_argument(
@@ -215,6 +216,13 @@ def _create_argument_parser() -> argparse.ArgumentParser:
         "--clear-audio",
         action="store_true",
         help="Override clearAudio - clear audio track names in MKV files",
+    )
+
+    parser.add_argument(
+        "-A",
+        "--set-default-audio",
+        action="store_true",
+        help="Override setDefaultAudio - enable default audio track setting",
     )
 
     parser.add_argument(
@@ -239,7 +247,7 @@ def _create_argument_parser() -> argparse.ArgumentParser:
     )
 
     parser.add_argument(
-        "-T",
+        "-O",
         "--stdout-only",
         action="store_true",
         help="Send program output to console (stdout) only, suppressing log file output.",
@@ -465,26 +473,26 @@ def parse_options() -> Options:
         sources["log_file_path"] = "config"
 
     # Set default subtitle track
-    if args.set_default:
+    if args.set_default_subtitle:
         set_default_sub_track = True
         sources["set_default_sub_track"] = "cli"
-    elif mcconfig and mcconfig.get("setDefaultSubTrack") is not None:
-        set_default_sub_track = mcconfig.get("setDefaultSubTrack", False)
+    elif mcconfig and mcconfig.get("setDefaultSubtitle") is not None:
+        set_default_sub_track = mcconfig.get("setDefaultSubtitle", False)
         sources["set_default_sub_track"] = "config"
     else:
         set_default_sub_track = False
         sources["set_default_sub_track"] = "default"
 
     # Force default first subtitle track
-    if args.default_first:
-        force_default_first_sub_track = True
-        sources["force_default_first_sub_track"] = "cli"
-    elif mcconfig and mcconfig.get("forceDefaultFirstSubTrack") is not None:
-        force_default_first_sub_track = mcconfig.get("forceDefaultFirstSubTrack", False)
-        sources["force_default_first_sub_track"] = "config"
+    if args.force_default_first_subtitle:
+        force_default_first_subtitle = True
+        sources["force_default_first_subtitle"] = "cli"
+    elif mcconfig and mcconfig.get("forceDefaultFirstSubtitle") is not None:
+        force_default_first_subtitle = mcconfig.get("forceDefaultFirstSubtitle", False)
+        sources["force_default_first_subtitle"] = "config"
     else:
-        force_default_first_sub_track = False
-        sources["force_default_first_sub_track"] = "default"
+        force_default_first_subtitle = False
+        sources["force_default_first_subtitle"] = "default"
 
     # Clear audio track names
     if args.clear_audio:
@@ -496,6 +504,17 @@ def parse_options() -> Options:
     else:
         clear_audio_track_names = False
         sources["clear_audio_track_names"] = "default"
+
+    # Set default audio track
+    if args.set_default_audio:
+        set_default_audio_track = True
+        sources["set_default_audio_track"] = "cli"
+    elif mcconfig and mcconfig.get("setDefaultAudio") is not None:
+        set_default_audio_track = mcconfig.get("setDefaultAudio", False)
+        sources["set_default_audio_track"] = "config"
+    else:
+        set_default_audio_track = False
+        sources["set_default_audio_track"] = "default"
 
     # Validate options
     _validate_options(args, only_mkv, only_mp4)
@@ -524,7 +543,8 @@ def parse_options() -> Options:
         stdout=stdout,
         stdout_only=stdout_only,
         set_default_sub_track=set_default_sub_track,
-        force_default_first_sub_track=force_default_first_sub_track,
+        force_default_first_subtitle=force_default_first_subtitle,
+        set_default_audio_track=set_default_audio_track,
         clear_audio_track_names=clear_audio_track_names,
         # Source tracking
         sources=sources,

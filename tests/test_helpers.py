@@ -33,9 +33,39 @@ def setup_mock_options():
     mock_options = Mock()
     mock_options.language = "en"
     mock_options.lang3 = "eng"
-    mock_options.force_default_first_sub_track = False
+    mock_options.force_default_first_subtitle = False
     mock_options.set_default_sub_track = False
+    mock_options.set_default_audio_track = False
     mock_options.dry_run = False
+    return mock_options
+
+
+def setup_complete_mock_options(**overrides):
+    """Set up a complete mock options object with all attributes for main.options patches"""
+    defaults = {
+        'language': 'en',
+        'lang3': 'eng', 
+        'force_default_first_subtitle': False,
+        'set_default_sub_track': False,
+        'set_default_audio_track': False,
+        'clear_audio_track_names': False,
+        'dry_run': False,
+        'only_mkv': False,
+        'only_mp4': False,
+        'sources': {
+            'set_default_sub_track': 'default',
+            'set_default_audio_track': 'default',
+            'force_default_first_subtitle': 'default',
+        }
+    }
+    
+    # Apply overrides
+    defaults.update(overrides)
+    
+    mock_options = Mock()
+    for key, value in defaults.items():
+        setattr(mock_options, key, value)
+    
     return mock_options
 
 
@@ -56,7 +86,8 @@ def create_mock_options(**overrides):
         "stdout": False,
         "stdout_only": False,
         "set_default_sub_track": False,
-        "force_default_first_sub_track": False,
+        "force_default_first_subtitle": False,
+        "set_default_audio_track": False,
         "clear_audio_track_names": False,
         "use_system_locale": False,
         "language": "en",
@@ -76,7 +107,8 @@ def create_mock_options(**overrides):
         "only_mkv": "default",
         "only_mp4": "default",
         "set_default_sub_track": "default",
-        "force_default_first_sub_track": "default",
+        "force_default_first_subtitle": "default",
+        "set_default_audio_track": "default",
         "clear_audio_track_names": "default",
         "use_system_locale": "default",
         "dry_run": "default",

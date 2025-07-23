@@ -26,7 +26,7 @@ class TestAudioTrackClearing:
                 mock_options.clear_audio_track_names = True
                 mock_options.dry_run = True
                 mock_options.set_default_sub_track = False
-                mock_options.force_default_first_sub_track = False
+                mock_options.force_default_first_subtitle = False
 
                 # Mock metadata with audio tracks
                 with patch("src.main.get_mkv_metadata") as mock_get_metadata:
@@ -69,7 +69,7 @@ class TestAudioTrackClearing:
                 mock_options.clear_audio_track_names = False
                 mock_options.dry_run = True
                 mock_options.set_default_sub_track = False
-                mock_options.force_default_first_sub_track = False
+                mock_options.force_default_first_subtitle = False
 
                 # Mock metadata with audio tracks
                 with patch("src.main.get_mkv_metadata") as mock_get_metadata:
@@ -112,7 +112,7 @@ class TestAudioTrackClearing:
                 mock_options.clear_audio_track_names = True
                 mock_options.dry_run = True
                 mock_options.set_default_sub_track = False
-                mock_options.force_default_first_sub_track = False
+                mock_options.force_default_first_subtitle = False
 
                 # Mock metadata with no audio tracks
                 with patch("src.main.get_mkv_metadata") as mock_get_metadata:

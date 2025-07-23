@@ -55,7 +55,7 @@ class TestToolInitialization:
         # Setup options to enable subtitle processing
         mock_options.dry_run = False
         mock_options.set_default_sub_track = True
-        mock_options.force_default_first_sub_track = False
+        mock_options.force_default_first_subtitle = False
 
         # Create a temporary test file
         with tempfile.NamedTemporaryFile(suffix=".mkv", delete=False) as tmp_file:

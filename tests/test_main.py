@@ -12,6 +12,7 @@ import pytest
 from main import (
     format_error_string,
     get_mkv_metadata,
+    get_mkv_audio_args,
     get_mkv_subtitle_args,
     get_mp4_metadata,
     get_tool_version,
@@ -206,7 +207,7 @@ class TestGetMkvSubtitleArgs:
         """Test subtitle args when target language is found"""
         mock_options.language = "en"
         mock_options.lang3 = "eng"
-        mock_options.force_default_first_sub_track = False
+        mock_options.force_default_first_subtitle = False
 
         metadata = {
             "tracks": [
@@ -246,7 +247,7 @@ class TestGetMkvSubtitleArgs:
         """Test subtitle args when no subtitle tracks exist"""
         mock_options.language = "en"
         mock_options.lang3 = "eng"
-        mock_options.force_default_first_sub_track = False
+        mock_options.force_default_first_subtitle = False
 
         metadata = {"tracks": [{"type": "video"}, {"type": "audio"}]}
 
@@ -261,7 +262,7 @@ class TestGetMkvSubtitleArgs:
         """Test forcing first subtitle track as default"""
         mock_options.language = "en"
         mock_options.lang3 = "eng"
-        mock_options.force_default_first_sub_track = True
+        mock_options.force_default_first_subtitle = True
 
         metadata = {
             "tracks": [
@@ -286,6 +287,78 @@ class TestGetMkvSubtitleArgs:
             "flag-default=1",
         ]
         assert result == expected
+
+
+class TestGetMkvAudioArgs:
+    """Test the get_mkv_audio_args function"""
+
+    @patch("main.options")
+    @patch("main.logger")
+    def test_get_mkv_audio_args_language_found(self, mock_logger, mock_options):
+        """Test audio args when target language is found"""
+        mock_options.language = "en"
+        mock_options.lang3 = "eng"
+        mock_options.set_default_audio_track = True
+
+        metadata = {
+            "tracks": [
+                {"type": "video"},
+                {
+                    "type": "audio",
+                    "properties": {"language_ietf": "en", "language": "eng"},
+                },
+                {
+                    "type": "audio",
+                    "properties": {"language_ietf": "es", "language": "spa"},
+                },
+            ]
+        }
+
+        result = get_mkv_audio_args(metadata)
+
+        expected = [
+            "-e",
+            "track:a1",
+            "-s",
+            "flag-default=1",
+            "-e",
+            "track:a2",
+            "-s",
+            "flag-default=0",
+        ]
+        assert result == expected
+
+    @patch("main.options")
+    @patch("main.logger")
+    def test_get_mkv_audio_args_no_audio(self, mock_logger, mock_options):
+        """Test audio args when no audio tracks exist"""
+        mock_options.language = "en"
+        mock_options.lang3 = "eng"
+        mock_options.set_default_audio_track = True
+
+        metadata = {"tracks": [{"type": "video"}, {"type": "subtitles"}]}
+
+        result = get_mkv_audio_args(metadata)
+        assert result == []
+
+    @patch("main.options")
+    @patch("main.logger")
+    def test_get_mkv_audio_args_disabled(self, mock_logger, mock_options):
+        """Test audio args when setDefaultAudio is disabled"""
+        mock_options.set_default_audio_track = False
+
+        metadata = {
+            "tracks": [
+                {"type": "video"},
+                {
+                    "type": "audio",
+                    "properties": {"language_ietf": "en", "language": "eng"},
+                },
+            ]
+        }
+
+        result = get_mkv_audio_args(metadata)
+        assert result == []
 
 
 class TestGetToolVersion:

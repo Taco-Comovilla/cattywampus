@@ -8,6 +8,7 @@ from unittest.mock import patch
 
 import main
 from main import process_mp4_file
+from .test_helpers import setup_complete_mock_options
 
 
 class TestDryRunSimple:
@@ -24,7 +25,7 @@ class TestDryRunSimple:
         mock_perf_counter.side_effect = [1000.0, 1005.0]  # 5 second difference
 
         # Setup options for dry run
-        mock_options.dry_run = True
+        mock_options.configure_mock(**setup_complete_mock_options(dry_run=True).__dict__)
 
         # Mock global variables that get incremented
         main.files_processed = 0
@@ -73,7 +74,7 @@ class TestDryRunSimple:
     def test_mp4_dry_run_with_no_metadata(self, mock_logger, mock_options):
         """Test MP4 dry run when no metadata is found"""
         # Setup options for dry run
-        mock_options.dry_run = True
+        mock_options.configure_mock(**setup_complete_mock_options(dry_run=True).__dict__)
 
         # Create a temporary test file
         with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as tmp_file:

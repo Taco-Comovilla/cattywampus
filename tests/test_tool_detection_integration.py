@@ -4,6 +4,7 @@ Integration tests for tool detection and initialization in main() function
 
 import os
 import tempfile
+from pathlib import Path
 from unittest.mock import patch
 
 import main

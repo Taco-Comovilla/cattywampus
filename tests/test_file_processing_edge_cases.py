@@ -4,6 +4,7 @@ Tests for file processing edge cases and conditional paths
 
 import os
 import tempfile
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest

@@ -4,6 +4,7 @@ Integration tests for configuration loading and option handling in main() functi
 
 import os
 import tempfile
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import main

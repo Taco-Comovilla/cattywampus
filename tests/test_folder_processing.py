@@ -4,6 +4,7 @@ Tests for folder processing error scenarios
 
 import os
 import tempfile
+from pathlib import Path
 from unittest.mock import patch
 
 import main

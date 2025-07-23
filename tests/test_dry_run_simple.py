@@ -4,6 +4,7 @@ Tests for dry run functionality - simplified approach
 
 import os
 import tempfile
+from pathlib import Path
 from unittest.mock import patch
 
 import main

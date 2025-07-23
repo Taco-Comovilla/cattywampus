@@ -4,6 +4,7 @@ Tests for platform-specific code paths and cross-platform compatibility
 
 import os
 import tempfile
+from pathlib import Path
 from unittest.mock import patch
 
 import main

@@ -4,6 +4,7 @@ Tests for tool initialization and edge cases
 
 import os
 import tempfile
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest

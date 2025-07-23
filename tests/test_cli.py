@@ -121,7 +121,7 @@ class TestArgumentParser:
         args = parser.parse_args(["-s", "-f", "test.mkv"])
 
         assert args.set_default_subtitle is True
-        assert args.default_first is True
+        assert args.force_default_first_subtitle is True
 
     def test_parse_multiple_files(self):
         """Test parsing multiple file arguments"""
@@ -206,7 +206,7 @@ class TestFullCLIIntegration:
             "language": "en",
             "logLevel": 20,
             "setDefaultSubtitle": False,
-            "forceDefaultFirstSubTrack": False,
+            "forceDefaultFirstSubtitle": False,
             "onlyMkv": False,
             "onlyMp4": False,
             "mkvmergePath": "",
@@ -290,7 +290,7 @@ onlyMkv = true
             assert config.get("onlyMkv") is True
 
             # Test that defaults are preserved for unspecified values
-            assert config.get("forceDefaultFirstSubTrack") is False  # default
+            assert config.get("forceDefaultFirstSubtitle") is False  # default
             assert config.get("onlyMp4") is False  # default
 
     @patch("mcoptions.mcconfig")
@@ -311,10 +311,10 @@ onlyMkv = true
 
             assert options.log_level == 10
             assert options.set_default_sub_track is True
-            assert options.force_default_first_sub_track is True
+            assert options.force_default_first_subtitle is True
             assert options.sources["log_level"] == "cli"
             assert options.sources["set_default_sub_track"] == "cli"
-            assert options.sources["force_default_first_sub_track"] == "cli"
+            assert options.sources["force_default_first_subtitle"] == "cli"
 
 
 class TestErrorHandling:
@@ -385,7 +385,7 @@ class TestConfigIntegration:
             "language": "fr",
             "logLevel": 10,
             "setDefaultSubtitle": True,
-            "forceDefaultFirstSubTrack": True,
+            "forceDefaultFirstSubtitle": True,
             "onlyMkv": False,
             "onlyMp4": False,
             "mkvmergePath": "/custom/mkvmerge",
@@ -399,7 +399,7 @@ class TestConfigIntegration:
         assert options.language == "fr"
         assert options.log_level == 10
         assert options.set_default_sub_track is True
-        assert options.force_default_first_sub_track is True
+        assert options.force_default_first_subtitle is True
         assert options.mkvmerge_path == "/custom/mkvmerge"
         assert options.mkvpropedit_path == "/custom/mkvpropedit"
         assert options.atomicparsley_path == "/custom/AtomicParsley"
@@ -419,7 +419,7 @@ class TestConfigIntegration:
             "language": "fr",
             "logLevel": 10,
             "setDefaultSubtitle": True,
-            "forceDefaultFirstSubTrack": True,
+            "forceDefaultFirstSubtitle": True,
             "onlyMkv": False,
             "onlyMp4": False,
             "mkvmergePath": "/custom/mkvmerge",

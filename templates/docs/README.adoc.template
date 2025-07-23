@@ -415,7 +415,7 @@ NOTE: The `--only-mkv` and `--only-mp4` options cannot be used together.
 
 `-s, --set-default-subtitle`:: Enable automatic setting of the first subtitle track in your preferred language as the default track. Only applies to MKV files. Default: false
 
-`-f, --default-first`:: Force the first subtitle track (regardless of language) to be set as the default track. Only applies to MKV files. Default: false
+`-f, --force-default-first-subtitle`:: Force the first subtitle track (regardless of language) to be set as the default track. Only applies to MKV files. Default: false
 
 `-A, --set-default-audio`:: Enable automatic setting of the first audio track in your preferred language as the default track. Only applies to MKV files. Default: false
 
@@ -470,7 +470,7 @@ Some options can be set in config.toml. This file will be generated on first use
 
 `setDefaultSubtitle`:: Boolean to enable automatic default subtitle track setting (MKV files only). Default: false
 
-`forceDefaultFirstSubTrack`:: Boolean to force first subtitle track as default regardless of language (MKV files only). Default: false
+`forceDefaultFirstSubtitle`:: Boolean to force first subtitle track as default regardless of language (MKV files only). Default: false
 
 `setDefaultAudio`:: Boolean to enable automatic default audio track setting (MKV files only). Default: false
 

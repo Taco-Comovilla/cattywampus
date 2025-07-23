@@ -84,7 +84,7 @@ def mock_config():
                 "mkvpropeditPath": "",
                 "atomicParsleyPath": "",
                 "setDefaultSubtitle": False,
-                "forceDefaultFirstSubTrack": False,
+                "forceDefaultFirstSubtitle": False,
                 "useSystemLocale": True,
                 "language": "en",
                 "onlyMkv": False,

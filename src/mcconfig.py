@@ -22,7 +22,7 @@ class Config:
             "mkvpropeditPath": "",
             "atomicParsleyPath": "",
             "setDefaultSubtitle": False,
-            "forceDefaultFirstSubTrack": False,
+            "forceDefaultFirstSubtitle": False,
             "clearAudio": False,
             "useSystemLocale": True,
             "language": "",

@@ -114,7 +114,7 @@ class Options:
     stdout: bool
     stdout_only: bool
     set_default_sub_track: bool
-    force_default_first_sub_track: bool
+    force_default_first_subtitle: bool
     set_default_audio_track: bool
     clear_audio_track_names: bool
 
@@ -206,9 +206,9 @@ def _create_argument_parser() -> argparse.ArgumentParser:
 
     parser.add_argument(
         "-f",
-        "--default-first",
+        "--force-default-first-subtitle",
         action="store_true",
-        help="Override forceDefaultFirstSubTrack - force first subtitle track as default",
+        help="Override forceDefaultFirstSubtitle - force first subtitle track as default",
     )
 
     parser.add_argument(
@@ -484,15 +484,15 @@ def parse_options() -> Options:
         sources["set_default_sub_track"] = "default"
 
     # Force default first subtitle track
-    if args.default_first:
-        force_default_first_sub_track = True
-        sources["force_default_first_sub_track"] = "cli"
-    elif mcconfig and mcconfig.get("forceDefaultFirstSubTrack") is not None:
-        force_default_first_sub_track = mcconfig.get("forceDefaultFirstSubTrack", False)
-        sources["force_default_first_sub_track"] = "config"
+    if args.force_default_first_subtitle:
+        force_default_first_subtitle = True
+        sources["force_default_first_subtitle"] = "cli"
+    elif mcconfig and mcconfig.get("forceDefaultFirstSubtitle") is not None:
+        force_default_first_subtitle = mcconfig.get("forceDefaultFirstSubtitle", False)
+        sources["force_default_first_subtitle"] = "config"
     else:
-        force_default_first_sub_track = False
-        sources["force_default_first_sub_track"] = "default"
+        force_default_first_subtitle = False
+        sources["force_default_first_subtitle"] = "default"
 
     # Clear audio track names
     if args.clear_audio:
@@ -543,7 +543,7 @@ def parse_options() -> Options:
         stdout=stdout,
         stdout_only=stdout_only,
         set_default_sub_track=set_default_sub_track,
-        force_default_first_sub_track=force_default_first_sub_track,
+        force_default_first_subtitle=force_default_first_subtitle,
         set_default_audio_track=set_default_audio_track,
         clear_audio_track_names=clear_audio_track_names,
         # Source tracking

@@ -207,7 +207,7 @@ class TestGetMkvSubtitleArgs:
         """Test subtitle args when target language is found"""
         mock_options.language = "en"
         mock_options.lang3 = "eng"
-        mock_options.force_default_first_sub_track = False
+        mock_options.force_default_first_subtitle = False
 
         metadata = {
             "tracks": [
@@ -247,7 +247,7 @@ class TestGetMkvSubtitleArgs:
         """Test subtitle args when no subtitle tracks exist"""
         mock_options.language = "en"
         mock_options.lang3 = "eng"
-        mock_options.force_default_first_sub_track = False
+        mock_options.force_default_first_subtitle = False
 
         metadata = {"tracks": [{"type": "video"}, {"type": "audio"}]}
 
@@ -262,7 +262,7 @@ class TestGetMkvSubtitleArgs:
         """Test forcing first subtitle track as default"""
         mock_options.language = "en"
         mock_options.lang3 = "eng"
-        mock_options.force_default_first_sub_track = True
+        mock_options.force_default_first_subtitle = True
 
         metadata = {
             "tracks": [

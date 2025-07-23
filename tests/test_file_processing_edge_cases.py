@@ -24,7 +24,7 @@ class TestFileProcessingEdgeCases:
         mock_options.set_default_sub_track = (
             True  # This enables the conditional on line 120
         )
-        mock_options.force_default_first_sub_track = False
+        mock_options.force_default_first_subtitle = False
 
         # Reset global counters
         main.files_processed = 0
@@ -145,7 +145,7 @@ class TestFileProcessingEdgeCases:
         with patch("main.options") as mock_options:
             mock_options.language = "eng"
             mock_options.lang3 = "eng"
-            mock_options.force_default_first_sub_track = False
+            mock_options.force_default_first_subtitle = False
 
             # Test with metadata containing no subtitle tracks
             metadata = {"tracks": [{"type": "video"}, {"type": "audio"}]}
@@ -164,7 +164,7 @@ class TestFileProcessingEdgeCases:
             mock_options.language = "eng"
             mock_options.lang3 = "eng"
             mock_options.set_default_sub_track = True
-            mock_options.force_default_first_sub_track = False
+            mock_options.force_default_first_subtitle = False
 
             # Test with subtitle track that doesn't match preferred language
             metadata = {
@@ -196,7 +196,7 @@ class TestFileProcessingEdgeCases:
         """Test MKV processing with no audio tracks (skips audio track commands)"""
         mock_options.dry_run = False
         mock_options.set_default_sub_track = False
-        mock_options.force_default_first_sub_track = False
+        mock_options.force_default_first_subtitle = False
 
         # Reset global counters
         main.files_processed = 0

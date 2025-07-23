@@ -18,7 +18,7 @@ class TestSubtitleProcessing:
         """Test subtitle processing for non-default tracks (lines 401-403)"""
         # Setup options
         mock_options.set_default_sub_track = True
-        mock_options.force_default_first_sub_track = False
+        mock_options.force_default_first_subtitle = False
         mock_options.language = "en"
         mock_options.lang3 = "eng"
 
@@ -58,7 +58,7 @@ class TestSubtitleProcessing:
         """Test subtitle processing with empty language properties"""
         # Setup options
         mock_options.set_default_sub_track = True
-        mock_options.force_default_first_sub_track = False
+        mock_options.force_default_first_subtitle = False
         mock_options.language = "en"
         mock_options.lang3 = "eng"
 
@@ -87,7 +87,7 @@ class TestSubtitleProcessing:
         """Test force first track default when no matching language found"""
         # Setup options to force first track default
         mock_options.set_default_sub_track = True
-        mock_options.force_default_first_sub_track = True
+        mock_options.force_default_first_subtitle = True
         mock_options.language = "en"
         mock_options.lang3 = "eng"
 
@@ -128,7 +128,7 @@ class TestSubtitleProcessing:
         """Test language_ietf fallback when language_ietf is missing"""
         # Setup options
         mock_options.set_default_sub_track = True
-        mock_options.force_default_first_sub_track = False
+        mock_options.force_default_first_subtitle = False
         mock_options.language = "en"
         mock_options.lang3 = "eng"
 

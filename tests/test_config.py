@@ -270,7 +270,7 @@ class TestParseOptions:
             "language": "en",
             "logLevel": 20,
             "setDefaultSubtitle": False,
-            "forceDefaultFirstSubTrack": False,
+            "forceDefaultFirstSubtitle": False,
             "onlyMkv": False,
             "onlyMp4": False,
             "mkvmergePath": "",
@@ -425,7 +425,7 @@ mkvmergePath = "/custom/path/to/mkvmerge"
 mkvpropeditPath = "/custom/path/to/mkvpropedit"
 atomicParsleyPath = "/custom/path/to/AtomicParsley"
 setDefaultSubtitle = true
-forceDefaultFirstSubTrack = true
+forceDefaultFirstSubtitle = true
 useSystemLocale = false
 language = "fr"
 onlyMkv = true
@@ -442,7 +442,7 @@ onlyMp4 = false
             assert config.get("mkvpropeditPath") == "/custom/path/to/mkvpropedit"
             assert config.get("atomicParsleyPath") == "/custom/path/to/AtomicParsley"
             assert config.get("setDefaultSubtitle") is True
-            assert config.get("forceDefaultFirstSubTrack") is True
+            assert config.get("forceDefaultFirstSubtitle") is True
             assert config.get("useSystemLocale") is False
             assert config.get("language") == "fr"
             assert config.get("onlyMkv") is True
@@ -524,7 +524,7 @@ onlyMkv = true
                 mock_args.mkvpropedit_path = None
                 mock_args.atomicparsley_path = None
                 mock_args.set_default_subtitle = False
-                mock_args.default_first = False
+                mock_args.force_default_first_subtitle = False
                 mock_args.logfile = None
 
                 mock_parser.parse_args.return_value = mock_args
@@ -583,7 +583,7 @@ onlyMkv = true
                 mock_args.mkvpropedit_path = None
                 mock_args.atomicparsley_path = None
                 mock_args.set_default_subtitle = False
-                mock_args.default_first = False
+                mock_args.force_default_first_subtitle = False
                 mock_args.clear_audio = False
                 mock_args.logfile = None
                 mock_args.stdout = False  # CLI default (not specified)
@@ -635,7 +635,7 @@ useSystemLocale = false
                 mock_args.mkvpropedit_path = None
                 mock_args.atomicparsley_path = None
                 mock_args.set_default_subtitle = False  # No CLI override
-                mock_args.default_first = False
+                mock_args.force_default_first_subtitle = False
                 mock_args.clear_audio = False
                 mock_args.logfile = None
                 mock_args.stdout = False  # No CLI override
@@ -686,7 +686,7 @@ class TestOptions:
             stdout=False,
             stdout_only=False,
             set_default_sub_track=False,
-            force_default_first_sub_track=False,
+            force_default_first_subtitle=False,
             set_default_audio_track=False,
             clear_audio_track_names=False,
             sources={},

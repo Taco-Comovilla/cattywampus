@@ -114,7 +114,7 @@ class TestConfigurationIntegration:
                         "only_mkv": "command line",
                         "only_mp4": "default",
                         "set_default_sub_track": "config file",
-                        "force_default_first_sub_track": "default",
+                        "force_default_first_subtitle": "default",
                         "set_default_audio_track": "default",
                         "use_system_locale": "default",
                         "dry_run": "command line",

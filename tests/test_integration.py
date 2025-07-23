@@ -25,7 +25,7 @@ class TestProcessMkvFile:
         # Setup
         mock_options.dry_run = False
         mock_options.set_default_sub_track = False
-        mock_options.force_default_first_sub_track = False
+        mock_options.force_default_first_subtitle = False
 
         mock_metadata = {
             "tracks": [{"type": "video"}, {"type": "audio"}, {"type": "subtitles"}]
@@ -73,7 +73,7 @@ class TestProcessMkvFile:
         # Setup
         mock_options.dry_run = False
         mock_options.set_default_sub_track = False
-        mock_options.force_default_first_sub_track = False
+        mock_options.force_default_first_subtitle = False
 
         mock_metadata = {"tracks": [{"type": "video"}, {"type": "subtitles"}]}
         mock_get_metadata.return_value = mock_metadata
@@ -124,7 +124,7 @@ class TestProcessMkvFile:
         # Setup
         mock_options.dry_run = True
         mock_options.set_default_sub_track = False
-        mock_options.force_default_first_sub_track = False
+        mock_options.force_default_first_subtitle = False
 
         mock_metadata = {"tracks": [{"type": "video"}]}
         mock_get_metadata.return_value = mock_metadata

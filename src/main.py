@@ -179,7 +179,7 @@ def process_mkv_file(file_path, track_id=1, mkvpropedit_path=None, mkvmerge_path
             )
         else:
             logger.debug("No audio tracks found, skipping audio track options")
-        if options.set_default_sub_track or options.force_default_first_sub_track:
+        if options.set_default_sub_track or options.force_default_first_subtitle:
             command = command + get_mkv_subtitle_args(metadata)
         if options.set_default_audio_track:
             command = command + get_mkv_audio_args(metadata)
@@ -470,7 +470,7 @@ def get_mkv_subtitle_args(metadata):
             if current_index == found_at_index or (
                 not track_found
                 and current_index == 1
-                and options.force_default_first_sub_track
+                and options.force_default_first_subtitle
             ):
                 logger.debug(
                     f"Enabling and defaulting subtitle track s{current_index} "

@@ -279,7 +279,7 @@ class TestErrorHandling:
         mock_options.configure_mock(**setup_complete_mock_options(
             dry_run=False,
             set_default_sub_track=False,
-            force_default_first_sub_track=False
+            force_default_first_subtitle=False
         ).__dict__)
 
         mock_get_metadata.return_value = {"tracks": [{"type": "video"}]}

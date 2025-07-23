@@ -42,27 +42,32 @@ class TestConfigurationIntegration:
                     )
                     mock_parse_options.return_value = mock_options
 
-                    # Mock logger setup
-                    with patch("main.logger.setup") as mock_logger_setup:
-                        # Mock tools as found
-                        with patch("main.shutil.which") as mock_which:
-                            mock_which.side_effect = lambda tool: (
-                                f"/usr/bin/{tool}" if tool else None
-                            )
+                    # Mock tools as found
+                    with patch("main.shutil.which") as mock_which:
+                        with patch("main.Path.is_file") as mock_is_file:
+                            with patch("main.os.access") as mock_access:
+                                mock_which.side_effect = lambda tool: (
+                                    f"/usr/bin/{tool}" if tool else None
+                                )
+                                mock_is_file.return_value = True
+                                mock_access.return_value = True
 
-                            with patch("main.process_mkv_file") as mock_process_mkv:
-                                with patch("main.logger") as mock_logger:
-                                    with patch("main.sys.exit") as mock_exit:
-                                        mock_process_mkv.return_value = None
+                                with patch("main.process_mkv_file") as mock_process_mkv:
+                                    # Mock logger setup to verify correct parameters
+                                    with patch("main.logger.setup") as mock_logger_setup:
+                                        with patch("main.sys.exit") as mock_exit:
+                                            mock_process_mkv.return_value = None
 
-                                        # Call main function
-                                        main.main()
+                                            # Call main function
+                                            main.main()
 
-                                        # Verify logger setup called with correct parameters (lines 462-465)
-                                        mock_logger_setup.assert_called_once_with(
-                                            log_file_path="/custom/log/path.log",
-                                            log_level=10,
-                                        )
+                                            # Verify logger setup called with correct parameters (lines 462-465)
+                                            mock_logger_setup.assert_called_once_with(
+                                                log_file_path="/custom/log/path.log",
+                                                log_level=10,
+                                                stdout_enabled=False,
+                                                stdout_only=False,
+                                            )
                                         mock_exit.assert_called_once()
         finally:
             # Clean up
@@ -191,39 +196,43 @@ class TestConfigurationIntegration:
 
                     # Mock tools as found
                     with patch("main.shutil.which") as mock_which:
-                        mock_which.side_effect = lambda tool: (
-                            f"/usr/bin/{tool}" if tool else None
-                        )
+                        with patch("main.Path.is_file") as mock_is_file:
+                            with patch("main.os.access") as mock_access:
+                                mock_which.side_effect = lambda tool: (
+                                    f"/usr/bin/{tool}" if tool else None
+                                )
+                                mock_is_file.return_value = True
+                                mock_access.return_value = True
 
-                        # Mock processing functions to simulate file type statistics
-                        with patch("main.process_mkv_file") as mock_process_mkv:
-                            with patch("main.process_mp4_file") as mock_process_mp4:
+                                # Mock processing functions to simulate file type statistics
+                                with patch("main.process_mkv_file") as mock_process_mkv:
+                                    with patch("main.process_mp4_file") as mock_process_mp4:
 
-                                def simulate_mkv_processing():
-                                    main.mkv_files_processed = 1
-                                    main.mkv_processing_time = 2.5
+                                        def simulate_mkv_processing(path):
+                                            main.mkv_files_processed = 1
+                                            main.mkv_processing_time = 2.5
 
-                                def simulate_mp4_processing():
-                                    main.mp4_files_processed = 1
-                                    main.mp4_processing_time = 1.8
+                                        def simulate_mp4_processing(path):
+                                            main.mp4_files_processed = 1
+                                            main.mp4_processing_time = 1.8
 
-                                mock_process_mkv.side_effect = simulate_mkv_processing
-                                mock_process_mp4.side_effect = simulate_mp4_processing
+                                        mock_process_mkv.side_effect = simulate_mkv_processing
+                                        mock_process_mp4.side_effect = simulate_mp4_processing
 
-                                with patch("main.logger") as mock_logger:
-                                    with patch("main.sys.exit") as mock_exit:
+                                        with patch("main.logger") as mock_logger:
+                                            with patch("main.sys.exit") as mock_exit:
 
-                                        # Call main function
-                                        main.main()
+                                                # Call main function
+                                                main.main()
 
-                                        # Verify file type statistics logging (lines 636-640)
-                                        mock_logger.info.assert_any_call(
-                                            "MKV files processed: 1, total MKV processing time: 2.500 seconds"
-                                        )
-                                        mock_logger.info.assert_any_call(
-                                            "MP4 files processed: 1, total MP4 processing time: 1.800 seconds"
-                                        )
-                                        mock_exit.assert_called_once()
+                                                # Verify file type statistics logging (lines 636-640)
+                                                mock_logger.info.assert_any_call(
+                                                    "MKV files processed: 1, total MKV processing time: 2.500 seconds"
+                                                )
+                                                mock_logger.info.assert_any_call(
+                                                    "MP4 files processed: 1, total MP4 processing time: 1.800 seconds"
+                                                )
+                                                mock_exit.assert_called_once()
         finally:
             # Clean up
             for path in [mkv_file_path, mp4_file_path]:

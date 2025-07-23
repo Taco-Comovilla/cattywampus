@@ -6,6 +6,7 @@ import logging
 import os
 import tempfile
 from io import StringIO
+from pathlib import Path
 from unittest.mock import patch
 
 import main
@@ -111,8 +112,8 @@ class TestStdoutOnlyLogging:
 
         finally:
             # Clean up
-            if os.path.exists(log_file_path):
-                os.unlink(log_file_path)
+            if Path(log_file_path).exists():
+                Path(log_file_path).unlink()
 
     def test_logger_setup_with_both_stdout_and_stdout_only(self):
         """Test that stdout_only takes precedence and only creates console handler"""
@@ -140,8 +141,8 @@ class TestStdoutOnlyLogging:
 
         finally:
             # Clean up
-            if os.path.exists(log_file_path):
-                os.unlink(log_file_path)
+            if Path(log_file_path).exists():
+                Path(log_file_path).unlink()
 
     def test_logger_setup_without_stdout_only(self):
         """Test that logger setup works normally without stdout_only option"""
@@ -165,8 +166,8 @@ class TestStdoutOnlyLogging:
 
         finally:
             # Clean up
-            if os.path.exists(log_file_path):
-                os.unlink(log_file_path)
+            if Path(log_file_path).exists():
+                Path(log_file_path).unlink()
 
     def test_stdout_only_with_main_function(self):
         """Test --stdout-only option in main() function integration"""
@@ -226,8 +227,8 @@ class TestStdoutOnlyLogging:
 
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_stdout_only_config_file_option(self):
         """Test that stdout_only option can be set via config file"""
@@ -257,8 +258,8 @@ class TestStdoutOnlyLogging:
 
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_stdout_only_cli_overrides_config(self):
         """Test that CLI --stdout-only overrides config file setting"""
@@ -290,8 +291,8 @@ class TestStdoutOnlyLogging:
 
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_stdout_only_vs_stdout_behavior(self):
         """Test that --stdout-only behaves differently from --stdout"""
@@ -330,8 +331,8 @@ class TestStdoutOnlyLogging:
 
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_version_and_help_not_affected_by_stdout_only(self):
         """Test that --version and --help work normally even with --stdout-only"""

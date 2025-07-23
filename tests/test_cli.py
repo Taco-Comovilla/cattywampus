@@ -269,7 +269,7 @@ class TestFullCLIIntegration:
             # Create a custom config file
             import os
 
-            custom_config_path = os.path.join(temp_dir, "integration_test.toml")
+            custom_config_path = str(Path(temp_dir) / "integration_test.toml")
             with open(custom_config_path, "w") as f:
                 f.write(
                     """

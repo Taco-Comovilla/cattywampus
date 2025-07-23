@@ -4,6 +4,7 @@ Tests for path processing, deduplication, and filtering in main() function
 
 import os
 import tempfile
+from pathlib import Path
 from unittest.mock import patch
 
 import main
@@ -55,8 +56,8 @@ class TestPathProcessing:
                                 mock_exit.assert_called_once()
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_main_function_file_type_filtering_mkv_only(self):
         """Test file type filtering with --only-mkv (lines 494-507)"""
@@ -105,8 +106,8 @@ class TestPathProcessing:
         finally:
             # Clean up
             for path in [mkv_file_path, mp4_file_path]:
-                if os.path.exists(path):
-                    os.unlink(path)
+                if Path(path).exists():
+                    Path(path).unlink()
 
     def test_main_function_file_type_filtering_mp4_only(self):
         """Test file type filtering with --only-mp4 (lines 494-507)"""
@@ -155,8 +156,8 @@ class TestPathProcessing:
         finally:
             # Clean up
             for path in [mkv_file_path, mp4_file_path]:
-                if os.path.exists(path):
-                    os.unlink(path)
+                if Path(path).exists():
+                    Path(path).unlink()
 
     def test_main_function_directory_filtering_preserved(self):
         """Test that directories are preserved during file type filtering (lines 502-504)"""
@@ -203,8 +204,8 @@ class TestPathProcessing:
                                         mock_exit.assert_called_once()
             finally:
                 # Clean up
-                if os.path.exists(mkv_file_path):
-                    os.unlink(mkv_file_path)
+                if Path(mkv_file_path).exists():
+                    Path(mkv_file_path).unlink()
 
     def test_main_function_mixed_file_and_folder_processing(self):
         """Test processing both files and folders (lines 617-624)"""
@@ -257,8 +258,8 @@ class TestPathProcessing:
             finally:
                 # Clean up
                 for path in [mkv_file_path, mp4_file_path]:
-                    if os.path.exists(path):
-                        os.unlink(path)
+                    if Path(path).exists():
+                        Path(path).unlink()
 
     def test_main_function_m4v_file_processing(self):
         """Test .m4v file processing (lines 621-622)"""
@@ -289,5 +290,5 @@ class TestPathProcessing:
                                 mock_exit.assert_called_once()
         finally:
             # Clean up
-            if os.path.exists(m4v_file_path):
-                os.unlink(m4v_file_path)
+            if Path(m4v_file_path).exists():
+                Path(m4v_file_path).unlink()

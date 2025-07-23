@@ -65,8 +65,8 @@ class TestConfigurationIntegration:
                                         mock_exit.assert_called_once()
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_main_function_configuration_options_logging(self):
         """Test configuration options logging with sources (lines 539-559)"""
@@ -155,8 +155,8 @@ class TestConfigurationIntegration:
                                     mock_exit.assert_called_once()
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_main_function_file_type_statistics_logging(self):
         """Test file type specific statistics logging (lines 636-640)"""
@@ -226,8 +226,8 @@ class TestConfigurationIntegration:
         finally:
             # Clean up
             for path in [mkv_file_path, mp4_file_path]:
-                if os.path.exists(path):
-                    os.unlink(path)
+                if Path(path).exists():
+                    Path(path).unlink()
             # Reset global variables
             main.mkv_files_processed = 0
             main.mp4_files_processed = 0

@@ -79,7 +79,7 @@ class TestFileProcessingEdgeCases:
 
         finally:
             # Clean up
-            os.unlink(tmp_file_path)
+            Path(tmp_file_path).unlink()
             main.files_processed = 0
             main.mkv_files_processed = 0
             main.mkv_processing_time = 0.0
@@ -134,7 +134,7 @@ class TestFileProcessingEdgeCases:
 
         finally:
             # Clean up
-            os.unlink(tmp_file_path)
+            Path(tmp_file_path).unlink()
             main.files_processed = 0
             main.mp4_files_processed = 0
             main.mp4_processing_time = 0.0
@@ -247,7 +247,7 @@ class TestFileProcessingEdgeCases:
 
         finally:
             # Clean up
-            os.unlink(tmp_file_path)
+            Path(tmp_file_path).unlink()
             main.files_processed = 0
             main.mkv_files_processed = 0
             main.mkv_processing_time = 0.0

@@ -59,8 +59,8 @@ class TestPlatformSpecific:
                                         mock_exit.assert_called_once()
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_main_function_unix_platform_tool_naming(self):
         """Test Unix platform tool naming without .exe extension"""
@@ -109,8 +109,8 @@ class TestPlatformSpecific:
                                         mock_exit.assert_called_once()
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_main_function_script_execution_guard(self):
         """Test script execution guard at module level (line 652)"""
@@ -167,8 +167,8 @@ class TestPlatformSpecific:
                                     mock_exit.assert_called_once()
         finally:
             # Clean up
-            if os.path.exists(m4v_file_path):
-                os.unlink(m4v_file_path)
+            if Path(m4v_file_path).exists():
+                Path(m4v_file_path).unlink()
 
     def test_input_file_read_error_handling(self):
         """Test input file read error handling scenarios (lines 439-447)"""

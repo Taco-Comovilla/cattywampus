@@ -4,6 +4,7 @@ Unit tests for configuration system (mcconfig.py and mcoptions.py)
 
 import os
 import tempfile
+from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
@@ -44,8 +45,8 @@ class TestConfig:
             with patch("mcconfig.Config._get_config_path", return_value=temp_dir):
                 config = Config("test_config.toml")
 
-                config_file = os.path.join(temp_dir, "test_config.toml")
-                assert os.path.exists(config_file)
+                config_file = str(Path(temp_dir) / "test_config.toml")
+                assert Path(config_file).exists()
 
     def test_config_get_with_default(self):
         """Test getting config values with default fallback"""
@@ -62,8 +63,8 @@ class TestConfig:
             with patch("mcconfig.Config._get_config_path", return_value=temp_dir):
                 config = Config("test_config.toml")
 
-                config_file = os.path.join(temp_dir, "test_config.toml")
-                assert os.path.exists(config_file)
+                config_file = str(Path(temp_dir) / "test_config.toml")
+                assert Path(config_file).exists()
 
                 # Read the generated file and verify it contains expected content
                 with open(config_file) as f:
@@ -77,8 +78,8 @@ class TestConfig:
             with patch("mcconfig.Config._get_config_path", return_value=temp_dir):
                 config = Config("test_config.toml")
 
-                config_file = os.path.join(temp_dir, "test_config.toml")
-                assert os.path.exists(config_file)
+                config_file = str(Path(temp_dir) / "test_config.toml")
+                assert Path(config_file).exists()
 
                 # Read the generated file and verify it contains example file content
                 with open(config_file) as f:
@@ -103,11 +104,10 @@ class TestConfig:
                 "useSystemLocale": True,
             }
 
-            config_file_path = os.path.join(temp_dir, "test_config.toml")
+            config_file_path = str(Path(temp_dir) / "test_config.toml")
 
             # Test the fallback behavior by temporarily moving the example file
             import shutil
-            from pathlib import Path
 
             # Find the real example file and temporarily rename it
             example_path = Path(__file__).parent.parent / "src" / "config.example.toml"
@@ -121,7 +121,7 @@ class TestConfig:
                 # Call the method - should fallback to old behavior
                 config._generate_default_config_file(config_file_path)
 
-                assert os.path.exists(config_file_path)
+                assert Path(config_file_path).exists()
 
                 # Read the generated file and verify it contains minimal content (no comments)
                 with open(config_file_path) as f:
@@ -419,7 +419,7 @@ class TestCustomConfig:
         """Test loading a custom configuration file"""
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create a custom config file
-            custom_config_path = os.path.join(temp_dir, "custom_config.toml")
+            custom_config_path = str(Path(temp_dir) / "custom_config.toml")
             with open(custom_config_path, "w") as f:
                 f.write(
                     """
@@ -455,7 +455,7 @@ onlyMp4 = false
             assert config.config_file_path == custom_config_path
 
             # Verify log file path uses same directory as custom config
-            expected_log_path = os.path.join(temp_dir, f"{__app_name__}.log")
+            expected_log_path = str(Path(temp_dir) / f"{__app_name__}.log")
             assert config.log_file_path == expected_log_path
 
     def test_custom_config_nonexistent_file(self):
@@ -473,7 +473,7 @@ onlyMp4 = false
         """Test custom config with only some settings specified"""
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create a custom config file with only some settings
-            custom_config_path = os.path.join(temp_dir, "partial_config.toml")
+            custom_config_path = str(Path(temp_dir) / "partial_config.toml")
             with open(custom_config_path, "w") as f:
                 f.write(
                     """
@@ -499,7 +499,7 @@ onlyMkv = true
         """Test parse_options with --config argument"""
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create a custom config file
-            custom_config_path = os.path.join(temp_dir, "custom.toml")
+            custom_config_path = str(Path(temp_dir) / "custom.toml")
             with open(custom_config_path, "w") as f:
                 f.write(
                     """
@@ -559,7 +559,7 @@ onlyMkv = true
         """Test that CLI arguments override custom config values"""
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create a custom config file
-            custom_config_path = os.path.join(temp_dir, "custom.toml")
+            custom_config_path = str(Path(temp_dir) / "custom.toml")
             with open(custom_config_path, "w") as f:
                 f.write(
                     """
@@ -611,7 +611,7 @@ onlyMkv = true
         """Test that custom config values override defaults when no CLI override"""
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create a custom config file with different values from defaults
-            custom_config_path = os.path.join(temp_dir, "custom.toml")
+            custom_config_path = str(Path(temp_dir) / "custom.toml")
             with open(custom_config_path, "w") as f:
                 f.write(
                     """

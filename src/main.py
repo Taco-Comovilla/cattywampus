@@ -146,7 +146,7 @@ def process_mkv_file(file_path, track_id=1, mkvpropedit_path=None, mkvmerge_path
     mkv_start_time = time.perf_counter()
 
     logger.info(f"Processing MKV file: {file_path}")
-    file_size = round(os.path.getsize(file_path) / 1024)  # size in KB
+    file_size = round(Path(file_path).stat().st_size / 1024)  # size in KB
     logger.debug(f"File size: {file_size} KB")
 
     metadata = get_mkv_metadata(file_path, mkvmerge_tool)
@@ -229,7 +229,7 @@ def process_mp4_file(file_path, atomicparsley_path=None):
     mp4_start_time = time.perf_counter()
 
     logger.info(f"Processing MP4 file: {file_path}")
-    file_size = round(os.path.getsize(file_path) / 1024)  # size in KB
+    file_size = round(Path(file_path).stat().st_size / 1024)  # size in KB
     logger.debug(f"File size: {file_size} KB")
 
     metadata = get_mp4_metadata(file_path, atomicparsley_tool)
@@ -297,12 +297,12 @@ def process_folder(folder_path):
     file_path = ""
 
     # Check if folder exists first
-    if not os.path.exists(folder_path):
+    if not Path(folder_path).exists():
         folders_errored = folders_errored + 1
         logger.error(f"Folder does not exist: {folder_path}")
         return
 
-    if not os.path.isdir(folder_path):
+    if not Path(folder_path).is_dir():
         folders_errored = folders_errored + 1
         logger.error(f"Path is not a directory: {folder_path}")
         return
@@ -312,11 +312,11 @@ def process_folder(folder_path):
             for file in files:
                 if file.endswith(".mkv"):
                     if not options.only_mp4:  # Process MKV unless only MP4 is enabled
-                        file_path = os.path.join(root, file)
+                        file_path = str(Path(root) / file)
                         process_mkv_file(file_path)
                 elif file.endswith((".mp4", ".m4v", ".mp4v")):
                     if not options.only_mkv:  # Process MP4 unless only MKV is enabled
-                        file_path = os.path.join(root, file)
+                        file_path = str(Path(root) / file)
                         process_mp4_file(file_path)
 
         folders_processed = folders_processed + 1
@@ -497,7 +497,7 @@ def read_paths_from_file(input_file):
     """
     paths = []
     try:
-        with open(input_file, encoding="utf-8") as f:
+        with Path(input_file).open(encoding="utf-8") as f:
             for line_num, line in enumerate(f, 1):
                 # Strip whitespace and handle both DOS (\r\n) and Unix (\n) line endings
                 path = line.strip()
@@ -507,10 +507,10 @@ def read_paths_from_file(input_file):
                     continue
 
                 # Resolve relative to current working directory
-                resolved_path = os.path.abspath(path)
+                resolved_path = str(Path(path).resolve())
 
                 # Check if path exists
-                if not os.path.exists(resolved_path):
+                if not Path(resolved_path).exists():
                     logger.warning(
                         f"Path from input file line {line_num} does not exist: {path}"
                     )
@@ -570,7 +570,7 @@ def main():
     unique_paths = []
     for path in all_paths:
         # Use absolute path for comparison to catch different ways of specifying same file
-        abs_path = os.path.abspath(path)
+        abs_path = str(Path(path).resolve())
         if abs_path not in seen:
             seen.add(abs_path)
             unique_paths.append(path)
@@ -582,13 +582,13 @@ def main():
     if options.only_mkv or options.only_mp4:
         filtered_paths = []
         for path in all_paths:
-            if os.path.isfile(path):
+            if Path(path).is_file():
                 if (path.lower().endswith(".mkv") and not options.only_mp4) or (
                     (path.lower().endswith(".mp4") or path.lower().endswith(".m4v"))
                     and not options.only_mkv
                 ):
                     filtered_paths.append(path)
-            elif os.path.isdir(path):
+            elif Path(path).is_dir():
                 # Always include directories - filtering happens during folder processing
                 filtered_paths.append(path)
 
@@ -734,7 +734,7 @@ def main():
         logger.debug("  AtomicParsley: not found")
 
     for path in all_paths:
-        if os.path.isfile(path):
+        if Path(path).is_file():
             if path.lower().endswith(".mkv"):
                 process_mkv_file(path)
             elif path.lower().endswith(".mp4") or path.lower().endswith(".m4v"):

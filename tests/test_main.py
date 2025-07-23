@@ -5,6 +5,7 @@ Unit tests for main.py functions
 import json
 import os
 import subprocess
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -346,7 +347,7 @@ class TestReadPathsFromFile:
 
     def test_read_paths_from_file_success(self, temp_dir):
         """Test successful reading of paths from file"""
-        test_file = os.path.join(temp_dir, "paths.txt")
+        test_file = str(Path(temp_dir) / "paths.txt")
         test_paths = ["path1.mkv", "path2.mp4", "# This is a comment", "", "path3.mkv"]
 
         with open(test_file, "w") as f:
@@ -369,8 +370,8 @@ class TestReadPathsFromFile:
         finally:
             # Clean up
             for path in ["path1.mkv", "path2.mp4", "path3.mkv"]:
-                if os.path.exists(path):
-                    os.remove(path)
+                if Path(path).exists():
+                    Path(path).unlink()
 
     def test_read_paths_from_file_nonexistent_file(self):
         """Test handling of non-existent input file"""
@@ -379,7 +380,7 @@ class TestReadPathsFromFile:
 
     def test_read_paths_from_file_nonexistent_paths(self, temp_dir):
         """Test handling of non-existent paths in file"""
-        test_file = os.path.join(temp_dir, "paths.txt")
+        test_file = str(Path(temp_dir) / "paths.txt")
 
         with open(test_file, "w") as f:
             f.write("nonexistent1.mkv\nnonexistent2.mp4\n")
@@ -393,7 +394,7 @@ class TestReadPathsFromFile:
 
     def test_read_paths_from_file_dos_line_endings(self, temp_dir):
         """Test handling of DOS line endings"""
-        test_file = os.path.join(temp_dir, "paths.txt")
+        test_file = str(Path(temp_dir) / "paths.txt")
 
         with open(test_file, "wb") as f:
             f.write(b"path1.mkv\r\npath2.mp4\r\n")
@@ -412,8 +413,8 @@ class TestReadPathsFromFile:
         finally:
             # Clean up
             for path in ["path1.mkv", "path2.mp4"]:
-                if os.path.exists(path):
-                    os.remove(path)
+                if Path(path).exists():
+                    Path(path).unlink()
 
 
 class TestFormatErrorString:

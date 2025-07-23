@@ -7,6 +7,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from src.main import has_audio_tracks, process_mkv_file
+from version import __app_name__
 
 
 class TestAudioTrackClearing:
@@ -247,8 +248,8 @@ class TestAudioTrackClearingCLI:
             sys.argv = original_argv
             import os
 
-            if os.path.exists(tmp_config_path):
-                os.unlink(tmp_config_path)
+            if Path(tmp_config_path).exists():
+                Path(tmp_config_path).unlink()
 
     def test_cli_overrides_config(self):
         """Test that CLI option overrides config file"""
@@ -275,5 +276,5 @@ class TestAudioTrackClearingCLI:
             sys.argv = original_argv
             import os
 
-            if os.path.exists(tmp_config_path):
-                os.unlink(tmp_config_path)
+            if Path(tmp_config_path).exists():
+                Path(tmp_config_path).unlink()

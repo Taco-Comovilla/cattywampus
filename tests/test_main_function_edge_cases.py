@@ -4,6 +4,7 @@ Tests for remaining main() function edge cases and conditional paths
 
 import os
 import tempfile
+from pathlib import Path
 from unittest.mock import patch
 
 import main
@@ -61,10 +62,10 @@ class TestMainFunctionEdgeCases:
                                     mock_exit.assert_called_once()
         finally:
             # Clean up
-            if os.path.exists(test_file_path):
-                os.unlink(test_file_path)
-            if os.path.exists(input_file_path):
-                os.unlink(input_file_path)
+            if Path(test_file_path).exists():
+                Path(test_file_path).unlink()
+            if Path(input_file_path).exists():
+                Path(input_file_path).unlink()
 
     def test_main_function_file_type_filtering_mkv_only(self):
         """Test main() function file type filtering with --only-mkv (lines 495-507)"""
@@ -120,8 +121,8 @@ class TestMainFunctionEdgeCases:
         finally:
             # Clean up
             for path in [mkv_file_path, mp4_file_path]:
-                if os.path.exists(path):
-                    os.unlink(path)
+                if Path(path).exists():
+                    Path(path).unlink()
 
     def test_main_function_path_deduplication_logging(self):
         """Test main() function path deduplication logging (lines 531-533)"""
@@ -170,8 +171,8 @@ class TestMainFunctionEdgeCases:
                                     mock_exit.assert_called_once()
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_main_function_tool_path_assignment_logic(self):
         """Test main() function tool path assignment logic (lines 563, 568, 573)"""
@@ -214,8 +215,8 @@ class TestMainFunctionEdgeCases:
                                     mock_exit.assert_called_once()
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_main_function_mixed_file_processing_dispatch(self):
         """Test main() function file processing dispatch (lines 623-624)"""
@@ -275,8 +276,8 @@ class TestMainFunctionEdgeCases:
             finally:
                 # Clean up
                 for path in [mkv_file_path, mp4_file_path]:
-                    if os.path.exists(path):
-                        os.unlink(path)
+                    if Path(path).exists():
+                        Path(path).unlink()
 
     def test_main_function_folder_error_statistics_logging(self):
         """Test main() function folder error statistics logging (line 628)"""
@@ -321,7 +322,7 @@ class TestMainFunctionEdgeCases:
                                     mock_exit.assert_called_once()
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
             # Reset global variables
             main.folders_errored = 0

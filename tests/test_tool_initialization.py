@@ -97,4 +97,4 @@ class TestToolInitialization:
 
         finally:
             # Clean up
-            os.unlink(tmp_file_path)
+            Path(tmp_file_path).unlink()

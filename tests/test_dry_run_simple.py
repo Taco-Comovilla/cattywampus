@@ -62,7 +62,7 @@ class TestDryRunSimple:
 
         finally:
             # Clean up
-            os.unlink(tmp_file_path)
+            Path(tmp_file_path).unlink()
             # Reset global variables
             main.files_processed = 0
             main.mp4_files_processed = 0
@@ -96,7 +96,7 @@ class TestDryRunSimple:
 
         finally:
             # Clean up
-            os.unlink(tmp_file_path)
+            Path(tmp_file_path).unlink()
 
     @patch("main.options")
     @patch("main.logger")
@@ -135,4 +135,4 @@ class TestDryRunSimple:
 
         finally:
             # Clean up
-            os.unlink(tmp_file_path)
+            Path(tmp_file_path).unlink()

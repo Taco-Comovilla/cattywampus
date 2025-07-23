@@ -141,8 +141,8 @@ class TestErrorHandlingIntegration:
                                         mock_exit.assert_called_once()
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_main_function_total_runtime_logging(self):
         """Test main() function logs total runtime statistics (lines 642-644)"""
@@ -198,8 +198,8 @@ class TestErrorHandlingIntegration:
                                         mock_exit.assert_called_once()
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_main_function_file_error_statistics_logging(self):
         """Test main() function logs file error statistics (lines 630-634)"""
@@ -262,8 +262,8 @@ class TestErrorHandlingIntegration:
                                     mock_exit.assert_called_once()
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
             # Reset global variables
             main.files_errored = 0
             main.files_with_errors = []

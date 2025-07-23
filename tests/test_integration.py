@@ -294,9 +294,9 @@ class TestProcessFolder:
         # Create temp directory with test files
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create test files
-            mkv_file = os.path.join(temp_dir, "test.mkv")
-            mp4_file = os.path.join(temp_dir, "test.mp4")
-            txt_file = os.path.join(temp_dir, "readme.txt")
+            mkv_file = str(Path(temp_dir) / "test.mkv")
+            mp4_file = str(Path(temp_dir) / "test.mp4")
+            txt_file = str(Path(temp_dir) / "readme.txt")
 
             with open(mkv_file, "w") as f:
                 f.write("fake mkv")
@@ -326,8 +326,8 @@ class TestProcessFolder:
         # Create temp directory with test files
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create test files
-            mkv_file = os.path.join(temp_dir, "test.mkv")
-            mp4_file = os.path.join(temp_dir, "test.mp4")
+            mkv_file = str(Path(temp_dir) / "test.mkv")
+            mp4_file = str(Path(temp_dir) / "test.mp4")
 
             with open(mkv_file, "w") as f:
                 f.write("fake mkv")
@@ -355,9 +355,9 @@ class TestProcessFolder:
         # Create temp directory with test files
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create test files
-            mkv_file = os.path.join(temp_dir, "test.mkv")
-            mp4_file = os.path.join(temp_dir, "test.mp4")
-            m4v_file = os.path.join(temp_dir, "test.m4v")
+            mkv_file = str(Path(temp_dir) / "test.mkv")
+            mp4_file = str(Path(temp_dir) / "test.mp4")
+            m4v_file = str(Path(temp_dir) / "test.m4v")
 
             with open(mkv_file, "w") as f:
                 f.write("fake mkv")
@@ -388,12 +388,12 @@ class TestProcessFolder:
         # Create temp directory with nested structure
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create nested directory
-            nested_dir = os.path.join(temp_dir, "nested")
+            nested_dir = str(Path(temp_dir) / "nested")
             os.makedirs(nested_dir)
 
             # Create test files at different levels
-            root_mkv = os.path.join(temp_dir, "root.mkv")
-            nested_mp4 = os.path.join(nested_dir, "nested.mp4")
+            root_mkv = str(Path(temp_dir) / "root.mkv")
+            nested_mp4 = str(Path(nested_dir) / "nested.mp4")
 
             with open(root_mkv, "w") as f:
                 f.write("fake mkv")

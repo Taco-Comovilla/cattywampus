@@ -4,11 +4,13 @@ CLI integration tests to cover main() function execution paths
 
 import os
 import tempfile
+from pathlib import Path
 from unittest.mock import patch
 
 import main
 
 from .test_helpers import create_mock_options
+from version import __app_name__
 
 
 class TestCLIIntegration:
@@ -56,8 +58,8 @@ class TestCLIIntegration:
                                     mock_exit.assert_called_once()
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_main_function_dry_run_mode(self):
         """Test main() function in dry run mode"""
@@ -99,8 +101,8 @@ class TestCLIIntegration:
                                     mock_exit.assert_called_once()
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_main_function_no_tools_found_exit(self):
         """Test main() function exits when no tools are found (lines 584-586)"""
@@ -132,8 +134,8 @@ class TestCLIIntegration:
                                 mock_exit.assert_called()
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_main_function_input_file_processing(self):
         """Test main() function with input file (lines 475-477)"""
@@ -174,16 +176,16 @@ class TestCLIIntegration:
                                 mock_exit.assert_called_once()
         finally:
             # Clean up
-            if os.path.exists(test_file_path):
-                os.unlink(test_file_path)
-            if os.path.exists(input_file_path):
-                os.unlink(input_file_path)
+            if Path(test_file_path).exists():
+                Path(test_file_path).unlink()
+            if Path(input_file_path).exists():
+                Path(input_file_path).unlink()
 
     def test_main_function_folder_processing(self):
         """Test main() function with folder processing (lines 623-624)"""
         # Create a temporary directory with a test file
         with tempfile.TemporaryDirectory() as tmp_dir:
-            test_file = os.path.join(tmp_dir, "test.mkv")
+            test_file = str(Path(tmp_dir) / "test.mkv")
             with open(test_file, "w") as f:
                 f.write("fake content")
 
@@ -249,5 +251,5 @@ class TestCLIIntegration:
                                     mock_exit.assert_called_once()
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()

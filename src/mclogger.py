@@ -2,6 +2,7 @@ __all__ = ["mclogger"]
 
 import logging
 import sys
+from pathlib import Path
 
 import __main__
 from version import __app_name__
@@ -48,9 +49,9 @@ class Logger:
                 # Ensure directory exists before creating file handler
                 import os
 
-                log_dir = os.path.dirname(log_file_path)
-                if log_dir and not os.path.exists(log_dir):
-                    os.makedirs(log_dir, exist_ok=True)
+                log_dir = Path(log_file_path).parent
+                if log_dir and not log_dir.exists():
+                    log_dir.mkdir(parents=True, exist_ok=True)
 
                 file_handler = logging.FileHandler(log_file_path)
                 file_handler.setLevel(log_level)

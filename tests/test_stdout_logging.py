@@ -6,6 +6,7 @@ import logging
 import os
 import tempfile
 from io import StringIO
+from pathlib import Path
 from unittest.mock import patch
 
 import main
@@ -124,8 +125,8 @@ class TestStdoutLogging:
 
         finally:
             # Clean up
-            if os.path.exists(log_file_path):
-                os.unlink(log_file_path)
+            if Path(log_file_path).exists():
+                Path(log_file_path).unlink()
 
     def test_logger_setup_without_stdout(self):
         """Test that logger setup works normally without stdout option"""
@@ -151,8 +152,8 @@ class TestStdoutLogging:
 
         finally:
             # Clean up
-            if os.path.exists(log_file_path):
-                os.unlink(log_file_path)
+            if Path(log_file_path).exists():
+                Path(log_file_path).unlink()
 
     def test_console_formatter_different_from_file(self):
         """Test that console and file use different formatters"""
@@ -200,8 +201,8 @@ class TestStdoutLogging:
 
         finally:
             # Clean up
-            if os.path.exists(log_file_path):
-                os.unlink(log_file_path)
+            if Path(log_file_path).exists():
+                Path(log_file_path).unlink()
 
     def test_stdout_with_main_function(self):
         """Test --stdout option in main() function integration"""
@@ -261,8 +262,8 @@ class TestStdoutLogging:
 
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_version_and_help_not_affected_by_stdout(self):
         """Test that --version and --help work normally even with --stdout"""
@@ -323,8 +324,8 @@ class TestStdoutLogging:
 
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_stdout_config_file_option(self):
         """Test that stdout option can be set via config file"""
@@ -354,8 +355,8 @@ class TestStdoutLogging:
 
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_stdout_cli_overrides_config(self):
         """Test that CLI --stdout overrides config file setting"""
@@ -387,5 +388,5 @@ class TestStdoutLogging:
 
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()

@@ -3,6 +3,7 @@ Tests for CLI interface and argument parsing
 """
 
 import tempfile
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest

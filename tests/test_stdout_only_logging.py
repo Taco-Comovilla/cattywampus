@@ -47,9 +47,9 @@ class TestStdoutOnlyLogging:
                 assert options.sources["log_level"] == "default"
 
     def test_stdout_only_short_option_parsing(self):
-        """Test that -T short option is parsed correctly"""
-        # Test with -T flag
-        with patch("sys.argv", [__app_name__, "-T", "test.mkv"]):
+        """Test that -O short option is parsed correctly"""
+        # Test with -O flag
+        with patch("sys.argv", [__app_name__, "-O", "test.mkv"]):
             # Mock empty config to ensure we get default behavior
             with patch("mcoptions.mcconfig") as mock_config:
                 mock_config.get.side_effect = lambda key, default=None: default

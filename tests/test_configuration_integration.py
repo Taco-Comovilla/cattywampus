@@ -97,6 +97,7 @@ class TestConfigurationIntegration:
                     mock_options.log_file_path = None
                     mock_options.log_level = 20
                     mock_options.set_default_sub_track = True
+                    mock_options.set_default_audio_track = False
                     mock_options.use_system_locale = False
                     mock_options.language = "en"
                     mock_options.lang3 = "eng"
@@ -114,6 +115,7 @@ class TestConfigurationIntegration:
                         "only_mp4": "default",
                         "set_default_sub_track": "config file",
                         "force_default_first_sub_track": "default",
+                        "set_default_audio_track": "default",
                         "use_system_locale": "default",
                         "dry_run": "command line",
                         "log_level": "config file",

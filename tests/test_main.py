@@ -344,7 +344,7 @@ class TestGetMkvAudioArgs:
     @patch("main.options")
     @patch("main.logger")
     def test_get_mkv_audio_args_disabled(self, mock_logger, mock_options):
-        """Test audio args when setDefaultAudioTrack is disabled"""
+        """Test audio args when setDefaultAudio is disabled"""
         mock_options.set_default_audio_track = False
 
         metadata = {

@@ -21,7 +21,7 @@ class Config:
             "mkvmergePath": "",
             "mkvpropeditPath": "",
             "atomicParsleyPath": "",
-            "setDefaultSubTrack": False,
+            "setDefaultSubtitle": False,
             "forceDefaultFirstSubTrack": False,
             "clearAudio": False,
             "useSystemLocale": True,

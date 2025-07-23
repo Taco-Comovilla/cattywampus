@@ -472,11 +472,11 @@ Some options can be set in config.toml. This file will be generated on first use
 
 `clearAudio`:: Boolean to enable clearing of audio track names in MKV files. When true, removes name metadata from audio track 1. Default: false
 
-`setDefaultSubTrack`:: Boolean to enable automatic default subtitle track setting (MKV files only). Default: false
+`setDefaultSubtitle`:: Boolean to enable automatic default subtitle track setting (MKV files only). Default: false
 
 `forceDefaultFirstSubTrack`:: Boolean to force first subtitle track as default regardless of language (MKV files only). Default: false
 
-`setDefaultAudioTrack`:: Boolean to enable automatic default audio track setting (MKV files only). Default: false
+`setDefaultAudio`:: Boolean to enable automatic default audio track setting (MKV files only). Default: false
 
 `logLevel`:: Default logging level (10=DEBUG, 20=INFO, 30=WARNING, 40=ERROR, 50=CRITICAL). Default: 20 (INFO)
 

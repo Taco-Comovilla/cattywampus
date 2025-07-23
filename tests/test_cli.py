@@ -205,7 +205,7 @@ class TestFullCLIIntegration:
             "useSystemLocale": True,
             "language": "en",
             "logLevel": 20,
-            "setDefaultSubTrack": False,
+            "setDefaultSubtitle": False,
             "forceDefaultFirstSubTrack": False,
             "onlyMkv": False,
             "onlyMp4": False,
@@ -276,7 +276,7 @@ class TestFullCLIIntegration:
 logLevel = 50
 language = "ja"
 useSystemLocale = false
-setDefaultSubTrack = true
+setDefaultSubtitle = true
 onlyMkv = true
 """
                 )
@@ -286,7 +286,7 @@ onlyMkv = true
             assert config.get("logLevel") == 50
             assert config.get("language") == "ja"
             assert config.get("useSystemLocale") is False
-            assert config.get("setDefaultSubTrack") is True
+            assert config.get("setDefaultSubtitle") is True
             assert config.get("onlyMkv") is True
 
             # Test that defaults are preserved for unspecified values
@@ -384,7 +384,7 @@ class TestConfigIntegration:
             "useSystemLocale": False,
             "language": "fr",
             "logLevel": 10,
-            "setDefaultSubTrack": True,
+            "setDefaultSubtitle": True,
             "forceDefaultFirstSubTrack": True,
             "onlyMkv": False,
             "onlyMp4": False,
@@ -418,7 +418,7 @@ class TestConfigIntegration:
             "useSystemLocale": False,
             "language": "fr",
             "logLevel": 10,
-            "setDefaultSubTrack": True,
+            "setDefaultSubtitle": True,
             "forceDefaultFirstSubTrack": True,
             "onlyMkv": False,
             "onlyMp4": False,

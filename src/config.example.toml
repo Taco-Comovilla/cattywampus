@@ -1,8 +1,4 @@
-# Copy this file to your local config folder and name it config.toml
-# On Linux this is usually ~/.config/app_name or $XDG_CONFIG_HOME/app_name
-# On macOS this is usually ~/Library/Application Support/app_name
-# On Windows this is usually %LOCALAPPDATA%\app_name
-
+# Copy this file to your local config folder
 # Log level as an integer
 # Any messages at or above this number will be logged
 # 10=DEBUG, 20=INFO, 30=WARNING, 40=ERROR, 50=CRITICAL
@@ -15,20 +11,20 @@ mkvmergePath = ""
 mkvpropeditPath = ""
 atomicParsleyPath = ""
 
-# If setDefaultSubTrack is set to true, the application will look for a subtitle
+# If setDefaultSubtitle is set to true, the application will look for a subtitle
 # track in the above language, and if one is found, it will set the
 # default_track and enabled_track flags of that track to true (and also unset
 # the default_track flag on every other subtitle track)
-setDefaultSubTrack = false
+setDefaultSubtitle = false
 
 # @TODO document this option
 forceDefaultFirstSubTrack = false
 
-# If setDefaultAudioTrack is set to true, the application will look for an audio
+# If setDefaultAudio is set to true, the application will look for an audio
 # track in the above language, and if one is found, it will set the
 # default_track flag of that track to true (and also unset the default_track
 # flag on every other audio track)
-setDefaultAudioTrack = false
+setDefaultAudio = false
 
 # Use system locale for default subtitle track language
 # When true, automatically detects system language instead of using the 'language' setting

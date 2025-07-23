@@ -201,7 +201,7 @@ def _create_argument_parser() -> argparse.ArgumentParser:
         "-s",
         "--set-default-subtitle",
         action="store_true",
-        help="Override setDefaultSubTrack - enable default subtitle track setting",
+        help="Override setDefaultSubtitle - enable default subtitle track setting",
     )
 
     parser.add_argument(
@@ -222,7 +222,7 @@ def _create_argument_parser() -> argparse.ArgumentParser:
         "-A",
         "--set-default-audio",
         action="store_true",
-        help="Override setDefaultAudioTrack - enable default audio track setting",
+        help="Override setDefaultAudio - enable default audio track setting",
     )
 
     parser.add_argument(
@@ -476,8 +476,8 @@ def parse_options() -> Options:
     if args.set_default_subtitle:
         set_default_sub_track = True
         sources["set_default_sub_track"] = "cli"
-    elif mcconfig and mcconfig.get("setDefaultSubTrack") is not None:
-        set_default_sub_track = mcconfig.get("setDefaultSubTrack", False)
+    elif mcconfig and mcconfig.get("setDefaultSubtitle") is not None:
+        set_default_sub_track = mcconfig.get("setDefaultSubtitle", False)
         sources["set_default_sub_track"] = "config"
     else:
         set_default_sub_track = False
@@ -509,8 +509,8 @@ def parse_options() -> Options:
     if args.set_default_audio:
         set_default_audio_track = True
         sources["set_default_audio_track"] = "cli"
-    elif mcconfig and mcconfig.get("setDefaultAudioTrack") is not None:
-        set_default_audio_track = mcconfig.get("setDefaultAudioTrack", False)
+    elif mcconfig and mcconfig.get("setDefaultAudio") is not None:
+        set_default_audio_track = mcconfig.get("setDefaultAudio", False)
         sources["set_default_audio_track"] = "config"
     else:
         set_default_audio_track = False

@@ -152,7 +152,7 @@ class TestConfigurationIntegration:
                                         "  onlyMp4: False - default"
                                     )
                                     mock_logger.debug.assert_any_call(
-                                        "  setDefaultSubTrack: True - config file"
+                                        "  setDefaultSubtitle: True - config file"
                                     )
                                     mock_logger.debug.assert_any_call(
                                         "  dryRun: True - command line"

@@ -727,10 +727,10 @@ def main():
 
     # Other options
     logger.debug(
-        f"  setDefaultSubTrack: {options.set_default_sub_track} - {options.sources['set_default_sub_track']}"
+        f"  setDefaultSubtitle: {options.set_default_sub_track} - {options.sources['set_default_sub_track']}"
     )
     logger.debug(
-        f"  setDefaultAudioTrack: {options.set_default_audio_track} - {options.sources['set_default_audio_track']}"
+        f"  setDefaultAudio: {options.set_default_audio_track} - {options.sources['set_default_audio_track']}"
     )
     logger.debug(
         f"  useSystemLocale: {options.use_system_locale} - {options.sources['use_system_locale']}"

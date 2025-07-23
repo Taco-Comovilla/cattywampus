@@ -270,7 +270,7 @@ class TestParseOptions:
             "useSystemLocale": True,
             "language": "en",
             "logLevel": 20,
-            "setDefaultSubTrack": False,
+            "setDefaultSubtitle": False,
             "forceDefaultFirstSubTrack": False,
             "onlyMkv": False,
             "onlyMp4": False,
@@ -425,7 +425,7 @@ logLevel = 10
 mkvmergePath = "/custom/path/to/mkvmerge"
 mkvpropeditPath = "/custom/path/to/mkvpropedit"
 atomicParsleyPath = "/custom/path/to/AtomicParsley"
-setDefaultSubTrack = true
+setDefaultSubtitle = true
 forceDefaultFirstSubTrack = true
 useSystemLocale = false
 language = "fr"
@@ -442,7 +442,7 @@ onlyMp4 = false
             assert config.get("mkvmergePath") == "/custom/path/to/mkvmerge"
             assert config.get("mkvpropeditPath") == "/custom/path/to/mkvpropedit"
             assert config.get("atomicParsleyPath") == "/custom/path/to/AtomicParsley"
-            assert config.get("setDefaultSubTrack") is True
+            assert config.get("setDefaultSubtitle") is True
             assert config.get("forceDefaultFirstSubTrack") is True
             assert config.get("useSystemLocale") is False
             assert config.get("language") == "fr"
@@ -490,7 +490,7 @@ onlyMkv = true
             assert config.get("onlyMkv") is True
 
             # Verify default values are preserved for unspecified settings
-            assert config.get("setDefaultSubTrack") is False  # default value
+            assert config.get("setDefaultSubtitle") is False  # default value
 
     @patch("sys.argv", [__app_name__, "--config", "custom.toml", "test.mkv"])
     def test_parse_options_with_custom_config(self):
@@ -504,7 +504,7 @@ onlyMkv = true
 logLevel = 10
 language = "es"
 useSystemLocale = false
-setDefaultSubTrack = true
+setDefaultSubtitle = true
 onlyMkv = true
 """
                 )
@@ -563,7 +563,7 @@ onlyMkv = true
                     """
 logLevel = 10
 language = "es"
-setDefaultSubTrack = true
+setDefaultSubtitle = true
 onlyMkv = true
 """
                 )
@@ -614,7 +614,7 @@ onlyMkv = true
                 f.write(
                     """
 logLevel = 10
-setDefaultSubTrack = true
+setDefaultSubtitle = true
 language = "de"
 useSystemLocale = false
 """

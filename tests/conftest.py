@@ -83,7 +83,7 @@ def mock_config():
                 "mkvmergePath": "",
                 "mkvpropeditPath": "",
                 "atomicParsleyPath": "",
-                "setDefaultSubTrack": False,
+                "setDefaultSubtitle": False,
                 "forceDefaultFirstSubTrack": False,
                 "useSystemLocale": True,
                 "language": "en",

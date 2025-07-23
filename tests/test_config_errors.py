@@ -239,7 +239,7 @@ language = "invalid\\escape"
                 """
 logLevel = 20
 language = "fr"
-setDefaultSubTrack = true
+setDefaultSubtitle = true
 """
             )
             temp_path = f.name
@@ -248,6 +248,6 @@ setDefaultSubTrack = true
             config = initialize_config(temp_path)
             assert config.get("logLevel") == 20
             assert config.get("language") == "fr"
-            assert config.get("setDefaultSubTrack") is True
+            assert config.get("setDefaultSubtitle") is True
         finally:
             Path(temp_path).unlink()

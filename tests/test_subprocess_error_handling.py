@@ -10,6 +10,7 @@ import pytest
 
 import main
 from main import get_mkv_metadata, get_mp4_metadata, process_mkv_file, process_mp4_file
+from .test_helpers import setup_complete_mock_options
 
 
 class TestSubprocessErrorHandling:
@@ -19,7 +20,7 @@ class TestSubprocessErrorHandling:
     @patch("main.logger")
     def test_process_mkv_file_mkvpropedit_missing(self, mock_logger, mock_options):
         """Test MKV processing when mkvpropedit is missing (lines 93-94)"""
-        mock_options.dry_run = False
+        mock_options.configure_mock(**setup_complete_mock_options(dry_run=False).__dict__)
 
         # Create a temporary test file
         with tempfile.NamedTemporaryFile(suffix=".mkv", delete=False) as tmp_file:
@@ -45,7 +46,7 @@ class TestSubprocessErrorHandling:
     @patch("main.logger")
     def test_process_mkv_file_mkvmerge_missing(self, mock_logger, mock_options):
         """Test MKV processing when mkvmerge is missing (lines 93-94)"""
-        mock_options.dry_run = False
+        mock_options.configure_mock(**setup_complete_mock_options(dry_run=False).__dict__)
 
         # Create a temporary test file
         with tempfile.NamedTemporaryFile(suffix=".mkv", delete=False) as tmp_file:
@@ -83,7 +84,7 @@ class TestSubprocessErrorHandling:
     @patch("main.logger")
     def test_process_mp4_file_atomicparsley_missing(self, mock_logger, mock_options):
         """Test MP4 processing when AtomicParsley is missing"""
-        mock_options.dry_run = False
+        mock_options.configure_mock(**setup_complete_mock_options(dry_run=False).__dict__)
 
         # Create a temporary test file
         with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as tmp_file:
@@ -107,8 +108,7 @@ class TestSubprocessErrorHandling:
     @patch("main.logger")
     def test_process_folder_nonexistent_folder(self, mock_logger, mock_options):
         """Test folder processing with non-existent folder (lines 250-252)"""
-        mock_options.only_mkv = False
-        mock_options.only_mp4 = False
+        mock_options.configure_mock(**setup_complete_mock_options(only_mkv=False, only_mp4=False).__dict__)
 
         # Reset global error counters
         main.folders_errored = 0
@@ -133,8 +133,7 @@ class TestSubprocessErrorHandling:
     @patch("main.logger")
     def test_process_folder_not_directory(self, mock_logger, mock_options):
         """Test folder processing with file instead of directory (lines 250-252)"""
-        mock_options.only_mkv = False
-        mock_options.only_mp4 = False
+        mock_options.configure_mock(**setup_complete_mock_options(only_mkv=False, only_mp4=False).__dict__)
 
         # Reset global error counters
         main.folders_errored = 0
@@ -164,8 +163,7 @@ class TestSubprocessErrorHandling:
     @patch("main.logger")
     def test_process_folder_general_exception(self, mock_logger, mock_options):
         """Test folder processing with general exception (lines 268-270)"""
-        mock_options.only_mkv = False
-        mock_options.only_mp4 = False
+        mock_options.configure_mock(**setup_complete_mock_options(only_mkv=False, only_mp4=False).__dict__)
 
         # Reset global error counters
         main.folders_errored = 0

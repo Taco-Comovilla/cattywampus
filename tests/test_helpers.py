@@ -35,7 +35,37 @@ def setup_mock_options():
     mock_options.lang3 = "eng"
     mock_options.force_default_first_sub_track = False
     mock_options.set_default_sub_track = False
+    mock_options.set_default_audio_track = False
     mock_options.dry_run = False
+    return mock_options
+
+
+def setup_complete_mock_options(**overrides):
+    """Set up a complete mock options object with all attributes for main.options patches"""
+    defaults = {
+        'language': 'en',
+        'lang3': 'eng', 
+        'force_default_first_sub_track': False,
+        'set_default_sub_track': False,
+        'set_default_audio_track': False,
+        'clear_audio_track_names': False,
+        'dry_run': False,
+        'only_mkv': False,
+        'only_mp4': False,
+        'sources': {
+            'set_default_sub_track': 'default',
+            'set_default_audio_track': 'default',
+            'force_default_first_sub_track': 'default',
+        }
+    }
+    
+    # Apply overrides
+    defaults.update(overrides)
+    
+    mock_options = Mock()
+    for key, value in defaults.items():
+        setattr(mock_options, key, value)
+    
     return mock_options
 
 

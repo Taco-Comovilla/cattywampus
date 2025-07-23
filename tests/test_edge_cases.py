@@ -16,6 +16,7 @@ from main import (
     process_mkv_file,
     process_mp4_file,
 )
+from .test_helpers import setup_complete_mock_options
 
 
 @pytest.fixture(autouse=True)
@@ -275,9 +276,11 @@ class TestErrorHandling:
     ):
         """Test handling of subprocess error during MKV processing"""
         # Setup
-        mock_options.dry_run = False
-        mock_options.set_default_sub_track = False
-        mock_options.force_default_first_sub_track = False
+        mock_options.configure_mock(**setup_complete_mock_options(
+            dry_run=False,
+            set_default_sub_track=False,
+            force_default_first_sub_track=False
+        ).__dict__)
 
         mock_get_metadata.return_value = {"tracks": [{"type": "video"}]}
         mock_run.side_effect = subprocess.CalledProcessError(
@@ -313,7 +316,7 @@ class TestErrorHandling:
     ):
         """Test handling of subprocess error during MP4 processing"""
         # Setup
-        mock_options.dry_run = False
+        mock_options.configure_mock(**setup_complete_mock_options(dry_run=False).__dict__)
 
         mock_get_metadata.return_value = {"title": "Test", "description": "Test"}
         mock_run.side_effect = subprocess.CalledProcessError(

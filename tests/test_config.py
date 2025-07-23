@@ -688,6 +688,7 @@ class TestOptions:
             stdout_only=False,
             set_default_sub_track=False,
             force_default_first_sub_track=False,
+            set_default_audio_track=False,
             clear_audio_track_names=False,
             sources={},
         )

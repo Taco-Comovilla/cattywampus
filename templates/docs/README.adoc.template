@@ -363,6 +363,9 @@ ${APP_NAME} --input file_list.txt
 # Enable default subtitle track setting with custom language (MKV only)
 ${APP_NAME} --set-default --language es /path/to/spanish/videos
 
+# Enable default audio track setting with custom language (MKV only)
+${APP_NAME} --set-default-audio --language es /path/to/spanish/videos
+
 # Clear audio track 1 names in MKV files (audio tack 1 names will be removed)
 ${APP_NAME} --clear-audio /path/to/mkv/files
 
@@ -379,7 +382,7 @@ ${APP_NAME} -S --dry-run /path/to/videos
 ${APP_NAME} --stdout-only /path/to/videos
 
 # Combine stdout-only with dry-run for console-only debugging
-${APP_NAME} -T --dry-run /path/to/videos
+${APP_NAME} -O --dry-run /path/to/videos
 ----
 
 === CLI Options
@@ -414,6 +417,8 @@ NOTE: The `--only-mkv` and `--only-mp4` options cannot be used together.
 
 `-f, --default-first`:: Force the first subtitle track (regardless of language) to be set as the default track. Only applies to MKV files. Default: false
 
+`-A, --set-default-audio`:: Enable automatic setting of the first audio track in your preferred language as the default track. Only applies to MKV files. Default: false
+
 NOTE: Audio track and subtitle track options only apply to MKV files. MP4/M4V files do not support these metadata modifications.
 
 ==== Tool Paths
@@ -422,7 +427,7 @@ NOTE: Audio track and subtitle track options only apply to MKV files. MP4/M4V fi
 
 `-P, --mkvpropedit-path PATH`:: Override the path to the mkvpropedit binary (used for MKV metadata modification). Use when mkvpropedit is not in your PATH or you want to use a specific version. Default: auto-detect from PATH
 
-`-A, --atomicparsley-path PATH`:: Override the path to the AtomicParsley binary (used for MP4/M4V metadata modification). Use when AtomicParsley is not in your PATH or you want to use a specific version. Default: auto-detect from PATH
+`-T, --atomicparsley-path PATH`:: Override the path to the AtomicParsley binary (used for MP4/M4V metadata modification). Use when AtomicParsley is not in your PATH or you want to use a specific version. Default: auto-detect from PATH
 
 ==== Configuration
 
@@ -434,7 +439,7 @@ NOTE: Audio track and subtitle track options only apply to MKV files. MP4/M4V fi
 
 `-S, --stdout`:: Send program output to console (stdout) as well as log file. Respects the configured log level. Useful for development, troubleshooting, or when you want to see real-time output. Default: false
 
-`-T, --stdout-only`:: Send program output to console (stdout) only, suppressing log file output. Respects the configured log level. Useful for CI/CD pipelines, containers, or when you want console-only output. Default: false
+`-O, --stdout-only`:: Send program output to console (stdout) only, suppressing log file output. Respects the configured log level. Useful for CI/CD pipelines, containers, or when you want console-only output. Default: false
 
 `-l, --logfile PATH`:: Override the log file path. Specify a custom location for the log file. Default: auto-generate in config directory
 
@@ -466,6 +471,8 @@ Some options can be set in config.toml. This file will be generated on first use
 `setDefaultSubTrack`:: Boolean to enable automatic default subtitle track setting (MKV files only). Default: false
 
 `forceDefaultFirstSubTrack`:: Boolean to force first subtitle track as default regardless of language (MKV files only). Default: false
+
+`setDefaultAudioTrack`:: Boolean to enable automatic default audio track setting (MKV files only). Default: false
 
 `logLevel`:: Default logging level (10=DEBUG, 20=INFO, 30=WARNING, 40=ERROR, 50=CRITICAL). Default: 20 (INFO)
 

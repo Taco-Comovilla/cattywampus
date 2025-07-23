@@ -181,6 +181,8 @@ def process_mkv_file(file_path, track_id=1, mkvpropedit_path=None, mkvmerge_path
             logger.debug("No audio tracks found, skipping audio track options")
         if options.set_default_sub_track or options.force_default_first_sub_track:
             command = command + get_mkv_subtitle_args(metadata)
+        if options.set_default_audio_track:
+            command = command + get_mkv_audio_args(metadata)
         logger.debug(f"mkvpropedit command: {' '.join(command)}")
 
         if options.dry_run:
@@ -492,6 +494,63 @@ def get_mkv_subtitle_args(metadata):
     return []
 
 
+def get_mkv_audio_args(metadata):
+    """Get audio track arguments for mkvpropedit to set default audio track."""
+    if not options.set_default_audio_track:
+        return []
+
+    audio_args = []
+    track_found = False
+    found_at_index = 1
+    current_index = 1
+    tracks = metadata.get("tracks", [])
+    audio_tracks = []
+
+    audio_track_index = 1
+    for track in tracks:
+        if track.get("type", "") == "audio":
+            audio_tracks.append(track)
+            this_language = (
+                track.get("properties", {}).get("language_ietf")
+                or track.get("properties", {}).get("language")
+                or "{unknown}"
+            )
+            if (
+                this_language in (options.lang3, options.language)
+            ) and not track_found:
+                track_found = True
+                found_at_index = audio_track_index
+                logger.debug(
+                    f"Audio track in {options.language} found at index "
+                    f"a{found_at_index}"
+                )
+            audio_track_index = audio_track_index + 1
+
+    if len(audio_tracks) > 0:
+        for track in audio_tracks:
+            a_track = f"track:a{current_index}"
+            if current_index == found_at_index:
+                logger.debug(
+                    f"Setting audio track a{current_index} as default "
+                    f"(language:{options.language})"
+                )
+                audio_args += ["-e", a_track, "-s", "flag-default=1"]
+            else:
+                this_language = (
+                    track.get("properties", {}).get("language_ietf")
+                    or track.get("properties", {}).get("language")
+                    or ""
+                )
+                logger.debug(
+                    f"Un-defaulting audio track a{current_index} (language:{this_language})"
+                )
+                audio_args += ["-e", a_track, "-s", "flag-default=0"]
+            current_index = current_index + 1
+        return audio_args
+    logger.debug("No audio tracks found.")
+    return []
+
+
 def read_paths_from_file(input_file):
     """
     Read file paths from a text file, handling both DOS and Unix line endings.
@@ -669,6 +728,9 @@ def main():
     # Other options
     logger.debug(
         f"  setDefaultSubTrack: {options.set_default_sub_track} - {options.sources['set_default_sub_track']}"
+    )
+    logger.debug(
+        f"  setDefaultAudioTrack: {options.set_default_audio_track} - {options.sources['set_default_audio_track']}"
     )
     logger.debug(
         f"  useSystemLocale: {options.use_system_locale} - {options.sources['use_system_locale']}"

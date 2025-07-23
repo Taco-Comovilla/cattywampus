@@ -115,6 +115,7 @@ class Options:
     stdout_only: bool
     set_default_sub_track: bool
     force_default_first_sub_track: bool
+    set_default_audio_track: bool
     clear_audio_track_names: bool
 
     # Source tracking - maps option name to source
@@ -190,7 +191,7 @@ def _create_argument_parser() -> argparse.ArgumentParser:
     )
 
     parser.add_argument(
-        "-A",
+        "-T",
         "--atomicparsley-path",
         type=str,
         help="Override atomicParsleyPath - path to AtomicParsley binary",
@@ -218,6 +219,13 @@ def _create_argument_parser() -> argparse.ArgumentParser:
     )
 
     parser.add_argument(
+        "-A",
+        "--set-default-audio",
+        action="store_true",
+        help="Override setDefaultAudioTrack - enable default audio track setting",
+    )
+
+    parser.add_argument(
         "-c",
         "--config",
         type=str,
@@ -239,7 +247,7 @@ def _create_argument_parser() -> argparse.ArgumentParser:
     )
 
     parser.add_argument(
-        "-T",
+        "-O",
         "--stdout-only",
         action="store_true",
         help="Send program output to console (stdout) only, suppressing log file output.",
@@ -497,6 +505,17 @@ def parse_options() -> Options:
         clear_audio_track_names = False
         sources["clear_audio_track_names"] = "default"
 
+    # Set default audio track
+    if args.set_default_audio:
+        set_default_audio_track = True
+        sources["set_default_audio_track"] = "cli"
+    elif mcconfig and mcconfig.get("setDefaultAudioTrack") is not None:
+        set_default_audio_track = mcconfig.get("setDefaultAudioTrack", False)
+        sources["set_default_audio_track"] = "config"
+    else:
+        set_default_audio_track = False
+        sources["set_default_audio_track"] = "default"
+
     # Validate options
     _validate_options(args, only_mkv, only_mp4)
 
@@ -525,6 +544,7 @@ def parse_options() -> Options:
         stdout_only=stdout_only,
         set_default_sub_track=set_default_sub_track,
         force_default_first_sub_track=force_default_first_sub_track,
+        set_default_audio_track=set_default_audio_track,
         clear_audio_track_names=clear_audio_track_names,
         # Source tracking
         sources=sources,

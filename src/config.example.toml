@@ -24,6 +24,12 @@ setDefaultSubTrack = false
 # @TODO document this option
 forceDefaultFirstSubTrack = false
 
+# If setDefaultAudioTrack is set to true, the application will look for an audio
+# track in the above language, and if one is found, it will set the
+# default_track flag of that track to true (and also unset the default_track
+# flag on every other audio track)
+setDefaultAudioTrack = false
+
 # Use system locale for default subtitle track language
 # When true, automatically detects system language instead of using the 'language' setting
 # Falls back to 'language' setting if system locale detection fails

@@ -78,7 +78,7 @@ class TestArgumentParser:
                 "/usr/bin/mkvmerge",
                 "-P",
                 "/usr/bin/mkvpropedit",
-                "-A",
+                "-T",
                 "/usr/bin/AtomicParsley",
                 "test.mkv",
             ]

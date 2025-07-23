@@ -85,9 +85,14 @@ class TestLoggerErrors:
 
     def test_logger_setup_with_empty_log_path(self):
         """Test logger setup with empty log file path"""
-        # Should raise an error with empty path
-        with pytest.raises((FileNotFoundError, OSError)):
-            logger.setup(log_file_path="", log_level=20)
+        # Logger should handle empty path gracefully and fall back to stderr
+        logger.setup(log_file_path="", log_level=20)
+        
+        # Should have at least one handler (stderr fallback)
+        assert len(logger.logger.handlers) >= 1
+        # Should have a StreamHandler for stderr fallback
+        stream_handlers = [h for h in logger.logger.handlers if isinstance(h, logging.StreamHandler)]
+        assert len(stream_handlers) >= 1
 
     def test_logger_multiple_setup_calls(self):
         """Test that multiple logger setup calls work correctly"""
@@ -111,9 +116,14 @@ class TestLoggerErrors:
         mock_file_handler.side_effect = OSError("Cannot create file handler")
 
         with tempfile.NamedTemporaryFile() as tmp_file:
-            # Should raise the IOError since the logger doesn't handle it gracefully
-            with pytest.raises(IOError, match="Cannot create file handler"):
-                logger.setup(log_file_path=tmp_file.name, log_level=20)
+            # Logger should handle the error gracefully and fall back to stderr
+            logger.setup(log_file_path=tmp_file.name, log_level=20)
+            
+            # Should have at least one handler (stderr fallback)
+            assert len(logger.logger.handlers) >= 1
+            # Should have a StreamHandler for stderr fallback
+            stream_handlers = [h for h in logger.logger.handlers if isinstance(h, logging.StreamHandler)]
+            assert len(stream_handlers) >= 1
 
     def test_logger_functions_before_setup(self):
         """Test that logger functions work even before setup is called"""

@@ -154,28 +154,32 @@ class TestCLIIntegration:
 
         try:
             # Mock sys.argv to simulate CLI execution with input file
-            with patch("sys.argv", [__app_name__, "--input-file", input_file_path]):
+            with patch("sys.argv", [__app_name__, "--input", input_file_path]):
                 # Mock tools as found
                 with patch("main.shutil.which") as mock_which:
-                    mock_which.side_effect = lambda tool: (
-                        f"/usr/bin/{tool}" if tool else None
-                    )
+                    with patch("main.Path.is_file") as mock_is_file:
+                        with patch("main.os.access") as mock_access:
+                            mock_which.side_effect = lambda tool: (
+                                f"/usr/bin/{tool}" if tool else None
+                            )
+                            mock_is_file.return_value = True
+                            mock_access.return_value = True
 
-                    # Mock the processing functions
-                    with patch("main.process_mkv_file") as mock_process_mkv:
-                        with patch("main.logger") as mock_logger:
-                            with patch("main.sys.exit") as mock_exit:
-                                mock_process_mkv.return_value = None
+                            # Mock the processing functions
+                            with patch("main.process_mkv_file") as mock_process_mkv:
+                                with patch("main.logger") as mock_logger:
+                                    with patch("main.sys.exit") as mock_exit:
+                                        mock_process_mkv.return_value = None
 
-                                # Call main function
-                                main.main()
+                                        # Call main function
+                                        main.main()
 
-                                # Verify input file was processed (lines 475-477)
-                                mock_logger.debug.assert_any_call(
-                                    f"Added 1 path from input file: {input_file_path}"
-                                )
-                                mock_process_mkv.assert_called_once()
-                                mock_exit.assert_called_once()
+                                        # Verify input file was processed (lines 475-477)
+                                        mock_logger.debug.assert_any_call(
+                                            f"Added 1 path from input file: {input_file_path}"
+                                        )
+                                        mock_process_mkv.assert_called_once()
+                                        mock_exit.assert_called_once()
         finally:
             # Clean up
             if Path(test_file_path).exists():
@@ -224,33 +228,37 @@ class TestCLIIntegration:
             with patch("sys.argv", [__app_name__, tmp_file_path]):
                 # Mock tools as found
                 with patch("main.shutil.which") as mock_which:
-                    mock_which.side_effect = lambda tool: (
-                        f"/usr/bin/{tool}" if tool else None
-                    )
+                    with patch("main.Path.is_file") as mock_is_file:
+                        with patch("main.os.access") as mock_access:
+                            mock_which.side_effect = lambda tool: (
+                                f"/usr/bin/{tool}" if tool else None
+                            )
+                            mock_is_file.return_value = True
+                            mock_access.return_value = True
 
-                    # Mock tool version detection
-                    with patch("main.get_tool_version") as mock_get_version:
-                        mock_get_version.return_value = "Tool version 1.2.3"
+                            # Mock tool version detection
+                            with patch("main.get_tool_version") as mock_get_version:
+                                mock_get_version.return_value = "Tool version 1.2.3"
 
-                        with patch("main.process_mkv_file") as mock_process_mkv:
-                            with patch("main.logger") as mock_logger:
-                                with patch("main.sys.exit") as mock_exit:
-                                    mock_process_mkv.return_value = None
+                                with patch("main.process_mkv_file") as mock_process_mkv:
+                                    with patch("main.logger") as mock_logger:
+                                        with patch("main.sys.exit") as mock_exit:
+                                            mock_process_mkv.return_value = None
 
-                                    # Call main function
-                                    main.main()
+                                            # Call main function
+                                            main.main()
 
-                                    # Verify tool version logging (lines 593-615)
-                                    mock_logger.info.assert_any_call(
-                                        "mkvpropedit version: Tool version 1.2.3"
-                                    )
-                                    mock_logger.info.assert_any_call(
-                                        "mkvmerge version: Tool version 1.2.3"
-                                    )
-                                    mock_logger.info.assert_any_call(
-                                        "AtomicParsley version: Tool version 1.2.3"
-                                    )
-                                    mock_exit.assert_called_once()
+                                            # Verify tool version logging (lines 593-615)
+                                            mock_logger.info.assert_any_call(
+                                                "mkvpropedit version: Tool version 1.2.3"
+                                            )
+                                            mock_logger.info.assert_any_call(
+                                                "mkvmerge version: Tool version 1.2.3"
+                                            )
+                                            mock_logger.info.assert_any_call(
+                                                "Tool version 1.2.3"
+                                            )
+                                            mock_exit.assert_called_once()
         finally:
             # Clean up
             if Path(tmp_file_path).exists():

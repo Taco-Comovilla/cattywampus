@@ -457,7 +457,8 @@ def get_mkv_subtitle_args(metadata):
                 track_found = True
                 found_at_index = subtitle_track_index
                 logger.debug(
-                    f"Subtitle track in {options.language} found at index s{found_at_index}"
+                    f"Subtitle track in {options.language} found at index "
+                    f"s{found_at_index}"
                 )
             subtitle_track_index = subtitle_track_index + 1
 
@@ -470,7 +471,8 @@ def get_mkv_subtitle_args(metadata):
                 and options.force_default_first_sub_track
             ):
                 logger.debug(
-                    f"Enabling and defaulting subtitle track s{current_index} (language:{options.language})"
+                    f"Enabling and defaulting subtitle track s{current_index} "
+                    f"(language:{options.language})"
                 )
                 subtitle_args += ["-e", s_track, "-s", "flag-enabled=1"]
                 subtitle_args += ["-e", s_track, "-s", "flag-default=1"]
@@ -645,7 +647,8 @@ def main():
 
     # Language configuration
     logger.debug(
-        f"  language: {options.lang_object.display_name()} ({options.language}/{options.lang3}) - {options.sources['language']}"
+        f"  language: {options.lang_object.display_name()} "
+        f"({options.language}/{options.lang3}) - {options.sources['language']}"
     )
 
     # Tool paths

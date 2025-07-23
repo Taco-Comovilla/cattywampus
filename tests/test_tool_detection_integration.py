@@ -9,6 +9,7 @@ from unittest.mock import patch
 import main
 
 from .test_helpers import create_mock_options
+from version import __app_name__
 
 
 class TestToolDetectionIntegration:

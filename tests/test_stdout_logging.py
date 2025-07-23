@@ -11,6 +11,7 @@ from unittest.mock import patch
 
 import main
 from mclogger import Logger
+from version import __app_name__
 
 
 class TestStdoutLogging:

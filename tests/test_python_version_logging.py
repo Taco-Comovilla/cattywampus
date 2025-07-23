@@ -10,6 +10,8 @@ from unittest.mock import patch
 
 import main
 
+from version import __app_name__
+
 
 class TestPythonVersionLogging:
     """Test Python version logging in main function"""

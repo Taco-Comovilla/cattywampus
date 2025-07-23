@@ -2,7 +2,6 @@
 Tests for Python version logging functionality
 """
 
-import os
 import sys
 import tempfile
 from pathlib import Path
@@ -47,7 +46,7 @@ class TestPythonVersionLogging:
                         # Mock process_mkv_file to avoid actual processing
                         with patch("main.process_mkv_file") as mock_process_mkv:
                             with patch("main.logger") as mock_logger:
-                                with patch("main.sys.exit") as mock_exit:
+                                with patch("main.sys.exit"):
                                     mock_process_mkv.return_value = None
 
                                     # Call main function
@@ -174,7 +173,7 @@ class TestPythonVersionLogging:
 
                         with patch("main.process_mkv_file") as mock_process_mkv:
                             with patch("main.logger") as mock_logger:
-                                with patch("main.sys.exit") as mock_exit:
+                                with patch("main.sys.exit"):
                                     mock_process_mkv.return_value = None
 
                                     # Call main function
@@ -255,7 +254,7 @@ class TestPythonVersionLogging:
 
                         with patch("main.process_mkv_file") as mock_process_mkv:
                             with patch("main.logger") as mock_logger:
-                                with patch("main.sys.exit") as mock_exit:
+                                with patch("main.sys.exit"):
                                     mock_process_mkv.return_value = None
 
                                     # Test system Python detection (normal case)
@@ -314,7 +313,7 @@ class TestPythonVersionLogging:
 
                         with patch("main.process_mkv_file") as mock_process_mkv:
                             with patch("main.logger") as mock_logger:
-                                with patch("main.sys.exit") as mock_exit:
+                                with patch("main.sys.exit"):
                                     mock_process_mkv.return_value = None
 
                                     # Mock PyInstaller environment
@@ -381,7 +380,7 @@ class TestPythonVersionLogging:
 
                         with patch("main.process_mkv_file") as mock_process_mkv:
                             with patch("main.logger") as mock_logger:
-                                with patch("main.sys.exit") as mock_exit:
+                                with patch("main.sys.exit"):
                                     mock_process_mkv.return_value = None
 
                                     # Call main function

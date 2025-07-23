@@ -2,7 +2,6 @@
 Tests for subprocess error handling and tool missing scenarios
 """
 
-import os
 import tempfile
 from pathlib import Path
 from unittest.mock import patch

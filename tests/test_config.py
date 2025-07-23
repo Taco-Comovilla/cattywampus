@@ -43,7 +43,7 @@ class TestConfig:
         """Test that config file is created if it doesn't exist"""
         with tempfile.TemporaryDirectory() as temp_dir:
             with patch("mcconfig.Config._get_config_path", return_value=temp_dir):
-                config = Config("test_config.toml")
+                Config("test_config.toml")
 
                 config_file = str(Path(temp_dir) / "test_config.toml")
                 assert Path(config_file).exists()
@@ -61,7 +61,7 @@ class TestConfig:
         """Test that default config file is generated with correct content"""
         with tempfile.TemporaryDirectory() as temp_dir:
             with patch("mcconfig.Config._get_config_path", return_value=temp_dir):
-                config = Config("test_config.toml")
+                Config("test_config.toml")
 
                 config_file = str(Path(temp_dir) / "test_config.toml")
                 assert Path(config_file).exists()
@@ -76,7 +76,7 @@ class TestConfig:
         """Test that config file is copied from example and contains comments"""
         with tempfile.TemporaryDirectory() as temp_dir:
             with patch("mcconfig.Config._get_config_path", return_value=temp_dir):
-                config = Config("test_config.toml")
+                Config("test_config.toml")
 
                 config_file = str(Path(temp_dir) / "test_config.toml")
                 assert Path(config_file).exists()

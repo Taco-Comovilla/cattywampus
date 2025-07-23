@@ -2,7 +2,6 @@
 Pytest configuration and shared fixtures
 """
 
-import os
 import shutil
 import sys
 import tempfile

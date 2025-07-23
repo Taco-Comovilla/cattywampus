@@ -2,7 +2,6 @@
 Tests for file processing edge cases and conditional paths
 """
 
-import os
 import tempfile
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -60,7 +59,7 @@ class TestFileProcessingEdgeCases:
                         mock_subprocess.return_value = MagicMock()
 
                         # Call the function with subtitle processing enabled
-                        result = process_mkv_file(
+                        process_mkv_file(
                             tmp_file_path,
                             mkvpropedit_path="/usr/bin/mkvpropedit",
                             mkvmerge_path="/usr/bin/mkvmerge",
@@ -118,7 +117,7 @@ class TestFileProcessingEdgeCases:
                     ]  # 2.5 second difference
 
                     # Call the function in dry run mode
-                    result = process_mp4_file(
+                    process_mp4_file(
                         tmp_file_path, atomicparsley_path="/usr/bin/AtomicParsley"
                     )
 
@@ -221,7 +220,7 @@ class TestFileProcessingEdgeCases:
                     mock_subprocess.return_value = MagicMock()
 
                     # Call the function
-                    result = process_mkv_file(
+                    process_mkv_file(
                         tmp_file_path,
                         mkvpropedit_path="/usr/bin/mkvpropedit",
                         mkvmerge_path="/usr/bin/mkvmerge",

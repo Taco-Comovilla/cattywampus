@@ -2,7 +2,6 @@
 Integration tests for error handling and exit scenarios in main() function
 """
 
-import os
 import tempfile
 from pathlib import Path
 from unittest.mock import patch
@@ -87,13 +86,13 @@ class TestErrorHandlingIntegration:
                             mock_is_file.return_value = True
                             mock_access.return_value = True
 
-                            with patch("main.logger") as mock_logger:
+                            with patch("main.logger"):
                                 with patch("main.sys.exit") as mock_exit:
 
                                     # Call main function - should exit due to file not found
                                     main.main()
 
-                                    # Verify exit was called due to input file error  
+                                    # Verify exit was called due to input file error
                                     mock_exit.assert_called_with()
 
     def test_main_function_path_environment_logging(self):

@@ -268,7 +268,6 @@ class TestFullCLIIntegration:
         """Integration test for custom config functionality"""
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create a custom config file
-            import os
 
             custom_config_path = str(Path(temp_dir) / "integration_test.toml")
             with open(custom_config_path, "w") as f:

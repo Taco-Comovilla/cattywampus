@@ -2,7 +2,6 @@
 Integration tests for tool detection and initialization in main() function
 """
 
-import os
 import tempfile
 from pathlib import Path
 from unittest.mock import patch
@@ -55,7 +54,7 @@ class TestToolDetectionIntegration:
                         )
 
                         with patch("main.process_mkv_file") as mock_process_mkv:
-                            with patch("main.logger") as mock_logger:
+                            with patch("main.logger"):
                                 with patch("main.sys.exit") as mock_exit:
                                     mock_process_mkv.return_value = None
 
@@ -119,7 +118,7 @@ class TestToolDetectionIntegration:
                             )
 
                             with patch("main.process_mkv_file") as mock_process_mkv:
-                                with patch("main.logger") as mock_logger:
+                                with patch("main.logger"):
                                     with patch("main.sys.exit") as mock_exit:
                                         mock_process_mkv.return_value = None
 
@@ -241,7 +240,7 @@ class TestToolDetectionIntegration:
                             )
 
                             with patch("main.process_mkv_file") as mock_process_mkv:
-                                with patch("main.logger") as mock_logger:
+                                with patch("main.logger"):
                                     with patch("main.sys.exit") as mock_exit:
                                         mock_process_mkv.return_value = None
 

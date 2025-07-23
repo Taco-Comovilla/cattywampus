@@ -21,7 +21,7 @@ class VideoCleanerExtension(GObject.GObject, Nautilus.MenuProvider):
 
         # Build the command to run the application
         # Assuming the application is installed in user's PATH
-        cmd = [__app_name__] + paths
+        cmd = [__app_name__, *paths]
 
         try:
             # Launch asynchronously

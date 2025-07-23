@@ -3,7 +3,6 @@ Unit tests for main.py functions
 """
 
 import json
-import os
 import subprocess
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -169,7 +168,7 @@ Atom "desc" contains: Test Description
 Other line"""
         mock_run.return_value = mock_result
 
-        result = get_mp4_metadata("test.mp4")
+        result = get_mp4_metadata("test.mp4", atomicparsley_path="/usr/bin/AtomicParsley")
 
         assert result == {"title": "Test Title", "description": "Test Description"}
 
@@ -180,7 +179,7 @@ Other line"""
         mock_result.stdout = "No relevant metadata found"
         mock_run.return_value = mock_result
 
-        result = get_mp4_metadata("test.mp4")
+        result = get_mp4_metadata("test.mp4", atomicparsley_path="/usr/bin/AtomicParsley")
 
         assert result == {"title": None, "description": None}
 
@@ -192,7 +191,7 @@ Other line"""
             1, "AtomicParsley", output="Error output"
         )
 
-        result = get_mp4_metadata("test.mp4")
+        result = get_mp4_metadata("test.mp4", atomicparsley_path="/usr/bin/AtomicParsley")
 
         assert result == {}
         mock_logger.error.assert_called_once()

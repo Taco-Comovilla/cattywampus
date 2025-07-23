@@ -8,7 +8,6 @@ from pathlib import Path
 from unittest.mock import patch
 
 import main
-
 from version import __app_name__
 
 
@@ -74,13 +73,8 @@ class TestPythonVersionLogging:
                                     ), "Python version was not logged"
 
                                     # Verify it's logged after BEGINNING RUN
-                                    info_calls = [
-                                        call for call in mock_logger.info.call_args_list
-                                    ]
-                                    debug_calls = [
-                                        call
-                                        for call in mock_logger.debug.call_args_list
-                                    ]
+                                    info_calls = list(mock_logger.info.call_args_list)
+                                    debug_calls = list(mock_logger.debug.call_args_list)
                                     beginning_run_logged = False
                                     python_version_logged = False
 

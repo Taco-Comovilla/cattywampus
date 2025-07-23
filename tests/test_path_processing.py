@@ -28,7 +28,7 @@ class TestPathProcessing:
         try:
             # Mock sys.argv with duplicate paths
             duplicate_paths = [tmp_file_path, abs_path, rel_path, tmp_file_path]
-            with patch("sys.argv", [__app_name__] + duplicate_paths):
+            with patch("sys.argv", [__app_name__, *duplicate_paths]):
                 # Mock tools as found
                 with patch("main.shutil.which") as mock_which:
                     mock_which.side_effect = lambda tool: (

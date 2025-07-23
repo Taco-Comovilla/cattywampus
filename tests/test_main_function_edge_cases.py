@@ -138,7 +138,7 @@ class TestMainFunctionEdgeCases:
         try:
             # Mock sys.argv with duplicate paths
             duplicate_paths = [tmp_file_path, abs_path, rel_path, tmp_file_path]
-            with patch("sys.argv", [__app_name__] + duplicate_paths):
+            with patch("sys.argv", [__app_name__, *duplicate_paths]):
                 # Mock parse_options
                 with patch("main.parse_options") as mock_parse_options:
                     mock_options = create_mock_options(paths=duplicate_paths)

@@ -279,22 +279,21 @@ class TestStdoutOnlyLogging:
             # Test CLI overriding config (config has stdoutOnly = false, CLI has --stdout-only)
             with patch(
                 "sys.argv", [__app_name__, "--stdout-only", "--dry-run", tmp_file_path]
-            ):
-                with patch("mcoptions.mcconfig") as mock_config:
-                    # Mock config that has stdoutOnly = false
-                    mock_config.get.side_effect = lambda key, default=None: {
-                        "stdoutOnly": False,
-                        "logLevel": 30,  # WARNING
-                    }.get(key, default)
+            ), patch("mcoptions.mcconfig") as mock_config:
+                # Mock config that has stdoutOnly = false
+                mock_config.get.side_effect = lambda key, default=None: {
+                    "stdoutOnly": False,
+                    "logLevel": 30,  # WARNING
+                }.get(key, default)
 
-                    from mcoptions import parse_options
+                from mcoptions import parse_options
 
-                    options = parse_options()
+                options = parse_options()
 
-                    assert options.stdout_only is True  # CLI overrides config
-                    assert options.log_level == 30  # WARNING from config
-                    assert options.sources["stdout_only"] == "cli"
-                    assert options.sources["log_level"] == "config"
+                assert options.stdout_only is True  # CLI overrides config
+                assert options.log_level == 30  # WARNING from config
+                assert options.sources["stdout_only"] == "cli"
+                assert options.sources["log_level"] == "config"
 
         finally:
             # Clean up

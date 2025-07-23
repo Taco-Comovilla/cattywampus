@@ -238,27 +238,25 @@ class TestGetSystemLocale:
         """Test system locale fallback to Python's locale"""
         mock_system.return_value = "Linux"
 
-        with patch.dict(os.environ, {}, clear=True):
-            with patch(
-                "mcoptions.locale.getdefaultlocale", return_value=("es_ES", "UTF-8")
-            ):
-                result = get_system_locale()
+        with patch.dict(os.environ, {}, clear=True), patch(
+            "mcoptions.locale.getdefaultlocale", return_value=("es_ES", "UTF-8")
+        ):
+            result = get_system_locale()
 
-                assert result == "es"
+            assert result == "es"
 
     @patch("mcoptions.platform.system")
     def test_get_system_locale_failure(self, mock_system):
         """Test system locale detection failure"""
         mock_system.return_value = "Linux"
 
-        with patch.dict(os.environ, {}, clear=True):
-            with patch(
-                "mcoptions.locale.getdefaultlocale",
-                side_effect=Exception("Locale error"),
-            ):
-                result = get_system_locale()
+        with patch.dict(os.environ, {}, clear=True), patch(
+            "mcoptions.locale.getdefaultlocale",
+            side_effect=Exception("Locale error"),
+        ):
+            result = get_system_locale()
 
-                assert result is None
+            assert result is None
 
 
 class TestParseOptions:

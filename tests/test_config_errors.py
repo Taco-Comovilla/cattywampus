@@ -4,6 +4,7 @@ Tests for configuration error handling scenarios
 
 import os
 import tempfile
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -41,10 +42,10 @@ class TestConfigErrors:
         with pytest.raises(EnvironmentError, match="LOCALAPPDATA is not set"):
             config._get_config_path()
 
-    @patch("mcconfig.os.makedirs")
-    def test_config_directory_creation_error(self, mock_makedirs):
+    @patch("mcconfig.Path.mkdir")
+    def test_config_directory_creation_error(self, mock_mkdir):
         """Test config behavior when directory creation fails"""
-        mock_makedirs.side_effect = PermissionError("Permission denied")
+        mock_mkdir.side_effect = PermissionError("Permission denied")
 
         # This should raise the PermissionError during initialization
         with pytest.raises(PermissionError, match="Permission denied"):
@@ -53,7 +54,7 @@ class TestConfigErrors:
     def test_config_invalid_toml_file(self):
         """Test config behavior with invalid TOML content"""
         with tempfile.TemporaryDirectory() as tmp_dir:
-            config_file_path = os.path.join(tmp_dir, "invalid_config.toml")
+            config_file_path = str(Path(tmp_dir) / "invalid_config.toml")
 
             # Create invalid TOML content
             with open(config_file_path, "w") as f:
@@ -87,7 +88,7 @@ class TestConfigErrors:
         finally:
             # Restore permissions and clean up
             os.chmod(tmp_file_path, 0o644)
-            os.unlink(tmp_file_path)
+            Path(tmp_file_path).unlink()
 
     def test_config_nonexistent_file(self):
         """Test config behavior with non-existent config file"""
@@ -106,7 +107,7 @@ class TestConfigErrors:
         mock_tomllib_load.side_effect = Exception("TOML load error")
 
         with tempfile.TemporaryDirectory() as tmp_dir:
-            config_file_path = os.path.join(tmp_dir, "test_config.toml")
+            config_file_path = str(Path(tmp_dir) / "test_config.toml")
 
             # Create valid TOML file
             with open(config_file_path, "w") as f:
@@ -139,7 +140,7 @@ language = invalid_unquoted_string
                 initialize_config(temp_path)
             assert exc_info.value.code == 1
         finally:
-            os.unlink(temp_path)
+            Path(temp_path).unlink()
 
     def test_custom_config_toml_unclosed_bracket_graceful(self):
         """Test graceful handling of unclosed bracket in custom config"""
@@ -157,7 +158,7 @@ language = [unclosed_bracket
                 initialize_config(temp_path)
             assert exc_info.value.code == 1
         finally:
-            os.unlink(temp_path)
+            Path(temp_path).unlink()
 
     def test_custom_config_toml_duplicate_key_graceful(self):
         """Test graceful handling of duplicate keys in custom config"""
@@ -175,7 +176,7 @@ logLevel = 20
                 initialize_config(temp_path)
             assert exc_info.value.code == 1
         finally:
-            os.unlink(temp_path)
+            Path(temp_path).unlink()
 
     def test_custom_config_toml_invalid_escape_graceful(self):
         """Test graceful handling of invalid escape sequences in custom config"""
@@ -193,7 +194,7 @@ language = "invalid\\escape"
                 initialize_config(temp_path)
             assert exc_info.value.code == 1
         finally:
-            os.unlink(temp_path)
+            Path(temp_path).unlink()
 
     def test_custom_config_permission_denied_graceful(self):
         """Test graceful handling of permission denied for custom config"""
@@ -212,7 +213,7 @@ language = "invalid\\escape"
             # Restore permissions before cleanup
             try:
                 os.chmod(temp_path, 0o644)
-                os.unlink(temp_path)
+                Path(temp_path).unlink()
             except:
                 pass
 
@@ -220,7 +221,7 @@ language = "invalid\\escape"
         """Test that default config file TOML errors are handled gracefully"""
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create a malformed default config file
-            config_file = os.path.join(temp_dir, "config.toml")
+            config_file = str(Path(temp_dir) / "config.toml")
             with open(config_file, "w") as f:
                 f.write("logLevel = [malformed\n")
 
@@ -249,4 +250,4 @@ setDefaultSubTrack = true
             assert config.get("language") == "fr"
             assert config.get("setDefaultSubTrack") is True
         finally:
-            os.unlink(temp_path)
+            Path(temp_path).unlink()

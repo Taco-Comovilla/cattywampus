@@ -6,6 +6,7 @@ import logging
 import os
 import tempfile
 from io import StringIO
+from pathlib import Path
 from unittest.mock import patch
 
 import main
@@ -33,27 +34,35 @@ class TestStdoutOnlyLogging:
         """Test that --stdout-only option is parsed correctly"""
         # Test with --stdout-only flag
         with patch("sys.argv", [__app_name__, "--stdout-only", "test.mkv"]):
-            from mcoptions import parse_options
+            # Mock empty config to ensure we get default behavior
+            with patch("mcoptions.mcconfig") as mock_config:
+                mock_config.get.side_effect = lambda key, default=None: default
+                
+                from mcoptions import parse_options
 
-            options = parse_options()
+                options = parse_options()
 
-            assert options.stdout_only is True
-            assert options.log_level == 10  # DEBUG level
-            assert options.sources["stdout_only"] == "cli"
-            assert options.sources["log_level"] == "stdout option"
+                assert options.stdout_only is True
+                assert options.log_level == 20  # INFO level (default, not overridden)
+                assert options.sources["stdout_only"] == "cli"
+                assert options.sources["log_level"] == "default"
 
     def test_stdout_only_short_option_parsing(self):
         """Test that -T short option is parsed correctly"""
         # Test with -T flag
         with patch("sys.argv", [__app_name__, "-T", "test.mkv"]):
-            from mcoptions import parse_options
+            # Mock empty config to ensure we get default behavior
+            with patch("mcoptions.mcconfig") as mock_config:
+                mock_config.get.side_effect = lambda key, default=None: default
+                
+                from mcoptions import parse_options
 
-            options = parse_options()
+                options = parse_options()
 
-            assert options.stdout_only is True
-            assert options.log_level == 10  # DEBUG level
-            assert options.sources["stdout_only"] == "cli"
-            assert options.sources["log_level"] == "stdout option"
+                assert options.stdout_only is True
+                assert options.log_level == 20  # INFO level (default, not overridden)
+                assert options.sources["stdout_only"] == "cli"
+                assert options.sources["log_level"] == "default"
 
     def test_stdout_only_option_disabled_by_default(self):
         """Test that stdout_only option is disabled by default"""
@@ -71,9 +80,9 @@ class TestStdoutOnlyLogging:
                 assert options.stdout_only is False
                 assert options.sources["stdout_only"] == "default"
 
-    def test_stdout_only_overrides_log_level(self):
-        """Test that --stdout-only overrides explicit log level"""
-        # Test that --stdout-only takes precedence over --loglevel
+    def test_stdout_only_does_not_override_log_level(self):
+        """Test that --stdout-only does not override explicit log level"""
+        # Test that --loglevel takes precedence over --stdout-only
         with patch(
             "sys.argv", [__app_name__, "--stdout-only", "--loglevel", "30", "test.mkv"]
         ):
@@ -82,8 +91,8 @@ class TestStdoutOnlyLogging:
             options = parse_options()
 
             assert options.stdout_only is True
-            assert options.log_level == 10  # DEBUG, not WARNING (30)
-            assert options.sources["log_level"] == "stdout option"
+            assert options.log_level == 30  # WARNING (30), explicit setting honored
+            assert options.sources["log_level"] == "cli"
 
     def test_logger_setup_with_stdout_only(self):
         """Test that logger setup correctly handles stdout_only option"""
@@ -111,8 +120,8 @@ class TestStdoutOnlyLogging:
 
         finally:
             # Clean up
-            if os.path.exists(log_file_path):
-                os.unlink(log_file_path)
+            if Path(log_file_path).exists():
+                Path(log_file_path).unlink()
 
     def test_logger_setup_with_both_stdout_and_stdout_only(self):
         """Test that stdout_only takes precedence and only creates console handler"""
@@ -140,8 +149,8 @@ class TestStdoutOnlyLogging:
 
         finally:
             # Clean up
-            if os.path.exists(log_file_path):
-                os.unlink(log_file_path)
+            if Path(log_file_path).exists():
+                Path(log_file_path).unlink()
 
     def test_logger_setup_without_stdout_only(self):
         """Test that logger setup works normally without stdout_only option"""
@@ -165,8 +174,8 @@ class TestStdoutOnlyLogging:
 
         finally:
             # Clean up
-            if os.path.exists(log_file_path):
-                os.unlink(log_file_path)
+            if Path(log_file_path).exists():
+                Path(log_file_path).unlink()
 
     def test_stdout_only_with_main_function(self):
         """Test --stdout-only option in main() function integration"""
@@ -226,8 +235,8 @@ class TestStdoutOnlyLogging:
 
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_stdout_only_config_file_option(self):
         """Test that stdout_only option can be set via config file"""
@@ -243,7 +252,7 @@ class TestStdoutOnlyLogging:
                     # Mock config that has stdoutOnly = true
                     mock_config.get.side_effect = lambda key, default=None: {
                         "stdoutOnly": True,
-                        "logLevel": 20,  # INFO, but should be overridden by stdout_only
+                        "logLevel": 20,  # INFO, should be used as configured
                     }.get(key, default)
 
                     from mcoptions import parse_options
@@ -251,14 +260,14 @@ class TestStdoutOnlyLogging:
                     options = parse_options()
 
                     assert options.stdout_only is True
-                    assert options.log_level == 10  # DEBUG, overridden by stdout_only
+                    assert options.log_level == 20  # INFO, from config setting
                     assert options.sources["stdout_only"] == "config"
-                    assert options.sources["log_level"] == "stdout option"
+                    assert options.sources["log_level"] == "config"
 
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_stdout_only_cli_overrides_config(self):
         """Test that CLI --stdout-only overrides config file setting"""
@@ -284,14 +293,14 @@ class TestStdoutOnlyLogging:
                     options = parse_options()
 
                     assert options.stdout_only is True  # CLI overrides config
-                    assert options.log_level == 10  # DEBUG from stdout_only
+                    assert options.log_level == 30  # WARNING from config
                     assert options.sources["stdout_only"] == "cli"
-                    assert options.sources["log_level"] == "stdout option"
+                    assert options.sources["log_level"] == "config"
 
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_stdout_only_vs_stdout_behavior(self):
         """Test that --stdout-only behaves differently from --stdout"""
@@ -330,8 +339,8 @@ class TestStdoutOnlyLogging:
 
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_version_and_help_not_affected_by_stdout_only(self):
         """Test that --version and --help work normally even with --stdout-only"""

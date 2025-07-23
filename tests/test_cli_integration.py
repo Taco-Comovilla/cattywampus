@@ -4,11 +4,13 @@ CLI integration tests to cover main() function execution paths
 
 import os
 import tempfile
+from pathlib import Path
 from unittest.mock import patch
 
 import main
 
 from .test_helpers import create_mock_options
+from version import __app_name__
 
 
 class TestCLIIntegration:
@@ -56,8 +58,8 @@ class TestCLIIntegration:
                                     mock_exit.assert_called_once()
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_main_function_dry_run_mode(self):
         """Test main() function in dry run mode"""
@@ -99,8 +101,8 @@ class TestCLIIntegration:
                                     mock_exit.assert_called_once()
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_main_function_no_tools_found_exit(self):
         """Test main() function exits when no tools are found (lines 584-586)"""
@@ -119,21 +121,23 @@ class TestCLIIntegration:
 
                     # Mock all tools as not found
                     with patch("main.shutil.which", return_value=None):
-                        with patch("main.logger") as mock_logger:
-                            with patch("main.sys.exit") as mock_exit:
+                        with patch("main.Path.is_file", return_value=False):
+                            with patch("main.os.access", return_value=False):
+                                with patch("main.logger") as mock_logger:
+                                    with patch("main.sys.exit") as mock_exit:
 
-                                # Call main function - should exit early
-                                main.main()
+                                        # Call main function - should exit early
+                                        main.main()
 
-                                # Verify critical error and exit (lines 584-586)
-                                mock_logger.critical.assert_any_call(
-                                    "neither mkvtoolnix nor AtomicParsley found in PATH. Exiting."
-                                )
-                                mock_exit.assert_called()
+                                        # Verify critical error and exit (lines 584-586)
+                                        mock_logger.critical.assert_any_call(
+                                            "neither mkvtoolnix nor AtomicParsley found in PATH. Exiting."
+                                        )
+                                        mock_exit.assert_called()
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_main_function_input_file_processing(self):
         """Test main() function with input file (lines 475-477)"""
@@ -150,40 +154,44 @@ class TestCLIIntegration:
 
         try:
             # Mock sys.argv to simulate CLI execution with input file
-            with patch("sys.argv", [__app_name__, "--input-file", input_file_path]):
+            with patch("sys.argv", [__app_name__, "--input", input_file_path]):
                 # Mock tools as found
                 with patch("main.shutil.which") as mock_which:
-                    mock_which.side_effect = lambda tool: (
-                        f"/usr/bin/{tool}" if tool else None
-                    )
+                    with patch("main.Path.is_file") as mock_is_file:
+                        with patch("main.os.access") as mock_access:
+                            mock_which.side_effect = lambda tool: (
+                                f"/usr/bin/{tool}" if tool else None
+                            )
+                            mock_is_file.return_value = True
+                            mock_access.return_value = True
 
-                    # Mock the processing functions
-                    with patch("main.process_mkv_file") as mock_process_mkv:
-                        with patch("main.logger") as mock_logger:
-                            with patch("main.sys.exit") as mock_exit:
-                                mock_process_mkv.return_value = None
+                            # Mock the processing functions
+                            with patch("main.process_mkv_file") as mock_process_mkv:
+                                with patch("main.logger") as mock_logger:
+                                    with patch("main.sys.exit") as mock_exit:
+                                        mock_process_mkv.return_value = None
 
-                                # Call main function
-                                main.main()
+                                        # Call main function
+                                        main.main()
 
-                                # Verify input file was processed (lines 475-477)
-                                mock_logger.debug.assert_any_call(
-                                    f"Added 1 path from input file: {input_file_path}"
-                                )
-                                mock_process_mkv.assert_called_once()
-                                mock_exit.assert_called_once()
+                                        # Verify input file was processed (lines 475-477)
+                                        mock_logger.debug.assert_any_call(
+                                            f"Added 1 path from input file: {input_file_path}"
+                                        )
+                                        mock_process_mkv.assert_called_once()
+                                        mock_exit.assert_called_once()
         finally:
             # Clean up
-            if os.path.exists(test_file_path):
-                os.unlink(test_file_path)
-            if os.path.exists(input_file_path):
-                os.unlink(input_file_path)
+            if Path(test_file_path).exists():
+                Path(test_file_path).unlink()
+            if Path(input_file_path).exists():
+                Path(input_file_path).unlink()
 
     def test_main_function_folder_processing(self):
         """Test main() function with folder processing (lines 623-624)"""
         # Create a temporary directory with a test file
         with tempfile.TemporaryDirectory() as tmp_dir:
-            test_file = os.path.join(tmp_dir, "test.mkv")
+            test_file = str(Path(tmp_dir) / "test.mkv")
             with open(test_file, "w") as f:
                 f.write("fake content")
 
@@ -220,34 +228,38 @@ class TestCLIIntegration:
             with patch("sys.argv", [__app_name__, tmp_file_path]):
                 # Mock tools as found
                 with patch("main.shutil.which") as mock_which:
-                    mock_which.side_effect = lambda tool: (
-                        f"/usr/bin/{tool}" if tool else None
-                    )
+                    with patch("main.Path.is_file") as mock_is_file:
+                        with patch("main.os.access") as mock_access:
+                            mock_which.side_effect = lambda tool: (
+                                f"/usr/bin/{tool}" if tool else None
+                            )
+                            mock_is_file.return_value = True
+                            mock_access.return_value = True
 
-                    # Mock tool version detection
-                    with patch("main.get_tool_version") as mock_get_version:
-                        mock_get_version.return_value = "Tool version 1.2.3"
+                            # Mock tool version detection
+                            with patch("main.get_tool_version") as mock_get_version:
+                                mock_get_version.return_value = "Tool version 1.2.3"
 
-                        with patch("main.process_mkv_file") as mock_process_mkv:
-                            with patch("main.logger") as mock_logger:
-                                with patch("main.sys.exit") as mock_exit:
-                                    mock_process_mkv.return_value = None
+                                with patch("main.process_mkv_file") as mock_process_mkv:
+                                    with patch("main.logger") as mock_logger:
+                                        with patch("main.sys.exit") as mock_exit:
+                                            mock_process_mkv.return_value = None
 
-                                    # Call main function
-                                    main.main()
+                                            # Call main function
+                                            main.main()
 
-                                    # Verify tool version logging (lines 593-615)
-                                    mock_logger.info.assert_any_call(
-                                        "mkvpropedit version: Tool version 1.2.3"
-                                    )
-                                    mock_logger.info.assert_any_call(
-                                        "mkvmerge version: Tool version 1.2.3"
-                                    )
-                                    mock_logger.info.assert_any_call(
-                                        "AtomicParsley version: Tool version 1.2.3"
-                                    )
-                                    mock_exit.assert_called_once()
+                                            # Verify tool version logging (lines 593-615)
+                                            mock_logger.info.assert_any_call(
+                                                "mkvpropedit version: Tool version 1.2.3"
+                                            )
+                                            mock_logger.info.assert_any_call(
+                                                "mkvmerge version: Tool version 1.2.3"
+                                            )
+                                            mock_logger.info.assert_any_call(
+                                                "Tool version 1.2.3"
+                                            )
+                                            mock_exit.assert_called_once()
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()

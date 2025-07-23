@@ -4,6 +4,7 @@ Edge case tests using the created test files
 
 import os
 import subprocess
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -301,7 +302,7 @@ class TestErrorHandling:
             assert "Error processing file" in error_call
 
         finally:
-            os.unlink(temp_path)
+            Path(temp_path).unlink()
 
     @patch("main.options")
     @patch("main.atomicparsley", "/usr/bin/AtomicParsley")
@@ -337,7 +338,7 @@ class TestErrorHandling:
             assert "Error processing file" in error_call
 
         finally:
-            os.unlink(temp_path)
+            Path(temp_path).unlink()
 
 
 class TestFileSystemEdgeCases:
@@ -369,10 +370,10 @@ class TestFileSystemEdgeCases:
         # Create nested directory structure
         long_path = temp_dir
         for i in range(10):
-            long_path = os.path.join(long_path, f"very_long_directory_name_{i}")
+            long_path = str(Path(long_path) / f"very_long_directory_name_{i}")
 
         os.makedirs(long_path)
-        test_file = os.path.join(long_path, "test_file_with_very_long_name.mkv")
+        test_file = str(Path(long_path) / "test_file_with_very_long_name.mkv")
 
         # Create fake file
         with open(test_file, "w") as f:
@@ -387,7 +388,7 @@ class TestFileSystemEdgeCases:
 
     def test_unicode_file_path(self, temp_dir):
         """Test processing file with unicode characters in path"""
-        unicode_file = os.path.join(temp_dir, "测试文件_éñtürñätīõñål.mkv")
+        unicode_file = str(Path(temp_dir) / "测试文件_éñtürñätīõñål.mkv")
 
         # Create fake file
         with open(unicode_file, "w") as f:

@@ -3,9 +3,11 @@ Tests for audio track name clearing functionality
 """
 
 import tempfile
+from pathlib import Path
 from unittest.mock import patch
 
 from src.main import has_audio_tracks, process_mkv_file
+from version import __app_name__
 
 
 class TestAudioTrackClearing:
@@ -51,10 +53,9 @@ class TestAudioTrackClearing:
 
         finally:
             # Clean up
-            import os
-
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            tmp_path = Path(tmp_file_path)
+            if tmp_path.exists():
+                tmp_path.unlink()
 
     def test_clear_audio_track_names_disabled(self):
         """Test that audio track names are preserved when option is disabled"""
@@ -96,10 +97,9 @@ class TestAudioTrackClearing:
 
         finally:
             # Clean up
-            import os
-
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            tmp_path = Path(tmp_file_path)
+            if tmp_path.exists():
+                tmp_path.unlink()
 
     def test_no_audio_tracks_found(self):
         """Test behavior when no audio tracks are present"""
@@ -141,10 +141,9 @@ class TestAudioTrackClearing:
 
         finally:
             # Clean up
-            import os
-
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            tmp_path = Path(tmp_file_path)
+            if tmp_path.exists():
+                tmp_path.unlink()
 
     def test_has_audio_tracks_function(self):
         """Test the has_audio_tracks helper function"""
@@ -249,8 +248,8 @@ class TestAudioTrackClearingCLI:
             sys.argv = original_argv
             import os
 
-            if os.path.exists(tmp_config_path):
-                os.unlink(tmp_config_path)
+            if Path(tmp_config_path).exists():
+                Path(tmp_config_path).unlink()
 
     def test_cli_overrides_config(self):
         """Test that CLI option overrides config file"""
@@ -277,5 +276,5 @@ class TestAudioTrackClearingCLI:
             sys.argv = original_argv
             import os
 
-            if os.path.exists(tmp_config_path):
-                os.unlink(tmp_config_path)
+            if Path(tmp_config_path).exists():
+                Path(tmp_config_path).unlink()

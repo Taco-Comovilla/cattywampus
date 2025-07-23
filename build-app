@@ -17,12 +17,12 @@ sys.path.insert(0, str(src_path))
 
 try:
     from version import (
-        __version__,
-        __app_name__,
         __app_description__,
-        __repo_base_url__,
-        __organization__,
+        __app_name__,
         __copyright__,
+        __organization__,
+        __repo_base_url__,
+        __version__,
     )
 except ImportError:
     # Will be handled in functions that use these imports
@@ -33,12 +33,12 @@ def get_metadata():
     """Get metadata from version.py."""
     try:
         return {
-            'version': __version__,
-            'app_name': __app_name__,
-            'description': __app_description__,
-            'repo_base_url': __repo_base_url__,
-            'organization': __organization__,
-            'copyright': __copyright__,
+            "version": __version__,
+            "app_name": __app_name__,
+            "description": __app_description__,
+            "repo_base_url": __repo_base_url__,
+            "organization": __organization__,
+            "copyright": __copyright__,
         }
     except NameError as e:
         print(f"Error: Could not import version information: {e}")
@@ -50,13 +50,12 @@ def get_platform_info():
     system = platform.system().lower()
     if system == "darwin":
         return "macos"
-    elif system == "windows":
+    if system == "windows":
         return "windows"
-    elif system == "linux":
+    if system == "linux":
         return "linux"
-    else:
-        print(f"Warning: Unknown platform {system}, defaulting to linux")
-        return "linux"
+    print(f"Warning: Unknown platform {system}, defaulting to linux")
+    return "linux"
 
 
 def check_command_exists(command):
@@ -67,12 +66,12 @@ def check_command_exists(command):
 def setup_python_environment():
     """Set up Python environment (pyenv, venv, or system)."""
     print("Setting up Python environment...")
-    
+
     # Check for pyenv
     if Path(".python-version").exists() and check_command_exists("pyenv"):
         print("Using pyenv with version from .python-version")
         return "python"  # pyenv automatically activates
-    
+
     # Check for existing venv
     venv_path = Path(".venv")
     if venv_path.exists():
@@ -81,28 +80,26 @@ def setup_python_environment():
             python_cmd = str(venv_path / "Scripts" / "python.exe")
         else:
             python_cmd = str(venv_path / "bin" / "python")
-        
+
         if Path(python_cmd).exists():
             return python_cmd
-        else:
-            print("Warning: Virtual environment exists but Python not found, recreating...")
-            shutil.rmtree(venv_path)
-    
+        print("Warning: Virtual environment exists but Python not found, recreating...")
+        shutil.rmtree(venv_path)
+
     # Create new venv
     print("Creating virtual environment...")
     python_cmd = "python3" if check_command_exists("python3") else "python"
-    
+
     try:
         subprocess.run([python_cmd, "-m", "venv", ".venv"], check=True)
     except subprocess.CalledProcessError:
         print("Error: Failed to create virtual environment. Make sure Python is installed.")
         sys.exit(1)
-    
+
     # Return path to venv python
     if platform.system() == "Windows":
         return str(venv_path / "Scripts" / "python.exe")
-    else:
-        return str(venv_path / "bin" / "python")
+    return str(venv_path / "bin" / "python")
 
 
 def install_dependencies(python_cmd):
@@ -119,14 +116,14 @@ def generate_windows_files(metadata):
     """Generate Windows-specific files (file_version_info.txt and setup.iss)."""
     if get_platform_info() != "windows":
         return
-    
+
     print("Generating Windows-specific files...")
-    
+
     # Generate file_version_info.txt
-    version_parts = metadata['version'].split('.')
+    version_parts = metadata["version"].split(".")
     major, minor, patch = int(version_parts[0]), int(version_parts[1]), int(version_parts[2])
-    
-    file_version_info = f'''# UTF-8
+
+    file_version_info = f"""# UTF-8
 #
 # For more details about fixed file info 'ffi' see:
 # http://msdn.microsoft.com/en-us/library/ms646997.aspx
@@ -171,18 +168,18 @@ VSVersionInfo(
     VarFileInfo([VarStruct('Translation', [1033, 1252])])
   ]
 )
-'''
-    
+"""
+
     # Ensure build/windows directory exists
-    Path('build/windows').mkdir(parents=True, exist_ok=True)
-    
-    with open('build/windows/file_version_info.txt', 'w', encoding='utf-8') as f:
+    Path("build/windows").mkdir(parents=True, exist_ok=True)
+
+    with open("build/windows/file_version_info.txt", "w", encoding="utf-8") as f:
         f.write(file_version_info)
-    
+
     # Generate appname.ini for InnoSetup
-    with open('appname.ini', 'w') as f:
+    with open("appname.ini", "w") as f:
         f.write(f'[app]\\nname={metadata["app_name"]}')
-    
+
     # Generate setup.iss
     setup_iss = f'''; DO NOT EDIT THIS NEXT LINE! It will be updated automatically by bump-my-version
 #define MyVersion "{metadata['version']}"
@@ -352,30 +349,30 @@ Filename: "reg"; Parameters: "delete ""HKCR\\SystemFileAssociations\\.mp4\\Shell
 Filename: "reg"; Parameters: "delete ""HKCR\\SystemFileAssociations\\.m4v\\Shell\\{{#MyAppName}}"" /f"; Flags: runhidden
 Filename: "reg"; Parameters: "delete ""HKCR\\SystemFileAssociations\\.mp4v\\Shell\\{{#MyAppName}}"" /f"; Flags: runhidden
 '''
-    
-    with open('build/windows/setup.iss', 'w', encoding='utf-8') as f:
+
+    with open("build/windows/setup.iss", "w", encoding="utf-8") as f:
         f.write(setup_iss)
 
 
 def process_template_string(template_content, metadata, binary_path=None):
     """Process a template string with metadata variables."""
     # Parse version for major/minor/patch components
-    version_parts = metadata['version'].split('.')
+    version_parts = metadata["version"].split(".")
     major, minor, patch = int(version_parts[0]), int(version_parts[1]), int(version_parts[2])
-    
+
     template_vars = {
-        'APP_NAME': metadata['app_name'],
-        'VERSION': metadata['version'], 
-        'VERSION_MAJOR': str(major),
-        'VERSION_MINOR': str(minor),
-        'VERSION_PATCH': str(patch),
-        'REPO_BASE_URL': metadata['repo_base_url'],
-        'APP_DESCRIPTION': metadata['description'],
-        'ORGANIZATION': metadata['organization'],
-        'COPYRIGHT': metadata['copyright'],
-        'BINARY_PATH': binary_path or '',
+        "APP_NAME": metadata["app_name"],
+        "VERSION": metadata["version"],
+        "VERSION_MAJOR": str(major),
+        "VERSION_MINOR": str(minor),
+        "VERSION_PATCH": str(patch),
+        "REPO_BASE_URL": metadata["repo_base_url"],
+        "APP_DESCRIPTION": metadata["description"],
+        "ORGANIZATION": metadata["organization"],
+        "COPYRIGHT": metadata["copyright"],
+        "BINARY_PATH": binary_path or "",
     }
-    
+
     template = Template(template_content)
     return template.safe_substitute(template_vars)
 
@@ -383,62 +380,61 @@ def process_template_string(template_content, metadata, binary_path=None):
 def process_templates(metadata):
     """Process all .template files with metadata variables."""
     print("Generating files from templates...")
-    
+
     # Parse version for major/minor/patch components
-    version_parts = metadata['version'].split('.')
+    version_parts = metadata["version"].split(".")
     major, minor, patch = int(version_parts[0]), int(version_parts[1]), int(version_parts[2])
-    
+
     template_vars = {
-        'APP_NAME': metadata['app_name'],
-        'VERSION': metadata['version'], 
-        'VERSION_MAJOR': str(major),
-        'VERSION_MINOR': str(minor),
-        'VERSION_PATCH': str(patch),
-        'REPO_BASE_URL': metadata['repo_base_url'],
-        'APP_DESCRIPTION': metadata['description'],
-        'ORGANIZATION': metadata['organization'],
-        'COPYRIGHT': metadata['copyright'],
+        "APP_NAME": metadata["app_name"],
+        "VERSION": metadata["version"],
+        "VERSION_MAJOR": str(major),
+        "VERSION_MINOR": str(minor),
+        "VERSION_PATCH": str(patch),
+        "REPO_BASE_URL": metadata["repo_base_url"],
+        "APP_DESCRIPTION": metadata["description"],
+        "ORGANIZATION": metadata["organization"],
+        "COPYRIGHT": metadata["copyright"],
     }
-    
+
     # Template mapping: template_file → output_file
     template_mappings = {
-        'templates/docs/README.adoc.template': './README.adoc',
-        'templates/docs/CONTRIBUTING.adoc.template': './CONTRIBUTING.adoc',
-        'templates/windows/file_version_info.txt.template': './build/windows/file_version_info.txt',
-        'templates/windows/setup.iss.template': './build/windows/setup.iss',
+        "templates/docs/README.adoc.template": "./README.adoc",
+        "templates/docs/CONTRIBUTING.adoc.template": "./CONTRIBUTING.adoc",
+        "templates/windows/file_version_info.txt.template": "./build/windows/file_version_info.txt",
+        "templates/windows/setup.iss.template": "./build/windows/setup.iss",
     }
-    
+
     def get_do_not_edit_header(file_path, template_path):
         """Generate appropriate DO NOT EDIT header for file type."""
         file_name = Path(file_path).name
         template_name = Path(template_path).name
-        
-        if file_name.endswith('.adoc'):
+
+        if file_name.endswith(".adoc"):
             return f"""// DO NOT EDIT THIS FILE - it is generated from {template_name}
 // Make changes to the template file instead: {template_path}
 // To regenerate: ./build-app --generate-docs
 
 """
-        elif file_name.endswith('.iss'):
+        if file_name.endswith(".iss"):
             return f"""; DO NOT EDIT THIS FILE - it is generated from {template_name}
 ; Make changes to the template file instead: {template_path}
 ; To regenerate: ./build-app --generate-docs
 
 """
-        elif file_name.endswith('.txt'):
+        if file_name.endswith(".txt"):
             return f"""# DO NOT EDIT THIS FILE - it is generated from {template_name}
 # Make changes to the template file instead: {template_path}
 # To regenerate: ./build-app --generate-docs
 
 """
-        elif file_name.endswith(('.plist', '.wflow')):
+        if file_name.endswith((".plist", ".wflow")):
             return f"""<!-- DO NOT EDIT THIS FILE - it is generated from {template_name} -->
 <!-- Make changes to the template file instead: {template_path} -->
 <!-- To regenerate: run ./install or ./build-app -->
 
 """
-        else:
-            return f"""# DO NOT EDIT THIS FILE - it is generated from {template_name}
+        return f"""# DO NOT EDIT THIS FILE - it is generated from {template_name}
 # Make changes to the template file instead: {template_path}
 # To regenerate: ./build-app --generate-docs
 
@@ -448,37 +444,37 @@ def process_templates(metadata):
         template_file = Path(template_path)
         if not template_file.exists():
             continue
-            
-        with open(template_file, 'r', encoding='utf-8') as f:
+
+        with open(template_file, encoding="utf-8") as f:
             template = Template(f.read())
-        
+
         output_file = Path(output_path)
         output_file.parent.mkdir(parents=True, exist_ok=True)
-        
+
         # Generate content and add DO NOT EDIT header
         content = template.substitute(template_vars)
         header = get_do_not_edit_header(output_path, template_path)
-        
-        with open(output_file, 'w', encoding='utf-8') as f:
+
+        with open(output_file, "w", encoding="utf-8") as f:
             f.write(header + content)
-        
+
         print(f"Generated: {output_file}")
 
 
 def run_pyinstaller(python_cmd, metadata, platform_name):
     """Run PyInstaller to build the executable."""
     print("Building executable with PyInstaller...")
-    
-    app_name = metadata['app_name']
+
+    app_name = metadata["app_name"]
     dist_path = f"dist/{platform_name}"
     work_path = f"build/{platform_name}"
     spec_path = f"build/{platform_name}"
-    
+
     # Create directories
     Path(dist_path).mkdir(parents=True, exist_ok=True)
     Path(work_path).mkdir(parents=True, exist_ok=True)
     Path(spec_path).mkdir(parents=True, exist_ok=True)
-    
+
     # Build PyInstaller command
     cmd = [
         python_cmd, "-m", "PyInstaller",
@@ -489,13 +485,13 @@ def run_pyinstaller(python_cmd, metadata, platform_name):
         "--workpath", work_path,
         "--specpath", spec_path
     ]
-    
+
     try:
         subprocess.run(cmd, check=True)
     except subprocess.CalledProcessError:
         print("Error: PyInstaller build failed.")
         sys.exit(1)
-    
+
     # Set version info on Windows
     if platform_name == "windows":
         print("Setting version info on executable...")
@@ -512,98 +508,98 @@ def run_pyinstaller(python_cmd, metadata, platform_name):
 def build_release(metadata, platform_name):
     """Create release package (compressed binary)."""
     print("Creating release package...")
-    
-    app_name = metadata['app_name']
-    version = metadata['version']
+
+    app_name = metadata["app_name"]
+    version = metadata["version"]
     dist_path = Path(f"dist/{platform_name}")
-    
+
     if platform_name == "windows":
         # Windows: Create ZIP file
         executable = dist_path / f"{app_name}.exe"
         if not executable.exists():
             print(f"Error: Executable not found: {executable}")
             sys.exit(1)
-        
+
         # Remove old ZIP files
         for old_zip in dist_path.glob("*.zip"):
             print(f"Removing old release file: {old_zip}")
             old_zip.unlink()
-        
+
         # Create new ZIP
         zip_name = f"{app_name}-windows-{version}.zip"
         zip_path = dist_path / zip_name
-        
-        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
+
+        with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
             zf.write(executable, executable.name)
-        
+
         print(f"Release binary created: {zip_path}")
-        
+
     else:
         # Unix: Create gzipped file
         executable = dist_path / app_name
         if not executable.exists():
             print(f"Error: Executable not found: {executable}")
             sys.exit(1)
-        
+
         # Remove old gz files
         for old_gz in dist_path.glob("*.gz"):
             print(f"Removing old release file: {old_gz}")
             old_gz.unlink()
-        
+
         # Create new gz
         gz_name = f"{app_name}-{platform_name}-{version}.gz"
         gz_path = dist_path / gz_name
-        
-        with open(executable, 'rb') as f_in:
-            with gzip.open(gz_path, 'wb') as f_out:
+
+        with open(executable, "rb") as f_in:
+            with gzip.open(gz_path, "wb") as f_out:
                 shutil.copyfileobj(f_in, f_out)
-        
+
         # Remove execute bit from compressed file
         gz_path.chmod(0o644)
-        
+
         print(f"Release binary created: {gz_path}")
 
 
 def main():
     """Main build function."""
     parser = argparse.ArgumentParser(description="Cross-platform build script")
-    parser.add_argument('--release', action='store_true', 
-                       help='Create release package after building')
-    parser.add_argument('--generate-docs', action='store_true',
-                       help='Only generate documentation and config files')
+    parser.add_argument("--release", action="store_true",
+                       help="Create release package after building")
+    parser.add_argument("--generate-docs", action="store_true",
+                       help="Only generate documentation and config files")
     args = parser.parse_args()
-    
+
     # Get metadata and platform info
     metadata = get_metadata()
-    
+
     if args.generate_docs:
         # Only generate files from templates, exit
         process_templates(metadata)
         print("Documentation generation completed!")
         return
-    
+
     platform_name = get_platform_info()
     print(f"Building {metadata['app_name']} v{metadata['version']} for {platform_name}")
-    
+
     # Set up environment and dependencies
     python_cmd = setup_python_environment()
     install_dependencies(python_cmd)
-    
+
     # Generate files from templates (always do this during build)
     process_templates(metadata)
-    
+
     # Generate platform-specific files (legacy - will be removed)
     generate_windows_files(metadata)
-    
+
     # Build executable
     run_pyinstaller(python_cmd, metadata, platform_name)
-    
+
     print("Build completed successfully!")
-    
+
     # Create release package if requested
     if args.release:
         build_release(metadata, platform_name)
-    
+
     # Show next steps
     print()
     print("Next steps:")

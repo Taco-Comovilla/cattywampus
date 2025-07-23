@@ -4,11 +4,13 @@ Integration tests for tool detection and initialization in main() function
 
 import os
 import tempfile
+from pathlib import Path
 from unittest.mock import patch
 
 import main
 
 from .test_helpers import create_mock_options
+from version import __app_name__
 
 
 class TestToolDetectionIntegration:
@@ -71,8 +73,8 @@ class TestToolDetectionIntegration:
                                     mock_exit.assert_called_once()
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_main_function_tool_path_fallback_to_system(self):
         """Test tool path fallback to system binaries on Windows/Unix (lines 565-575)"""
@@ -131,8 +133,8 @@ class TestToolDetectionIntegration:
                                         mock_exit.assert_called_once()
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_main_function_tool_discovery_logging(self):
         """Test tool discovery logging with sources (lines 588-615)"""
@@ -199,8 +201,8 @@ class TestToolDetectionIntegration:
                                         mock_exit.assert_called_once()
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_main_function_windows_tool_naming(self):
         """Test Windows-specific tool naming (.exe extension) (lines 565-575)"""
@@ -253,5 +255,5 @@ class TestToolDetectionIntegration:
                                         mock_exit.assert_called_once()
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()

@@ -10,8 +10,8 @@ from pathlib import Path
 # Add src to path for local imports
 sys.path.insert(0, "src")
 try:
-    from version import __app_name__
     from mcconfig import Config
+    from version import __app_name__
 except ImportError:
     # Will be handled in functions that use these imports
     pass

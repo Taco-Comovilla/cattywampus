@@ -6,10 +6,12 @@ import logging
 import os
 import tempfile
 from io import StringIO
+from pathlib import Path
 from unittest.mock import patch
 
 import main
 from mclogger import Logger
+from version import __app_name__
 
 
 class TestStdoutLogging:
@@ -31,27 +33,35 @@ class TestStdoutLogging:
         """Test that --stdout option is parsed correctly"""
         # Test with --stdout flag
         with patch("sys.argv", [__app_name__, "--stdout", "test.mkv"]):
-            from mcoptions import parse_options
+            # Mock empty config to ensure we get default behavior
+            with patch("mcoptions.mcconfig") as mock_config:
+                mock_config.get.side_effect = lambda key, default=None: default
+                
+                from mcoptions import parse_options
 
-            options = parse_options()
+                options = parse_options()
 
-            assert options.stdout is True
-            assert options.log_level == 10  # DEBUG level
-            assert options.sources["stdout"] == "cli"
-            assert options.sources["log_level"] == "stdout option"
+                assert options.stdout is True
+                assert options.log_level == 20  # INFO level (default, not overridden)
+                assert options.sources["stdout"] == "cli"
+                assert options.sources["log_level"] == "default"
 
     def test_stdout_short_option_parsing(self):
         """Test that -S short option is parsed correctly"""
         # Test with -S flag
         with patch("sys.argv", [__app_name__, "-S", "test.mkv"]):
-            from mcoptions import parse_options
+            # Mock empty config to ensure we get default behavior
+            with patch("mcoptions.mcconfig") as mock_config:
+                mock_config.get.side_effect = lambda key, default=None: default
+                
+                from mcoptions import parse_options
 
-            options = parse_options()
+                options = parse_options()
 
-            assert options.stdout is True
-            assert options.log_level == 10  # DEBUG level
-            assert options.sources["stdout"] == "cli"
-            assert options.sources["log_level"] == "stdout option"
+                assert options.stdout is True
+                assert options.log_level == 20  # INFO level (default, not overridden)
+                assert options.sources["stdout"] == "cli"
+                assert options.sources["log_level"] == "default"
 
     def test_stdout_option_disabled_by_default(self):
         """Test that stdout option is disabled by default"""
@@ -69,9 +79,9 @@ class TestStdoutLogging:
                 assert options.stdout is False
                 assert options.sources["stdout"] == "default"
 
-    def test_stdout_overrides_log_level(self):
-        """Test that --stdout overrides explicit log level"""
-        # Test that --stdout takes precedence over --loglevel
+    def test_stdout_does_not_override_log_level(self):
+        """Test that --stdout does not override explicit log level"""
+        # Test that --loglevel takes precedence over --stdout
         with patch(
             "sys.argv", [__app_name__, "--stdout", "--loglevel", "30", "test.mkv"]
         ):
@@ -80,8 +90,8 @@ class TestStdoutLogging:
             options = parse_options()
 
             assert options.stdout is True
-            assert options.log_level == 10  # DEBUG, not WARNING (30)
-            assert options.sources["log_level"] == "stdout option"
+            assert options.log_level == 30  # WARNING (30), explicit setting honored
+            assert options.sources["log_level"] == "cli"
 
     def test_logger_setup_with_stdout(self):
         """Test that logger setup correctly handles stdout option"""
@@ -124,8 +134,8 @@ class TestStdoutLogging:
 
         finally:
             # Clean up
-            if os.path.exists(log_file_path):
-                os.unlink(log_file_path)
+            if Path(log_file_path).exists():
+                Path(log_file_path).unlink()
 
     def test_logger_setup_without_stdout(self):
         """Test that logger setup works normally without stdout option"""
@@ -151,8 +161,8 @@ class TestStdoutLogging:
 
         finally:
             # Clean up
-            if os.path.exists(log_file_path):
-                os.unlink(log_file_path)
+            if Path(log_file_path).exists():
+                Path(log_file_path).unlink()
 
     def test_console_formatter_different_from_file(self):
         """Test that console and file use different formatters"""
@@ -200,8 +210,8 @@ class TestStdoutLogging:
 
         finally:
             # Clean up
-            if os.path.exists(log_file_path):
-                os.unlink(log_file_path)
+            if Path(log_file_path).exists():
+                Path(log_file_path).unlink()
 
     def test_stdout_with_main_function(self):
         """Test --stdout option in main() function integration"""
@@ -261,8 +271,8 @@ class TestStdoutLogging:
 
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_version_and_help_not_affected_by_stdout(self):
         """Test that --version and --help work normally even with --stdout"""
@@ -323,8 +333,8 @@ class TestStdoutLogging:
 
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_stdout_config_file_option(self):
         """Test that stdout option can be set via config file"""
@@ -340,7 +350,7 @@ class TestStdoutLogging:
                     # Mock config that has stdout = true
                     mock_config.get.side_effect = lambda key, default=None: {
                         "stdout": True,
-                        "logLevel": 20,  # INFO, but should be overridden by stdout
+                        "logLevel": 20,  # INFO, should be used as configured
                     }.get(key, default)
 
                     from mcoptions import parse_options
@@ -348,14 +358,14 @@ class TestStdoutLogging:
                     options = parse_options()
 
                     assert options.stdout is True
-                    assert options.log_level == 10  # DEBUG, overridden by stdout
+                    assert options.log_level == 20  # INFO, from config setting
                     assert options.sources["stdout"] == "config"
-                    assert options.sources["log_level"] == "stdout option"
+                    assert options.sources["log_level"] == "config"
 
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_stdout_cli_overrides_config(self):
         """Test that CLI --stdout overrides config file setting"""
@@ -381,11 +391,11 @@ class TestStdoutLogging:
                     options = parse_options()
 
                     assert options.stdout is True  # CLI overrides config
-                    assert options.log_level == 10  # DEBUG from stdout
+                    assert options.log_level == 30  # WARNING from config
                     assert options.sources["stdout"] == "cli"
-                    assert options.sources["log_level"] == "stdout option"
+                    assert options.sources["log_level"] == "config"
 
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()

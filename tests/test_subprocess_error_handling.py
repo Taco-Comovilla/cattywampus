@@ -4,6 +4,7 @@ Tests for subprocess error handling and tool missing scenarios
 
 import os
 import tempfile
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -39,7 +40,7 @@ class TestSubprocessErrorHandling:
             assert result is None
 
         finally:
-            os.unlink(tmp_file_path)
+            Path(tmp_file_path).unlink()
 
     @patch("main.options")
     @patch("main.logger")
@@ -65,7 +66,7 @@ class TestSubprocessErrorHandling:
             assert result is None
 
         finally:
-            os.unlink(tmp_file_path)
+            Path(tmp_file_path).unlink()
 
     def test_get_mkv_metadata_missing_tool_runtime_error(self):
         """Test get_mkv_metadata raises RuntimeError when tool is missing (line 301)"""
@@ -101,7 +102,7 @@ class TestSubprocessErrorHandling:
             assert result is None
 
         finally:
-            os.unlink(tmp_file_path)
+            Path(tmp_file_path).unlink()
 
     @patch("main.options")
     @patch("main.logger")
@@ -157,7 +158,7 @@ class TestSubprocessErrorHandling:
 
         finally:
             # Clean up
-            os.unlink(tmp_file_path)
+            Path(tmp_file_path).unlink()
             main.folders_errored = 0
 
     @patch("main.options")

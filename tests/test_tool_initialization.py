@@ -4,6 +4,7 @@ Tests for tool initialization and edge cases
 
 import os
 import tempfile
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -97,4 +98,4 @@ class TestToolInitialization:
 
         finally:
             # Clean up
-            os.unlink(tmp_file_path)
+            Path(tmp_file_path).unlink()

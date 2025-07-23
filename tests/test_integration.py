@@ -4,6 +4,7 @@ Integration tests for file processing workflows
 
 import os
 import tempfile
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from main import process_folder, process_mkv_file, process_mp4_file
@@ -58,7 +59,7 @@ class TestProcessMkvFile:
             mock_logger.info.assert_called()
 
         finally:
-            os.unlink(temp_path)
+            Path(temp_path).unlink()
 
     @patch("main.options")
     @patch("main.mkvpropedit", "/usr/bin/mkvpropedit")
@@ -109,7 +110,7 @@ class TestProcessMkvFile:
             assert any("No audio tracks found" in call for call in debug_calls)
 
         finally:
-            os.unlink(temp_path)
+            Path(temp_path).unlink()
 
     @patch("main.options")
     @patch("main.mkvpropedit", "/usr/bin/mkvpropedit")
@@ -147,7 +148,7 @@ class TestProcessMkvFile:
             assert any("DRY RUN" in call for call in info_calls)
 
         finally:
-            os.unlink(temp_path)
+            Path(temp_path).unlink()
 
     @patch("main.options")
     @patch("main.mkvpropedit", None)
@@ -173,7 +174,7 @@ class TestProcessMkvFile:
             )
 
         finally:
-            os.unlink(temp_path)
+            Path(temp_path).unlink()
 
 
 class TestProcessMp4File:
@@ -219,7 +220,7 @@ class TestProcessMp4File:
             mock_logger.info.assert_called()
 
         finally:
-            os.unlink(temp_path)
+            Path(temp_path).unlink()
 
     @patch("main.options")
     @patch("main.atomicparsley", "/usr/bin/AtomicParsley")
@@ -248,7 +249,7 @@ class TestProcessMp4File:
             mock_logger.info.assert_called_with("No metadata found in file.")
 
         finally:
-            os.unlink(temp_path)
+            Path(temp_path).unlink()
 
     @patch("main.options")
     @patch("main.atomicparsley", None)
@@ -273,7 +274,7 @@ class TestProcessMp4File:
             )
 
         finally:
-            os.unlink(temp_path)
+            Path(temp_path).unlink()
 
 
 class TestProcessFolder:
@@ -293,9 +294,9 @@ class TestProcessFolder:
         # Create temp directory with test files
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create test files
-            mkv_file = os.path.join(temp_dir, "test.mkv")
-            mp4_file = os.path.join(temp_dir, "test.mp4")
-            txt_file = os.path.join(temp_dir, "readme.txt")
+            mkv_file = str(Path(temp_dir) / "test.mkv")
+            mp4_file = str(Path(temp_dir) / "test.mp4")
+            txt_file = str(Path(temp_dir) / "readme.txt")
 
             with open(mkv_file, "w") as f:
                 f.write("fake mkv")
@@ -325,8 +326,8 @@ class TestProcessFolder:
         # Create temp directory with test files
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create test files
-            mkv_file = os.path.join(temp_dir, "test.mkv")
-            mp4_file = os.path.join(temp_dir, "test.mp4")
+            mkv_file = str(Path(temp_dir) / "test.mkv")
+            mp4_file = str(Path(temp_dir) / "test.mp4")
 
             with open(mkv_file, "w") as f:
                 f.write("fake mkv")
@@ -354,9 +355,9 @@ class TestProcessFolder:
         # Create temp directory with test files
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create test files
-            mkv_file = os.path.join(temp_dir, "test.mkv")
-            mp4_file = os.path.join(temp_dir, "test.mp4")
-            m4v_file = os.path.join(temp_dir, "test.m4v")
+            mkv_file = str(Path(temp_dir) / "test.mkv")
+            mp4_file = str(Path(temp_dir) / "test.mp4")
+            m4v_file = str(Path(temp_dir) / "test.m4v")
 
             with open(mkv_file, "w") as f:
                 f.write("fake mkv")
@@ -387,12 +388,12 @@ class TestProcessFolder:
         # Create temp directory with nested structure
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create nested directory
-            nested_dir = os.path.join(temp_dir, "nested")
+            nested_dir = str(Path(temp_dir) / "nested")
             os.makedirs(nested_dir)
 
             # Create test files at different levels
-            root_mkv = os.path.join(temp_dir, "root.mkv")
-            nested_mp4 = os.path.join(nested_dir, "nested.mp4")
+            root_mkv = str(Path(temp_dir) / "root.mkv")
+            nested_mp4 = str(Path(nested_dir) / "nested.mp4")
 
             with open(root_mkv, "w") as f:
                 f.write("fake mkv")

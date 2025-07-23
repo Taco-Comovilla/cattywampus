@@ -3,6 +3,7 @@ __all__ = ["mcconfig"]
 import os
 import platform
 import sys
+from pathlib import Path
 
 from version import __app_name__
 
@@ -35,19 +36,19 @@ class Config:
             # Use custom config file path directly
             self.config_file_path = custom_config_path
             # For custom config, use same directory for log file
-            self.config_path = os.path.dirname(custom_config_path)
-            self.log_file_path = os.path.join(self.config_path, f"{__app_name__}.log")
+            self.config_path = str(Path(custom_config_path).parent)
+            self.log_file_path = str(Path(self.config_path) / f"{__app_name__}.log")
         else:
             # Use default config directory
             self.config_path = self._get_config_path()
-            self.config_file_path = os.path.join(self.config_path, filename)
-            self.log_file_path = os.path.join(self.config_path, f"{__app_name__}.log")
+            self.config_file_path = str(Path(self.config_path) / filename)
+            self.log_file_path = str(Path(self.config_path) / f"{__app_name__}.log")
             self._ensure_config_exists(self.config_path, self.config_file_path)
 
         # Load the config file if it exists
-        if os.path.isfile(self.config_file_path):
+        if Path(self.config_file_path).is_file():
             try:
-                with open(self.config_file_path, "rb") as config_file:
+                with Path(self.config_file_path).open("rb") as config_file:
                     loaded_config = tomllib.load(config_file)
                     # Merge loaded config with defaults (loaded values override defaults)
                     self.config.update(loaded_config)
@@ -98,15 +99,15 @@ class Config:
             base_dir = os.getenv("LOCALAPPDATA")
             if not base_dir:
                 raise OSError("LOCALAPPDATA is not set")
-            return os.path.join(base_dir, __app_name__)
+            return str(Path(base_dir) / __app_name__)
 
         if system == "Linux":
-            base_dir = os.getenv("XDG_CONFIG_HOME", os.path.expanduser("~/.config"))
-            return os.path.join(base_dir, __app_name__)
+            base_dir = os.getenv("XDG_CONFIG_HOME", str(Path("~/.config").expanduser()))
+            return str(Path(base_dir) / __app_name__)
 
         if system == "Darwin":  # macOS
             base_dir = os.path.expanduser("~/Library/Application Support")
-            return os.path.join(base_dir, __app_name__)
+            return str(Path(base_dir) / __app_name__)
 
         raise NotImplementedError(f"Unsupported platform: {system}")
 
@@ -124,12 +125,12 @@ class Config:
             shutil.copy2(example_config_path, config_file_path)
         else:
             # Fallback to old behavior if example file not found
-            with open(config_file_path, "wb") as f:
+            with Path(config_file_path).open("wb") as f:
                 f.write(tomli_w.dumps(self.config).encode("utf-8"))
 
     def _ensure_config_exists(self, config_dir, config_file_path):
-        os.makedirs(config_dir, exist_ok=True)
-        if not os.path.isfile(config_file_path):
+        Path(config_dir).mkdir(parents=True, exist_ok=True)
+        if not Path(config_file_path).is_file():
             self._generate_default_config_file(config_file_path)
 
     def get(self, key, default=None):

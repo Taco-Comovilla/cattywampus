@@ -4,6 +4,7 @@ Tests for folder processing error scenarios
 
 import os
 import tempfile
+from pathlib import Path
 from unittest.mock import patch
 
 import main
@@ -34,7 +35,7 @@ class TestFolderProcessing:
 
         finally:
             # Clean up
-            os.unlink(file_path)
+            Path(file_path).unlink()
             main.folders_errored = 0
 
     @patch("main.logger")
@@ -87,7 +88,7 @@ class TestFolderProcessing:
         """Test successful folder processing to hit line 266"""
         # Create a directory with a test file
         with tempfile.TemporaryDirectory() as tmp_dir:
-            test_file = os.path.join(tmp_dir, "test.mkv")
+            test_file = str(Path(tmp_dir) / "test.mkv")
             with open(test_file, "w") as f:
                 f.write("fake content")
 

@@ -134,7 +134,7 @@ class TestInstallScript:
         content = install_script.read_text()
 
         # Verify the function is called after successful uninstall
-        assert "check_and_warn_about_preserved_config(app_name)" in content
+        assert "check_and_warn_about_preserved_config()" in content
 
         # Verify it's called in both success and warning code paths
         success_pattern = "Previous version uninstalled successfully"

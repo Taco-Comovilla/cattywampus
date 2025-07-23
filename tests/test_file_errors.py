@@ -4,6 +4,7 @@ Tests for file I/O error handling scenarios
 
 import os
 import tempfile
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -34,7 +35,7 @@ class TestFileErrorHandling:
         finally:
             # Restore permissions and clean up
             os.chmod(tmp_file_path, 0o644)
-            os.unlink(tmp_file_path)
+            Path(tmp_file_path).unlink()
 
     def test_read_paths_from_file_unicode_decode_error(self):
         """Test reading paths from file with invalid UTF-8 encoding"""
@@ -53,7 +54,7 @@ class TestFileErrorHandling:
 
         finally:
             # Clean up
-            os.unlink(tmp_file_path)
+            Path(tmp_file_path).unlink()
 
     @patch("main.open")
     def test_read_paths_from_file_general_exception(self, mock_file_open):
@@ -80,7 +81,7 @@ class TestFileErrorHandling:
 
         finally:
             # Clean up
-            os.unlink(tmp_file_path)
+            Path(tmp_file_path).unlink()
 
     @patch("main.logger")
     def test_read_paths_from_file_with_comments_and_empty_lines(self, mock_logger):
@@ -105,7 +106,7 @@ class TestFileErrorHandling:
 
         finally:
             # Clean up
-            os.unlink(tmp_file_path)
+            Path(tmp_file_path).unlink()
 
     @patch("main.logger")
     def test_read_paths_from_file_dos_line_endings(self, mock_logger):
@@ -127,7 +128,7 @@ class TestFileErrorHandling:
 
         finally:
             # Clean up
-            os.unlink(tmp_file_path)
+            Path(tmp_file_path).unlink()
 
     @patch("main.logger")
     def test_read_paths_from_file_nonexistent_paths(self, mock_logger):
@@ -148,7 +149,7 @@ class TestFileErrorHandling:
 
         finally:
             # Clean up
-            os.unlink(tmp_file_path)
+            Path(tmp_file_path).unlink()
 
     @patch("main.logger")
     def test_read_paths_from_file_with_logging(self, mock_logger):
@@ -178,4 +179,4 @@ class TestFileErrorHandling:
         finally:
             # Restore permissions and clean up
             os.chmod(tmp_file_path, 0o644)
-            os.unlink(tmp_file_path)
+            Path(tmp_file_path).unlink()

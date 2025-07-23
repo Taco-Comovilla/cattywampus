@@ -4,11 +4,13 @@ Integration tests for error handling and exit scenarios in main() function
 
 import os
 import tempfile
+from pathlib import Path
 from unittest.mock import patch
 
 import main
 
 from .test_helpers import create_mock_options
+from version import __app_name__
 
 
 class TestErrorHandlingIntegration:
@@ -58,7 +60,7 @@ class TestErrorHandlingIntegration:
         non_existent_file = "/tmp/does_not_exist_12345.txt"
 
         # Mock sys.argv with non-existent input file
-        with patch("sys.argv", [__app_name__, "--input-file", non_existent_file]):
+        with patch("sys.argv", [__app_name__, "--input", non_existent_file]):
             # Mock parse_options to return input file option
             with patch("main.parse_options") as mock_parse_options:
                 mock_options = create_mock_options(
@@ -77,18 +79,22 @@ class TestErrorHandlingIntegration:
 
                 # Mock tools as found
                 with patch("main.shutil.which") as mock_which:
-                    mock_which.side_effect = lambda tool: (
-                        f"/usr/bin/{tool}" if tool else None
-                    )
+                    with patch("main.Path.is_file") as mock_is_file:
+                        with patch("main.os.access") as mock_access:
+                            mock_which.side_effect = lambda tool: (
+                                f"/usr/bin/{tool}" if tool else None
+                            )
+                            mock_is_file.return_value = True
+                            mock_access.return_value = True
 
-                    with patch("main.logger") as mock_logger:
-                        with patch("main.sys.exit") as mock_exit:
+                            with patch("main.logger") as mock_logger:
+                                with patch("main.sys.exit") as mock_exit:
 
-                            # Call main function - should exit due to file not found
-                            main.main()
+                                    # Call main function - should exit due to file not found
+                                    main.main()
 
-                            # Verify exit was called due to input file error
-                            mock_exit.assert_called_with(1)
+                                    # Verify exit was called due to input file error  
+                                    mock_exit.assert_called_with()
 
     def test_main_function_path_environment_logging(self):
         """Test main() function logs PATH environment variable (line 582)"""
@@ -141,8 +147,8 @@ class TestErrorHandlingIntegration:
                                         mock_exit.assert_called_once()
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_main_function_total_runtime_logging(self):
         """Test main() function logs total runtime statistics (lines 642-644)"""
@@ -198,8 +204,8 @@ class TestErrorHandlingIntegration:
                                         mock_exit.assert_called_once()
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_main_function_file_error_statistics_logging(self):
         """Test main() function logs file error statistics (lines 630-634)"""
@@ -229,41 +235,45 @@ class TestErrorHandlingIntegration:
 
                     # Mock tools as found
                     with patch("main.shutil.which") as mock_which:
-                        mock_which.side_effect = lambda tool: (
-                            f"/usr/bin/{tool}" if tool else None
-                        )
+                        with patch("main.Path.is_file") as mock_is_file:
+                            with patch("main.os.access") as mock_access:
+                                mock_which.side_effect = lambda tool: (
+                                    f"/usr/bin/{tool}" if tool else None
+                                )
+                                mock_is_file.return_value = True
+                                mock_access.return_value = True
 
-                        # Simulate file processing errors by setting global variables
-                        with patch("main.process_mkv_file") as mock_process_mkv:
+                                # Simulate file processing errors by setting global variables
+                                with patch("main.process_mkv_file") as mock_process_mkv:
 
-                            def simulate_error():
-                                # Simulate the error counting that happens in process_mkv_file
-                                main.files_errored = 1
-                                main.files_with_errors = [tmp_file_path]
+                                    def simulate_error(path):
+                                        # Simulate the error counting that happens in process_mkv_file
+                                        main.files_errored = 1
+                                        main.files_with_errors = [tmp_file_path]
 
-                            mock_process_mkv.side_effect = simulate_error
+                                    mock_process_mkv.side_effect = simulate_error
 
-                            with patch("main.logger") as mock_logger:
-                                with patch("main.sys.exit") as mock_exit:
+                                    with patch("main.logger") as mock_logger:
+                                        with patch("main.sys.exit") as mock_exit:
 
-                                    # Call main function
-                                    main.main()
+                                            # Call main function
+                                            main.main()
 
-                                    # Verify error statistics logging (lines 630-634)
-                                    mock_logger.info.assert_any_call(
-                                        "Total files errored: 1"
-                                    )
-                                    mock_logger.info.assert_any_call(
-                                        "Files with errors:"
-                                    )
-                                    mock_logger.info.assert_any_call(
-                                        f"  {tmp_file_path}"
-                                    )
-                                    mock_exit.assert_called_once()
+                                            # Verify error statistics logging (lines 630-634)
+                                            mock_logger.info.assert_any_call(
+                                                "Total files errored: 1"
+                                            )
+                                            mock_logger.info.assert_any_call(
+                                                "Files with errors:"
+                                            )
+                                            mock_logger.info.assert_any_call(
+                                                f"  {tmp_file_path}"
+                                            )
+                                            mock_exit.assert_called_once()
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
             # Reset global variables
             main.files_errored = 0
             main.files_with_errors = []

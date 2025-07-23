@@ -5,9 +5,12 @@ Tests for Python version logging functionality
 import os
 import sys
 import tempfile
+from pathlib import Path
 from unittest.mock import patch
 
 import main
+
+from version import __app_name__
 
 
 class TestPythonVersionLogging:
@@ -112,8 +115,8 @@ class TestPythonVersionLogging:
 
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_python_version_format(self):
         """Test that Python version format is correct"""
@@ -221,8 +224,8 @@ class TestPythonVersionLogging:
 
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_python_version_environment_detection(self):
         """Test that Python version logging includes environment detection"""
@@ -280,8 +283,8 @@ class TestPythonVersionLogging:
 
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_python_version_bundled_detection(self):
         """Test that Python version logging detects PyInstaller bundle"""
@@ -347,8 +350,8 @@ class TestPythonVersionLogging:
 
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()
 
     def test_logging_order_without_dry_run(self):
         """Test that Python version is logged in correct order without dry run"""
@@ -425,5 +428,5 @@ class TestPythonVersionLogging:
 
         finally:
             # Clean up
-            if os.path.exists(tmp_file_path):
-                os.unlink(tmp_file_path)
+            if Path(tmp_file_path).exists():
+                Path(tmp_file_path).unlink()

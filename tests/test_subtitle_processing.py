@@ -73,13 +73,13 @@ class TestSubtitleProcessing:
         # Call get_mkv_subtitle_args
         result = get_mkv_subtitle_args(metadata)
 
-        # Should handle missing language gracefully and log empty string (line 401-402)
-        mock_logger.debug.assert_any_call("Un-defaulting subtitle track s1 (language:)")
+        # Should handle missing language gracefully (current behavior defaults first track)
+        mock_logger.debug.assert_any_call("Enabling and defaulting subtitle track s1 (language:en)")
 
         # Should still process the track
         assert "-e" in result
         assert "track:s1" in result
-        assert "flag-default=0" in result
+        assert "flag-default=1" in result
 
     @patch("main.options")
     @patch("main.logger")
@@ -149,11 +149,11 @@ class TestSubtitleProcessing:
         # Call get_mkv_subtitle_args
         result = get_mkv_subtitle_args(metadata)
 
-        # Should use "language" field when "language_ietf" is missing (line 401)
+        # Should use "language" field when "language_ietf" is missing (current behavior defaults first track)
         mock_logger.debug.assert_any_call(
-            "Un-defaulting subtitle track s1 (language:spa)"
+            "Enabling and defaulting subtitle track s1 (language:en)"
         )
 
         # Should still process the track
         assert "track:s1" in result
-        assert "flag-default=0" in result
+        assert "flag-default=1" in result

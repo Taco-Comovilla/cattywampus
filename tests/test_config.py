@@ -167,8 +167,8 @@ class TestConfig:
         mock_system.return_value = "Darwin"
 
         with patch(
-            "mcconfig.os.path.expanduser",
-            return_value="/Users/test/Library/Application Support",
+            "mcconfig.Path.expanduser",
+            return_value=Path("/Users/test/Library/Application Support"),
         ):
             config = Config.__new__(Config)
             path = config._get_config_path()

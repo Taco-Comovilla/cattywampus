@@ -298,11 +298,11 @@ class TestProcessFolder:
             mp4_file = str(Path(temp_dir) / "test.mp4")
             txt_file = str(Path(temp_dir) / "readme.txt")
 
-            with open(mkv_file, "w") as f:
+            with Path(mkv_file).open("w") as f:
                 f.write("fake mkv")
-            with open(mp4_file, "w") as f:
+            with Path(mp4_file).open("w") as f:
                 f.write("fake mp4")
-            with open(txt_file, "w") as f:
+            with Path(txt_file).open("w") as f:
                 f.write("text file")
 
             # Test
@@ -329,9 +329,9 @@ class TestProcessFolder:
             mkv_file = str(Path(temp_dir) / "test.mkv")
             mp4_file = str(Path(temp_dir) / "test.mp4")
 
-            with open(mkv_file, "w") as f:
+            with Path(mkv_file).open("w") as f:
                 f.write("fake mkv")
-            with open(mp4_file, "w") as f:
+            with Path(mp4_file).open("w") as f:
                 f.write("fake mp4")
 
             # Test
@@ -359,11 +359,11 @@ class TestProcessFolder:
             mp4_file = str(Path(temp_dir) / "test.mp4")
             m4v_file = str(Path(temp_dir) / "test.m4v")
 
-            with open(mkv_file, "w") as f:
+            with Path(mkv_file).open("w") as f:
                 f.write("fake mkv")
-            with open(mp4_file, "w") as f:
+            with Path(mp4_file).open("w") as f:
                 f.write("fake mp4")
-            with open(m4v_file, "w") as f:
+            with Path(m4v_file).open("w") as f:
                 f.write("fake m4v")
 
             # Test
@@ -389,15 +389,15 @@ class TestProcessFolder:
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create nested directory
             nested_dir = str(Path(temp_dir) / "nested")
-            os.makedirs(nested_dir)
+            Path(nested_dir).mkdir(parents=True)
 
             # Create test files at different levels
             root_mkv = str(Path(temp_dir) / "root.mkv")
             nested_mp4 = str(Path(nested_dir) / "nested.mp4")
 
-            with open(root_mkv, "w") as f:
+            with Path(root_mkv).open("w") as f:
                 f.write("fake mkv")
-            with open(nested_mp4, "w") as f:
+            with Path(nested_mp4).open("w") as f:
                 f.write("fake mp4")
 
             # Test

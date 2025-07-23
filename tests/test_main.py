@@ -350,21 +350,21 @@ class TestReadPathsFromFile:
         test_file = str(Path(temp_dir) / "paths.txt")
         test_paths = ["path1.mkv", "path2.mp4", "# This is a comment", "", "path3.mkv"]
 
-        with open(test_file, "w") as f:
+        with Path(test_file).open("w") as f:
             f.write("\n".join(test_paths))
 
         # Create dummy files so they exist
         for path in ["path1.mkv", "path2.mp4", "path3.mkv"]:
-            with open(path, "w") as f:
+            with Path(path).open("w") as f:
                 f.write("")
 
         try:
             result = read_paths_from_file(test_file)
 
             expected = [
-                os.path.abspath("path1.mkv"),
-                os.path.abspath("path2.mp4"),
-                os.path.abspath("path3.mkv"),
+                str(Path("path1.mkv").resolve()),
+                str(Path("path2.mp4").resolve()),
+                str(Path("path3.mkv").resolve()),
             ]
             assert result == expected
         finally:
@@ -382,7 +382,7 @@ class TestReadPathsFromFile:
         """Test handling of non-existent paths in file"""
         test_file = str(Path(temp_dir) / "paths.txt")
 
-        with open(test_file, "w") as f:
+        with Path(test_file).open("w") as f:
             f.write("nonexistent1.mkv\nnonexistent2.mp4\n")
 
         with patch("main.logger") as mock_logger:
@@ -396,19 +396,19 @@ class TestReadPathsFromFile:
         """Test handling of DOS line endings"""
         test_file = str(Path(temp_dir) / "paths.txt")
 
-        with open(test_file, "wb") as f:
+        with Path(test_file).open("wb") as f:
             f.write(b"path1.mkv\r\npath2.mp4\r\n")
 
         # Create dummy files
-        with open("path1.mkv", "w") as f:
+        with Path("path1.mkv").open("w") as f:
             f.write("")
-        with open("path2.mp4", "w") as f:
+        with Path("path2.mp4").open("w") as f:
             f.write("")
 
         try:
             result = read_paths_from_file(test_file)
 
-            expected = [os.path.abspath("path1.mkv"), os.path.abspath("path2.mp4")]
+            expected = [str(Path("path1.mkv").resolve()), str(Path("path2.mp4").resolve())]
             assert result == expected
         finally:
             # Clean up

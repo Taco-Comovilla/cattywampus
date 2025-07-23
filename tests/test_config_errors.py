@@ -77,7 +77,7 @@ class TestConfigErrors:
 
         try:
             # Make file read-only
-            os.chmod(tmp_file_path, 0o444)
+            Path(tmp_file_path).chmod(0o444)
 
             config = Config(tmp_file_path)
 
@@ -87,7 +87,7 @@ class TestConfigErrors:
 
         finally:
             # Restore permissions and clean up
-            os.chmod(tmp_file_path, 0o644)
+            Path(tmp_file_path).chmod(0o644)
             Path(tmp_file_path).unlink()
 
     def test_config_nonexistent_file(self):
@@ -204,7 +204,7 @@ language = "invalid\\escape"
 
         try:
             # Remove read permissions
-            os.chmod(temp_path, 0o000)
+            Path(temp_path).chmod(0o000)
 
             with pytest.raises(SystemExit) as exc_info:
                 initialize_config(temp_path)
@@ -212,7 +212,7 @@ language = "invalid\\escape"
         finally:
             # Restore permissions before cleanup
             try:
-                os.chmod(temp_path, 0o644)
+                Path(temp_path).chmod(0o644)
                 Path(temp_path).unlink()
             except (OSError, FileNotFoundError, PermissionError):
                 # Ignore cleanup errors - file might not exist or have permission issues

@@ -742,7 +742,7 @@ def main():
                 process_mkv_file(path)
             elif path.lower().endswith(".mp4") or path.lower().endswith(".m4v"):
                 process_mp4_file(path)
-        elif os.path.isdir(path):
+        elif Path(path).is_dir():
             process_folder(path)
 
     logger.info(f"Total folders processed: {folders_processed}")

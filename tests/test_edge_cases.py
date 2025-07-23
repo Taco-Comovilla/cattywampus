@@ -372,11 +372,11 @@ class TestFileSystemEdgeCases:
         for i in range(10):
             long_path = str(Path(long_path) / f"very_long_directory_name_{i}")
 
-        os.makedirs(long_path)
+        Path(long_path).mkdir(parents=True)
         test_file = str(Path(long_path) / "test_file_with_very_long_name.mkv")
 
         # Create fake file
-        with open(test_file, "w") as f:
+        with Path(test_file).open("w") as f:
             f.write("fake content")
 
         # Should handle long paths gracefully
@@ -391,7 +391,7 @@ class TestFileSystemEdgeCases:
         unicode_file = str(Path(temp_dir) / "测试文件_éñtürñätīõñål.mkv")
 
         # Create fake file
-        with open(unicode_file, "w") as f:
+        with Path(unicode_file).open("w") as f:
             f.write("fake content")
 
         # Should handle unicode paths gracefully

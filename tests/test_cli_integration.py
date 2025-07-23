@@ -191,7 +191,7 @@ class TestCLIIntegration:
         # Create a temporary directory with a test file
         with tempfile.TemporaryDirectory() as tmp_dir:
             test_file = str(Path(tmp_dir) / "test.mkv")
-            with open(test_file, "w") as f:
+            with Path(test_file).open("w") as f:
                 f.write("fake content")
 
             # Mock sys.argv to simulate CLI execution with folder

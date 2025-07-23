@@ -57,14 +57,14 @@ class TestConfigErrors:
             config_file_path = str(Path(tmp_dir) / "invalid_config.toml")
 
             # Create invalid TOML content
-            with open(config_file_path, "w") as f:
+            with Path(config_file_path).open("w") as f:
                 f.write("invalid toml content [[[")
 
             # Should raise a TOML parsing error
             with pytest.raises((tomllib.TOMLDecodeError, ValueError)):
                 config = Config.__new__(Config)
                 config.config_file_path = config_file_path
-                with open(config_file_path, "rb") as config_file:
+                with Path(config_file_path).open("rb") as config_file:
                     config.config = tomllib.load(config_file)
 
     def test_config_read_only_file(self):
@@ -77,7 +77,7 @@ class TestConfigErrors:
 
         try:
             # Make file read-only
-            os.chmod(tmp_file_path, 0o444)
+            Path(tmp_file_path).chmod(0o444)
 
             config = Config(tmp_file_path)
 
@@ -87,7 +87,7 @@ class TestConfigErrors:
 
         finally:
             # Restore permissions and clean up
-            os.chmod(tmp_file_path, 0o644)
+            Path(tmp_file_path).chmod(0o644)
             Path(tmp_file_path).unlink()
 
     def test_config_nonexistent_file(self):
@@ -110,14 +110,14 @@ class TestConfigErrors:
             config_file_path = str(Path(tmp_dir) / "test_config.toml")
 
             # Create valid TOML file
-            with open(config_file_path, "w") as f:
+            with Path(config_file_path).open("w") as f:
                 f.write('test_key = "test_value"\n')
 
             # Should raise the TOML loading error
             with pytest.raises(Exception, match="TOML load error"):
                 config = Config.__new__(Config)
                 config.config_file_path = config_file_path
-                with open(config_file_path, "rb") as config_file:
+                with Path(config_file_path).open("rb") as config_file:
                     config.config = tomllib.load(config_file)
 
 
@@ -204,7 +204,7 @@ language = "invalid\\escape"
 
         try:
             # Remove read permissions
-            os.chmod(temp_path, 0o000)
+            Path(temp_path).chmod(0o000)
 
             with pytest.raises(SystemExit) as exc_info:
                 initialize_config(temp_path)
@@ -212,7 +212,7 @@ language = "invalid\\escape"
         finally:
             # Restore permissions before cleanup
             try:
-                os.chmod(temp_path, 0o644)
+                Path(temp_path).chmod(0o644)
                 Path(temp_path).unlink()
             except (OSError, FileNotFoundError, PermissionError):
                 # Ignore cleanup errors - file might not exist or have permission issues
@@ -222,8 +222,8 @@ language = "invalid\\escape"
         """Test that default config file TOML errors are handled gracefully"""
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create a malformed default config file
-            config_file = str(Path(temp_dir) / "config.toml")
-            with open(config_file, "w") as f:
+            config_file = Path(temp_dir) / "config.toml"
+            with config_file.open("w") as f:
                 f.write("logLevel = [malformed\n")
 
             with patch("mcconfig.Config._get_config_path", return_value=temp_dir):

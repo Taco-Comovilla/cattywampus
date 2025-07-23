@@ -24,7 +24,7 @@ class TestFileErrorHandling:
 
         try:
             # Remove read permissions
-            os.chmod(tmp_file_path, 0o000)
+            Path(tmp_file_path).chmod(0o000)
 
             # Should exit with error code 1
             with pytest.raises(SystemExit) as exc_info:
@@ -34,7 +34,7 @@ class TestFileErrorHandling:
 
         finally:
             # Restore permissions and clean up
-            os.chmod(tmp_file_path, 0o644)
+            Path(tmp_file_path).chmod(0o644)
             Path(tmp_file_path).unlink()
 
     def test_read_paths_from_file_unicode_decode_error(self):
@@ -161,7 +161,7 @@ class TestFileErrorHandling:
 
         try:
             # Remove read permissions
-            os.chmod(tmp_file_path, 0o000)
+            Path(tmp_file_path).chmod(0o000)
 
             # Should log permission error
             with pytest.raises(SystemExit):
@@ -178,5 +178,5 @@ class TestFileErrorHandling:
 
         finally:
             # Restore permissions and clean up
-            os.chmod(tmp_file_path, 0o644)
+            Path(tmp_file_path).chmod(0o644)
             Path(tmp_file_path).unlink()

@@ -106,8 +106,7 @@ class Config:
             return str(Path(base_dir) / __app_name__)
 
         if system == "Darwin":  # macOS
-            base_dir = os.path.expanduser("~/Library/Application Support")
-            return str(Path(base_dir) / __app_name__)
+            return str(Path("~/Library/Application Support").expanduser() / __app_name__)
 
         raise NotImplementedError(f"Unsupported platform: {system}")
 

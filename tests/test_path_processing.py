@@ -22,7 +22,7 @@ class TestPathProcessing:
             tmp_file_path = tmp_file.name
 
             # Create different ways to reference the same file
-            abs_path = os.path.abspath(tmp_file_path)
+            abs_path = str(Path(tmp_file_path).resolve())
             rel_path = os.path.relpath(tmp_file_path)
 
         try:

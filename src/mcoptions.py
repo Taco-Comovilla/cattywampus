@@ -199,7 +199,7 @@ def _create_argument_parser() -> argparse.ArgumentParser:
 
     parser.add_argument(
         "-s",
-        "--set-default",
+        "--set-default-subtitle",
         action="store_true",
         help="Override setDefaultSubTrack - enable default subtitle track setting",
     )
@@ -473,7 +473,7 @@ def parse_options() -> Options:
         sources["log_file_path"] = "config"
 
     # Set default subtitle track
-    if args.set_default:
+    if args.set_default_subtitle:
         set_default_sub_track = True
         sources["set_default_sub_track"] = "cli"
     elif mcconfig and mcconfig.get("setDefaultSubTrack") is not None:

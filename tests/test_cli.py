@@ -120,7 +120,7 @@ class TestArgumentParser:
 
         args = parser.parse_args(["-s", "-f", "test.mkv"])
 
-        assert args.set_default is True
+        assert args.set_default_subtitle is True
         assert args.default_first is True
 
     def test_parse_multiple_files(self):

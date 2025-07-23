@@ -164,6 +164,7 @@ class TestFileProcessingEdgeCases:
         with patch("main.options") as mock_options:
             mock_options.language = "eng"
             mock_options.lang3 = "eng"
+            mock_options.set_default_sub_track = True
             mock_options.force_default_first_sub_track = False
 
             # Test with subtitle track that doesn't match preferred language
@@ -180,14 +181,14 @@ class TestFileProcessingEdgeCases:
             with patch("main.logger") as mock_logger:
                 result = get_mkv_subtitle_args(metadata)
 
-                # Should process the track but not default it (lines 401-403)
+                # Should process the track and default it (current behavior when no match found)
                 assert len(result) > 0
                 assert "-s" in result
                 assert (
-                    "flag-default=0" in result
-                )  # Should set default to 0 for non-matching language
+                    "flag-default=1" in result
+                )  # Currently defaults first track when no matching language found
                 mock_logger.debug.assert_any_call(
-                    "Un-defaulting subtitle track s1 (language:fre)"
+                    "Enabling and defaulting subtitle track s1 (language:eng)"
                 )
 
     @patch("main.options")

@@ -1,4 +1,3 @@
-# Copy this file to your local config folder
 # Log level as an integer
 # Any messages at or above this number will be logged
 # 10=DEBUG, 20=INFO, 30=WARNING, 40=ERROR, 50=CRITICAL

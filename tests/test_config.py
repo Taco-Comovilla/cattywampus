@@ -85,7 +85,6 @@ class TestConfig:
                 with Path(config_file).open() as f:
                     content = f.read()
                     # Verify it contains helpful comments from example file
-                    assert "# Copy this file to your local config folder" in content
                     assert "# Log level as an integer" in content
                     assert "# Direct paths to binaries" in content
                     assert "logLevel = 20" in content

@@ -2,7 +2,7 @@
 ; Make changes to the template file instead: templates/windows/setup.iss.template
 ; To regenerate: ./build-app --generate-docs
 
-#define MyVersion "1.0.0"
+#define MyVersion "1.1.0"
 ; Get app name from temporary file created by build script
 #define MyAppName ReadIni("appname.ini", "app", "name", "")
 #if MyAppName == ""

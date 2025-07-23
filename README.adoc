@@ -191,7 +191,7 @@ NOTE: You may need to enable the Quick Action in System Settings > Privacy & Sec
 **Option 1: Installer (Recommended)**
 
 1. Download the Windows installer from the link:https://github.com/Taco-Comovilla/cattywampus/releases/latest[latest release^]
-2. Run `Setup-cattywampus-1.0.0.exe`
+2. Run `Setup-cattywampus-1.1.0.exe`
 3. Follow the installation wizard
 
 The installer will:

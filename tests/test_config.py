@@ -67,7 +67,7 @@ class TestConfig:
                 assert Path(config_file).exists()
 
                 # Read the generated file and verify it contains expected content
-                with open(config_file) as f:
+                with Path(config_file).open() as f:
                     content = f.read()
                     assert "logLevel = 20" in content
                     assert "useSystemLocale = true" in content
@@ -82,7 +82,7 @@ class TestConfig:
                 assert Path(config_file).exists()
 
                 # Read the generated file and verify it contains example file content
-                with open(config_file) as f:
+                with Path(config_file).open() as f:
                     content = f.read()
                     # Verify it contains helpful comments from example file
                     assert "# Copy this file to your local config folder" in content
@@ -124,7 +124,7 @@ class TestConfig:
                 assert Path(config_file_path).exists()
 
                 # Read the generated file and verify it contains minimal content (no comments)
-                with open(config_file_path) as f:
+                with Path(config_file_path).open() as f:
                     content = f.read()
                     # Should not contain example file comments
                     assert "# Copy this file to your local config folder" not in content
@@ -419,8 +419,8 @@ class TestCustomConfig:
         """Test loading a custom configuration file"""
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create a custom config file
-            custom_config_path = str(Path(temp_dir) / "custom_config.toml")
-            with open(custom_config_path, "w") as f:
+            custom_config_path = Path(temp_dir) / "custom_config.toml"
+            with custom_config_path.open("w") as f:
                 f.write(
                     """
 logLevel = 10
@@ -473,8 +473,8 @@ onlyMp4 = false
         """Test custom config with only some settings specified"""
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create a custom config file with only some settings
-            custom_config_path = str(Path(temp_dir) / "partial_config.toml")
-            with open(custom_config_path, "w") as f:
+            custom_config_path = Path(temp_dir) / "partial_config.toml"
+            with custom_config_path.open("w") as f:
                 f.write(
                     """
 logLevel = 40
@@ -499,8 +499,8 @@ onlyMkv = true
         """Test parse_options with --config argument"""
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create a custom config file
-            custom_config_path = str(Path(temp_dir) / "custom.toml")
-            with open(custom_config_path, "w") as f:
+            custom_config_path = Path(temp_dir) / "custom.toml"
+            with custom_config_path.open("w") as f:
                 f.write(
                     """
 logLevel = 10
@@ -559,8 +559,8 @@ onlyMkv = true
         """Test that CLI arguments override custom config values"""
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create a custom config file
-            custom_config_path = str(Path(temp_dir) / "custom.toml")
-            with open(custom_config_path, "w") as f:
+            custom_config_path = Path(temp_dir) / "custom.toml"
+            with custom_config_path.open("w") as f:
                 f.write(
                     """
 logLevel = 10
@@ -611,8 +611,8 @@ onlyMkv = true
         """Test that custom config values override defaults when no CLI override"""
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create a custom config file with different values from defaults
-            custom_config_path = str(Path(temp_dir) / "custom.toml")
-            with open(custom_config_path, "w") as f:
+            custom_config_path = Path(temp_dir) / "custom.toml"
+            with custom_config_path.open("w") as f:
                 f.write(
                     """
 logLevel = 10

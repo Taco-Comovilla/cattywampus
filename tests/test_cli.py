@@ -269,8 +269,8 @@ class TestFullCLIIntegration:
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create a custom config file
 
-            custom_config_path = str(Path(temp_dir) / "integration_test.toml")
-            with open(custom_config_path, "w") as f:
+            custom_config_path = Path(temp_dir) / "integration_test.toml"
+            with custom_config_path.open("w") as f:
                 f.write(
                     """
 logLevel = 50

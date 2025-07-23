@@ -16,7 +16,9 @@ atomicParsleyPath = ""
 # the default_track flag on every other subtitle track)
 setDefaultSubtitle = false
 
-# @TODO document this option
+# If forceDefaultFirstSubTrack is set to true, the first subtitle track will be
+# set as default regardless of language (MKV files only)
+# This overrides language-based subtitle track selection
 forceDefaultFirstSubTrack = false
 
 # If setDefaultAudio is set to true, the application will look for an audio

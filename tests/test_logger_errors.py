@@ -6,7 +6,6 @@ import logging
 import tempfile
 from unittest.mock import patch
 
-import pytest
 
 import mclogger
 from mclogger import logger
@@ -24,7 +23,7 @@ class TestLoggerErrors:
         with tempfile.NamedTemporaryFile() as tmp_file:
             # Should not raise an exception
             logger.setup(log_file_path=tmp_file.name, log_level=20)
-            
+
             # Should have a stderr handler since file handler failed
             assert len(logger.logger.handlers) >= 1
             # At least one handler should be a StreamHandler (stderr fallback)
@@ -41,18 +40,17 @@ class TestLoggerErrors:
 
     def test_logger_setup_with_nonexistent_directory(self):
         """Test logger setup with a path in a non-existent directory"""
-        import os
         from pathlib import Path
-        
+
         # Use a path that definitely doesn't exist
         nonexistent_path = "/tmp/definitely_does_not_exist_12345/test.log"
 
         # Logger should create the directory and succeed
         logger.setup(log_file_path=nonexistent_path, log_level=20)
-        
+
         # Directory should now exist
         assert Path(nonexistent_path).parent.exists()
-        
+
         # Clean up
         if Path(nonexistent_path).exists():
             Path(nonexistent_path).unlink()
@@ -87,7 +85,7 @@ class TestLoggerErrors:
         """Test logger setup with empty log file path"""
         # Logger should handle empty path gracefully and fall back to stderr
         logger.setup(log_file_path="", log_level=20)
-        
+
         # Should have at least one handler (stderr fallback)
         assert len(logger.logger.handlers) >= 1
         # Should have a StreamHandler for stderr fallback
@@ -118,7 +116,7 @@ class TestLoggerErrors:
         with tempfile.NamedTemporaryFile() as tmp_file:
             # Logger should handle the error gracefully and fall back to stderr
             logger.setup(log_file_path=tmp_file.name, log_level=20)
-            
+
             # Should have at least one handler (stderr fallback)
             assert len(logger.logger.handlers) >= 1
             # Should have a StreamHandler for stderr fallback

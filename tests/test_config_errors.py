@@ -49,7 +49,7 @@ class TestConfigErrors:
 
         # This should raise the PermissionError during initialization
         with pytest.raises(PermissionError, match="Permission denied"):
-            config = Config("test_config.toml")
+            Config("test_config.toml")
 
     def test_config_invalid_toml_file(self):
         """Test config behavior with invalid TOML content"""
@@ -214,7 +214,8 @@ language = "invalid\\escape"
             try:
                 os.chmod(temp_path, 0o644)
                 Path(temp_path).unlink()
-            except:
+            except (OSError, FileNotFoundError, PermissionError):
+                # Ignore cleanup errors - file might not exist or have permission issues
                 pass
 
     def test_default_config_toml_error_graceful(self):

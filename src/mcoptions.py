@@ -50,8 +50,8 @@ def get_system_locale():
                     system_locale = system_locale.split("-")[
                         0
                     ]  # Just take language part
-            except:
-                # Fallback to Python's locale
+            except (OSError, AttributeError, ctypes.ArgumentError):
+                # Fallback to Python's locale if Windows locale detection fails
                 system_locale, _ = locale.getdefaultlocale()
         else:
             # On Unix-like systems (Linux, macOS)

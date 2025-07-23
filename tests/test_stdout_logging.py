@@ -3,7 +3,6 @@ Tests for --stdout CLI option functionality
 """
 
 import logging
-import os
 import tempfile
 from io import StringIO
 from pathlib import Path
@@ -36,7 +35,7 @@ class TestStdoutLogging:
             # Mock empty config to ensure we get default behavior
             with patch("mcoptions.mcconfig") as mock_config:
                 mock_config.get.side_effect = lambda key, default=None: default
-                
+
                 from mcoptions import parse_options
 
                 options = parse_options()
@@ -53,7 +52,7 @@ class TestStdoutLogging:
             # Mock empty config to ensure we get default behavior
             with patch("mcoptions.mcconfig") as mock_config:
                 mock_config.get.side_effect = lambda key, default=None: default
-                
+
                 from mcoptions import parse_options
 
                 options = parse_options()
@@ -249,7 +248,7 @@ class TestStdoutLogging:
 
                         # Mock process_mkv_file to avoid actual processing
                         with patch("main.process_mkv_file") as mock_process_mkv:
-                            with patch("main.sys.exit") as mock_exit:
+                            with patch("main.sys.exit"):
                                 with patch("sys.stdout", captured_output):
                                     mock_process_mkv.return_value = None
 
@@ -278,7 +277,7 @@ class TestStdoutLogging:
         """Test that --version and --help work normally even with --stdout"""
         # Test --version with --stdout
         with patch("sys.argv", [__app_name__, "--stdout", "--version"]):
-            with patch("sys.exit") as mock_exit:
+            with patch("sys.exit"):
                 try:
                     from mcoptions import parse_options
 
@@ -289,7 +288,7 @@ class TestStdoutLogging:
 
         # Test --help with --stdout
         with patch("sys.argv", [__app_name__, "--stdout", "--help"]):
-            with patch("sys.exit") as mock_exit:
+            with patch("sys.exit"):
                 try:
                     from mcoptions import parse_options
 

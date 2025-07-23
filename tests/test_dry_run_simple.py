@@ -2,7 +2,6 @@
 Tests for dry run functionality - simplified approach
 """
 
-import os
 import tempfile
 from pathlib import Path
 from unittest.mock import patch
@@ -46,7 +45,7 @@ class TestDryRunSimple:
                 }
 
                 # Call the function in dry run mode
-                result = process_mp4_file(
+                process_mp4_file(
                     tmp_file_path, atomicparsley_path="/usr/bin/AtomicParsley"
                 )
 
@@ -120,7 +119,7 @@ class TestDryRunSimple:
                 }
 
                 # Call the function
-                result = process_mp4_file(
+                process_mp4_file(
                     tmp_file_path, atomicparsley_path="/usr/bin/AtomicParsley"
                 )
 

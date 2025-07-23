@@ -2,7 +2,6 @@
 CLI integration tests to cover main() function execution paths
 """
 
-import os
 import tempfile
 from pathlib import Path
 from unittest.mock import patch
@@ -205,7 +204,7 @@ class TestCLIIntegration:
 
                     # Mock the processing functions
                     with patch("main.process_folder") as mock_process_folder:
-                        with patch("main.logger") as mock_logger:
+                        with patch("main.logger"):
                             with patch("main.sys.exit") as mock_exit:
                                 mock_process_folder.return_value = None
 

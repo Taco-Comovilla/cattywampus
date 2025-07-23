@@ -2,7 +2,6 @@
 Tests for tool initialization and edge cases
 """
 
-import os
 import tempfile
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -85,7 +84,7 @@ class TestToolInitialization:
                         mock_subprocess.return_value = MagicMock()
 
                         # Call the function with subtitle processing enabled
-                        result = process_mkv_file(
+                        process_mkv_file(
                             tmp_file_path,
                             mkvpropedit_path="/usr/bin/mkvpropedit",
                             mkvmerge_path="/usr/bin/mkvmerge",

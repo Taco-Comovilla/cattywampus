@@ -37,10 +37,10 @@ class TestAudioTrackClearing:
                         ]
                     }
 
-                    with patch("src.main.subprocess.run") as mock_subprocess:
+                    with patch("src.main.subprocess.run"):
                         with patch("src.main.logger") as mock_logger:
                             # Call the function
-                            result = process_mkv_file(
+                            process_mkv_file(
                                 tmp_file_path,
                                 mkvpropedit_path="/usr/bin/mkvpropedit",
                                 mkvmerge_path="/usr/bin/mkvmerge",
@@ -81,10 +81,10 @@ class TestAudioTrackClearing:
                         ]
                     }
 
-                    with patch("src.main.subprocess.run") as mock_subprocess:
+                    with patch("src.main.subprocess.run"):
                         with patch("src.main.logger") as mock_logger:
                             # Call the function
-                            result = process_mkv_file(
+                            process_mkv_file(
                                 tmp_file_path,
                                 mkvpropedit_path="/usr/bin/mkvpropedit",
                                 mkvmerge_path="/usr/bin/mkvmerge",
@@ -125,10 +125,10 @@ class TestAudioTrackClearing:
                         ]
                     }
 
-                    with patch("src.main.subprocess.run") as mock_subprocess:
+                    with patch("src.main.subprocess.run"):
                         with patch("src.main.logger") as mock_logger:
                             # Call the function
-                            result = process_mkv_file(
+                            process_mkv_file(
                                 tmp_file_path,
                                 mkvpropedit_path="/usr/bin/mkvpropedit",
                                 mkvmerge_path="/usr/bin/mkvmerge",
@@ -246,7 +246,6 @@ class TestAudioTrackClearingCLI:
             assert options.sources["clear_audio_track_names"] == "config"
         finally:
             sys.argv = original_argv
-            import os
 
             if Path(tmp_config_path).exists():
                 Path(tmp_config_path).unlink()
@@ -274,7 +273,6 @@ class TestAudioTrackClearingCLI:
             assert options.sources["clear_audio_track_names"] == "cli"
         finally:
             sys.argv = original_argv
-            import os
 
             if Path(tmp_config_path).exists():
                 Path(tmp_config_path).unlink()

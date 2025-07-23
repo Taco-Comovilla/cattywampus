@@ -2,7 +2,6 @@
 Integration tests for configuration loading and option handling in main() function
 """
 
-import os
 import tempfile
 from pathlib import Path
 from unittest.mock import MagicMock, patch

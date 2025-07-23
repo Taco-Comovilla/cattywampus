@@ -1,4 +1,4 @@
-__all__ = ["mclogger"]
+__all__ = ["Logger", "logger"]
 
 import logging
 import sys
@@ -47,7 +47,6 @@ class Logger:
         if not stdout_only:
             try:
                 # Ensure directory exists before creating file handler
-                import os
 
                 log_dir = Path(log_file_path).parent
                 if log_dir and not log_dir.exists():

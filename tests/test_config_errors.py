@@ -2,7 +2,6 @@
 Tests for configuration error handling scenarios
 """
 
-import os
 import tempfile
 from pathlib import Path
 from unittest.mock import patch

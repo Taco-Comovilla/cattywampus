@@ -2,7 +2,6 @@
 Integration tests for file processing workflows
 """
 
-import os
 import tempfile
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -97,7 +96,7 @@ class TestProcessMkvFile:
 
             # Should not include audio track options
             audio_track_present = False
-            for i, arg in enumerate(call_args):
+            for _i, arg in enumerate(call_args):
                 if arg == "track:a1":
                     audio_track_present = True
                     break

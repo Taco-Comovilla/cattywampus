@@ -13,7 +13,7 @@ import os
 import platform
 import sys
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import Optional
 
 from langcodes import Language
 
@@ -58,7 +58,7 @@ def get_system_locale():
             # Try environment variables first
             for env_var in ["LC_ALL", "LC_MESSAGES", "LANG"]:
                 env_locale = os.environ.get(env_var)
-                if env_locale and env_locale != "C" and env_locale != "POSIX":
+                if env_locale and env_locale not in {"C", "POSIX"}:
                     system_locale = env_locale
                     break
 
@@ -90,7 +90,7 @@ class Options:
     """Container for all parsed options and configuration values."""
 
     # Command line arguments
-    paths: List[str]
+    paths: list[str]
     input_file: Optional[str]
     dry_run: bool
     only_mkv: bool

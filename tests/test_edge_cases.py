@@ -2,7 +2,6 @@
 Edge case tests using the created test files
 """
 
-import os
 import subprocess
 from pathlib import Path
 from unittest.mock import MagicMock, patch

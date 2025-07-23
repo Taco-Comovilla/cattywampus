@@ -308,7 +308,7 @@ def process_folder(folder_path):
         return
 
     try:
-        for root, dirs, files in os.walk(folder_path):
+        for root, _dirs, files in os.walk(folder_path):
             for file in files:
                 if file.endswith(".mkv"):
                     if not options.only_mp4:  # Process MKV unless only MP4 is enabled
@@ -452,7 +452,7 @@ def get_mkv_subtitle_args(metadata):
                 or "{unknown}"
             )
             if (
-                this_language == options.lang3 or this_language == options.language
+                this_language in (options.lang3, options.language)
             ) and not track_found:
                 track_found = True
                 found_at_index = subtitle_track_index

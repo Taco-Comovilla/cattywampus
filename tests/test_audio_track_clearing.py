@@ -37,8 +37,7 @@ class TestAudioTrackClearing:
                         ]
                     }
 
-                    with patch("src.main.subprocess.run"):
-                        with patch("src.main.logger") as mock_logger:
+                    with patch("src.main.subprocess.run"), patch("src.main.logger") as mock_logger:
                             # Call the function
                             process_mkv_file(
                                 tmp_file_path,
@@ -81,8 +80,7 @@ class TestAudioTrackClearing:
                         ]
                     }
 
-                    with patch("src.main.subprocess.run"):
-                        with patch("src.main.logger") as mock_logger:
+                    with patch("src.main.subprocess.run"), patch("src.main.logger") as mock_logger:
                             # Call the function
                             process_mkv_file(
                                 tmp_file_path,
@@ -125,8 +123,7 @@ class TestAudioTrackClearing:
                         ]
                     }
 
-                    with patch("src.main.subprocess.run"):
-                        with patch("src.main.logger") as mock_logger:
+                    with patch("src.main.subprocess.run"), patch("src.main.logger") as mock_logger:
                             # Call the function
                             process_mkv_file(
                                 tmp_file_path,

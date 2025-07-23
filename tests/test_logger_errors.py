@@ -2,6 +2,7 @@
 Tests for logger error conditions and edge cases
 """
 
+import logging
 import tempfile
 from unittest.mock import patch
 
@@ -19,10 +20,16 @@ class TestLoggerErrors:
         """Test logger setup when file handler creation fails due to permissions"""
         mock_file_handler.side_effect = PermissionError("Permission denied")
 
-        # This should raise a PermissionError since the logger doesn't handle it gracefully
+        # Logger should handle the error gracefully and fall back to stderr
         with tempfile.NamedTemporaryFile() as tmp_file:
-            with pytest.raises(PermissionError, match="Permission denied"):
-                logger.setup(log_file_path=tmp_file.name, log_level=20)
+            # Should not raise an exception
+            logger.setup(log_file_path=tmp_file.name, log_level=20)
+            
+            # Should have a stderr handler since file handler failed
+            assert len(logger.logger.handlers) >= 1
+            # At least one handler should be a StreamHandler (stderr fallback)
+            stream_handlers = [h for h in logger.logger.handlers if isinstance(h, logging.StreamHandler)]
+            assert len(stream_handlers) >= 1
 
     def test_logger_setup_invalid_log_level(self):
         """Test logger setup with invalid log level"""
@@ -34,12 +41,23 @@ class TestLoggerErrors:
 
     def test_logger_setup_with_nonexistent_directory(self):
         """Test logger setup with a path in a non-existent directory"""
+        import os
+        from pathlib import Path
+        
         # Use a path that definitely doesn't exist
         nonexistent_path = "/tmp/definitely_does_not_exist_12345/test.log"
 
-        # Should raise FileNotFoundError since the logger doesn't create directories
-        with pytest.raises(FileNotFoundError):
-            logger.setup(log_file_path=nonexistent_path, log_level=20)
+        # Logger should create the directory and succeed
+        logger.setup(log_file_path=nonexistent_path, log_level=20)
+        
+        # Directory should now exist
+        assert Path(nonexistent_path).parent.exists()
+        
+        # Clean up
+        if Path(nonexistent_path).exists():
+            Path(nonexistent_path).unlink()
+        if Path(nonexistent_path).parent.exists():
+            Path(nonexistent_path).parent.rmdir()
 
     @patch("mclogger.sys.stdout.isatty")
     def test_logger_non_interactive_detection(self, mock_isatty):

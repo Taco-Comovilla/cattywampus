@@ -42,10 +42,10 @@ class TestConfigErrors:
         with pytest.raises(EnvironmentError, match="LOCALAPPDATA is not set"):
             config._get_config_path()
 
-    @patch("mcconfig.os.makedirs")
-    def test_config_directory_creation_error(self, mock_makedirs):
+    @patch("mcconfig.Path.mkdir")
+    def test_config_directory_creation_error(self, mock_mkdir):
         """Test config behavior when directory creation fails"""
-        mock_makedirs.side_effect = PermissionError("Permission denied")
+        mock_mkdir.side_effect = PermissionError("Permission denied")
 
         # This should raise the PermissionError during initialization
         with pytest.raises(PermissionError, match="Permission denied"):

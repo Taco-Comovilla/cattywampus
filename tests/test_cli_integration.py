@@ -121,17 +121,19 @@ class TestCLIIntegration:
 
                     # Mock all tools as not found
                     with patch("main.shutil.which", return_value=None):
-                        with patch("main.logger") as mock_logger:
-                            with patch("main.sys.exit") as mock_exit:
+                        with patch("main.Path.is_file", return_value=False):
+                            with patch("main.os.access", return_value=False):
+                                with patch("main.logger") as mock_logger:
+                                    with patch("main.sys.exit") as mock_exit:
 
-                                # Call main function - should exit early
-                                main.main()
+                                        # Call main function - should exit early
+                                        main.main()
 
-                                # Verify critical error and exit (lines 584-586)
-                                mock_logger.critical.assert_any_call(
-                                    "neither mkvtoolnix nor AtomicParsley found in PATH. Exiting."
-                                )
-                                mock_exit.assert_called()
+                                        # Verify critical error and exit (lines 584-586)
+                                        mock_logger.critical.assert_any_call(
+                                            "neither mkvtoolnix nor AtomicParsley found in PATH. Exiting."
+                                        )
+                                        mock_exit.assert_called()
         finally:
             # Clean up
             if Path(tmp_file_path).exists():

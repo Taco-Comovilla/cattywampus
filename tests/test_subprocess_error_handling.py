@@ -18,6 +18,7 @@ class TestSubprocessErrorHandling:
 
     @patch("main.options")
     @patch("main.logger")
+    @patch("main.mkvpropedit", None)  # Mock global variable as None
     def test_process_mkv_file_mkvpropedit_missing(self, mock_logger, mock_options):
         """Test MKV processing when mkvpropedit is missing (lines 93-94)"""
         mock_options.configure_mock(**setup_complete_mock_options(dry_run=False).__dict__)
@@ -44,6 +45,7 @@ class TestSubprocessErrorHandling:
 
     @patch("main.options")
     @patch("main.logger")
+    @patch("main.mkvmerge", None)  # Mock global variable as None
     def test_process_mkv_file_mkvmerge_missing(self, mock_logger, mock_options):
         """Test MKV processing when mkvmerge is missing (lines 93-94)"""
         mock_options.configure_mock(**setup_complete_mock_options(dry_run=False).__dict__)
@@ -68,12 +70,14 @@ class TestSubprocessErrorHandling:
         finally:
             Path(tmp_file_path).unlink()
 
+    @patch("main.mkvmerge", None)  # Mock global variable as None
     def test_get_mkv_metadata_missing_tool_runtime_error(self):
         """Test get_mkv_metadata raises RuntimeError when tool is missing (line 301)"""
         # Should raise RuntimeError when mkvmerge tool is not available (line 301)
         with pytest.raises(RuntimeError, match="mkvmerge tool not available"):
             get_mkv_metadata("test.mkv", mkvmerge_path=None)
 
+    @patch("main.atomicparsley", None)  # Mock global variable as None
     def test_get_mp4_metadata_missing_tool_runtime_error(self):
         """Test get_mp4_metadata raises RuntimeError when tool is missing (line 332)"""
         # Should raise RuntimeError when AtomicParsley tool is not available (line 332)
@@ -82,6 +86,7 @@ class TestSubprocessErrorHandling:
 
     @patch("main.options")
     @patch("main.logger")
+    @patch("main.atomicparsley", None)  # Mock global variable as None
     def test_process_mp4_file_atomicparsley_missing(self, mock_logger, mock_options):
         """Test MP4 processing when AtomicParsley is missing"""
         mock_options.configure_mock(**setup_complete_mock_options(dry_run=False).__dict__)

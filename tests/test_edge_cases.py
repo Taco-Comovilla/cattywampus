@@ -22,6 +22,17 @@ from .test_helpers import setup_complete_mock_options
 @pytest.fixture(autouse=True)
 def setup_tools():
     """Automatically initialize tools for all tests in this module"""
+    # Check if tools are available, skip tests if not
+    import shutil
+    
+    mkvmerge_available = shutil.which("mkvmerge") is not None
+    atomicparsley_available = shutil.which("AtomicParsley") is not None
+    
+    if not mkvmerge_available:
+        pytest.skip("mkvmerge not available - skipping edge case tests with real files", allow_module_level=True)
+    if not atomicparsley_available:
+        pytest.skip("AtomicParsley not available - skipping edge case tests with real files", allow_module_level=True)
+    
     initialize_tools()
 
 

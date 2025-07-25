@@ -1,7 +1,7 @@
 Source: cattywampus
 Section: video
 Priority: optional
-Maintainer: Taco Comovilla <maintainer@example.com>
+Maintainer: Taco Comovilla <tacocomovilla@cattywampus.dev>
 Build-Depends: debhelper-compat (= 13),
                python3-all,
                python3-setuptools,
@@ -17,7 +17,6 @@ Architecture: all
 Depends: ${python3:Depends},
          ${misc:Depends},
          python3,
-         python3-langcodes,
          python3-tomli | python3 (>= 3.11),
          python3-tomli-w,
          mkvtoolnix,

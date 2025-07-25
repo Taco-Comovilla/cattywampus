@@ -18,5 +18,8 @@ __license__ = "Released under the MIT License https://opensource.org/license/mit
 # Organization information - single source of truth
 __organization__ = "Taco Comovilla"
 
+# Maintainer email - single source of truth
+__maintainer_email__ = "tacocomovilla@cattywampus.dev"
+
 # Copyright information - single source of truth
 __copyright__ = f"Copyright © 2025 {__organization__}"

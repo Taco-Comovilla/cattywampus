@@ -8,14 +8,14 @@ case "$1" in
     remove|upgrade|deconfigure)
         echo "Preparing to remove cattywampus..."
         
-        # Note: We intentionally preserve user configuration and log files
+        # Note: We intentionally preserve any user configuration and log files
         # in ~/.local/share/cattywampus/ as these are personal data that
         # users may want to keep even after uninstalling the package.
         
         # If this were a complete purge, we might remove user data, but
         # for a standard remove operation, we preserve user settings.
         
-        echo "User configuration files in ~/.local/share/cattywampus/ will be preserved."
+        echo "Any user configuration files in ~/.local/share/cattywampus/ will be preserved."
         ;;
         
     failed-upgrade)

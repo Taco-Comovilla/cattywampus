@@ -1,7 +1,7 @@
 Source: ${APP_NAME}
 Section: video
 Priority: optional
-Maintainer: ${ORGANIZATION} <maintainer@example.com>
+Maintainer: ${ORGANIZATION} <${MAINTAINER_EMAIL}>
 Build-Depends: debhelper-compat (= 13),
                python3-all,
                python3-setuptools,
@@ -19,7 +19,6 @@ Depends: $${python3:Depends},
          python3,
          python3-tomli | python3 (>= 3.11),
          python3-tomli-w,
-         python3-pip,
          mkvtoolnix,
          atomicparsley
 Description: ${APP_DESCRIPTION}

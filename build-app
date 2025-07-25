@@ -20,6 +20,7 @@ try:
         __app_description__,
         __app_name__,
         __copyright__,
+        __maintainer_email__,
         __organization__,
         __repo_base_url__,
         __version__,
@@ -38,6 +39,7 @@ def get_metadata():
             "description": __app_description__,
             "repo_base_url": __repo_base_url__,
             "organization": __organization__,
+            "maintainer_email": __maintainer_email__,
             "copyright": __copyright__,
         }
     except NameError as e:
@@ -369,6 +371,7 @@ def process_template_string(template_content, metadata, binary_path=None):
         "REPO_BASE_URL": metadata["repo_base_url"],
         "APP_DESCRIPTION": metadata["description"],
         "ORGANIZATION": metadata["organization"],
+        "MAINTAINER_EMAIL": metadata["maintainer_email"],
         "COPYRIGHT": metadata["copyright"],
         "BINARY_PATH": binary_path or "",
     }
@@ -394,6 +397,7 @@ def process_templates(metadata):
         "REPO_BASE_URL": metadata["repo_base_url"],
         "APP_DESCRIPTION": metadata["description"],
         "ORGANIZATION": metadata["organization"],
+        "MAINTAINER_EMAIL": metadata["maintainer_email"],
         "COPYRIGHT": metadata["copyright"],
     }
 
@@ -589,6 +593,7 @@ def generate_debian_files(metadata):
             "REPO_BASE_URL": metadata["repo_base_url"],
             "APP_DESCRIPTION": metadata["description"],
             "ORGANIZATION": metadata["organization"],
+            "MAINTAINER_EMAIL": metadata["maintainer_email"],
             "COPYRIGHT": metadata["copyright"],
         })
         

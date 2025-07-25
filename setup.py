@@ -16,6 +16,7 @@ try:
         __app_description__,
         __repo_base_url__,
         __organization__,
+        __maintainer_email__,
         __license__,
     )
 except ImportError as e:
@@ -32,9 +33,9 @@ else:
 
 # Runtime dependencies for Debian packaging
 install_requires = [
-    "langcodes>=3.3.0",
     "tomli>=1.2.3; python_version < '3.11'",
     "tomli-w>=1.0.0",
+    "pycountry>=20.7.3",
 ]
 
 setup(
@@ -44,7 +45,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/plain",
     author=__organization__,
-    author_email="maintainer@example.com", 
+    author_email=__maintainer_email__, 
     url=__repo_base_url__,
     license="MIT",
     

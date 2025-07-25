@@ -15,11 +15,40 @@ import sys
 from dataclasses import dataclass
 from typing import Optional
 
-from langcodes import Language
+import pycountry
 
 from mcconfig import initialize_config, mcconfig
 from mclogger import logger
 from version import __app_name__, __version__
+
+
+def get_language_alpha3(language_code: str) -> str:
+    """
+    Convert a BCP-47 language code to ISO 639-3 alpha3 format.
+    
+    Args:
+        language_code: BCP-47 language code (e.g., 'en', 'en-US', 'es-ES')
+        
+    Returns:
+        3-letter ISO 639-3 language code (e.g., 'eng', 'spa')
+        
+    Raises:
+        ValueError: If the language code is not found
+    """
+    # Extract just the language part from BCP-47 code (before any hyphen)
+    lang_part = language_code.split('-')[0].lower()
+    
+    # Look up the language in pycountry
+    lang = pycountry.languages.get(alpha_2=lang_part)
+    if lang and hasattr(lang, 'alpha_3'):
+        return lang.alpha_3
+    
+    # If alpha_2 lookup failed, try alpha_3 in case it's already a 3-letter code
+    lang = pycountry.languages.get(alpha_3=lang_part)
+    if lang and hasattr(lang, 'alpha_3'):
+        return lang.alpha_3
+    
+    raise ValueError(f"Language code '{language_code}' not found")
 
 
 def get_system_locale():
@@ -98,7 +127,6 @@ class Options:
 
     # Language configuration
     language: str
-    lang_object: Language
     lang3: str
     use_system_locale: bool
     detected_locale: Optional[str]
@@ -256,12 +284,12 @@ def _create_argument_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _setup_language_config() -> tuple[str, Language, str, bool, Optional[str]]:
+def _setup_language_config() -> tuple[str, str, bool, Optional[str]]:
     """
     Setup language configuration based on system locale detection and config.
 
     Returns:
-        tuple: (language, lang_object, lang3, use_system_locale, detected_locale)
+        tuple: (language, lang3, use_system_locale, detected_locale)
     """
     use_system_locale = mcconfig.get("useSystemLocale", True) if mcconfig else True
     detected_locale = None
@@ -283,20 +311,18 @@ def _setup_language_config() -> tuple[str, Language, str, bool, Optional[str]]:
             language = "en"
 
     try:
-        lang_object = Language.get(language)
         # mkvmerge outputs 3-letter language codes in its json
         # but the config file might have a 2-letter lang code
         # so we convert "en" -> "eng" for example
-        lang3 = lang_object.to_alpha3()
+        lang3 = get_language_alpha3(language)
     except Exception as e:
         logger.warning(
             f"Invalid language tag '{language}': {e}. Falling back to English."
         )
         language = "en"
-        lang_object = Language.get(language)
-        lang3 = lang_object.to_alpha3()
+        lang3 = get_language_alpha3(language)
 
-    return language, lang_object, lang3, use_system_locale, detected_locale
+    return language, lang3, use_system_locale, detected_locale
 
 
 def _validate_options(args: argparse.Namespace, only_mkv: bool, only_mp4: bool) -> None:
@@ -346,22 +372,20 @@ def parse_options() -> Options:
         # CLI language override
         language = args.language
         try:
-            lang_object = Language.get(language)
-            lang3 = lang_object.to_alpha3()
+            lang3 = get_language_alpha3(language)
         except Exception as e:
             logger.warning(
                 f"Invalid language tag from CLI '{language}': {e}. Falling back to English."
             )
             language = "en"
-            lang_object = Language.get(language)
-            lang3 = lang_object.to_alpha3()
+            lang3 = get_language_alpha3(language)
         use_system_locale = False
         detected_locale = None
         sources["language"] = "cli"
         sources["use_system_locale"] = "cli override"
     else:
         # Use existing logic for system locale vs config
-        language, lang_object, lang3, use_system_locale, detected_locale = (
+        language, lang3, use_system_locale, detected_locale = (
             _setup_language_config()
         )
 
@@ -529,7 +553,6 @@ def parse_options() -> Options:
         only_mp4=only_mp4,
         # Language configuration
         language=language,
-        lang_object=lang_object,
         lang3=lang3,
         use_system_locale=use_system_locale,
         detected_locale=detected_locale,

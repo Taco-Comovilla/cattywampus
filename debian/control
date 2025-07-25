@@ -23,7 +23,7 @@ Depends: ${python3:Depends},
          mkvtoolnix,
          atomicparsley
 Description: Video metadata cleaner
- Cattywampus is a command-line tool for removing unwanted metadata from video
+ cattywampus is a command-line tool for removing unwanted metadata from video
  files. It supports MKV files (using MKVToolNix) and MP4/M4V files (using
  AtomicParsley).
  .

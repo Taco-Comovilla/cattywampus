@@ -4,14 +4,20 @@
 # Output every command that modifies files on the build system.
 export DH_VERBOSE = 1
 
-# Suppress setuptools deprecation warnings during Debian build
-export SETUPTOOLS_USE_DISTUTILS = stdlib
+# Use modern Python packaging (avoids setup.py deprecation warnings)
+export PYBUILD_SYSTEM = build
 
-# Use Python 3 build system with pybuild (modern approach)
 %:
 	dh $@ --with python3 --buildsystem=pybuild
 
-# Skip tests during build since they require external tools
+# Use modern build tools instead of setup.py
+override_dh_auto_build:
+	python3 -m build --wheel --no-isolation
+
+override_dh_auto_install:
+	python3 -m installer --destdir=debian/cattywampus dist/*.whl
+
+# Skip tests during build since they require external tools  
 override_dh_auto_test:
 	# Skip tests - external dependencies not available during build
 

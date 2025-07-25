@@ -560,6 +560,80 @@ def build_release(metadata, platform_name):
         print(f"Release binary created: {gz_path}")
 
 
+def generate_debian_files(metadata):
+    """Generate Debian packaging files from templates."""
+    print("Generating Debian packaging files...")
+    
+    # Template mapping for Debian files
+    debian_template_mappings = {
+        "templates/debian/control.template": "./debian/control",
+        "templates/debian/changelog.template": "./debian/changelog",
+    }
+    
+    for template_path, output_path in debian_template_mappings.items():
+        template_file = Path(template_path)
+        if not template_file.exists():
+            print(f"Warning: Template not found: {template_path}")
+            continue
+            
+        with open(template_file, encoding="utf-8") as f:
+            template = Template(f.read())
+            
+        output_file = Path(output_path)
+        output_file.parent.mkdir(parents=True, exist_ok=True)
+        
+        # Generate content with metadata substitution
+        content = template.substitute({
+            "APP_NAME": metadata["app_name"],
+            "VERSION": metadata["version"],
+            "REPO_BASE_URL": metadata["repo_base_url"],
+            "APP_DESCRIPTION": metadata["description"],
+            "ORGANIZATION": metadata["organization"],
+            "COPYRIGHT": metadata["copyright"],
+        })
+        
+        with open(output_file, "w", encoding="utf-8") as f:
+            f.write(content)
+            
+        print(f"Generated: {output_file}")
+
+
+def build_debian_package(metadata):
+    """Build Debian package using debuild."""
+    print("Building Debian package...")
+    
+    # Check if debuild is available
+    if not shutil.which("debuild"):
+        print("Error: debuild not found. Install with: sudo apt-get install devscripts")
+        sys.exit(1)
+    
+    # Generate Debian packaging files from templates
+    generate_debian_files(metadata)
+    
+    # Build the package
+    try:
+        # Use debuild to build the package
+        cmd = ["debuild", "-us", "-uc", "-b"]
+        print(f"Running: {' '.join(cmd)}")
+        subprocess.run(cmd, check=True, cwd=".")
+        
+        print("Debian package build completed successfully!")
+        
+        # Look for the generated .deb file
+        parent_dir = Path("..").resolve()
+        deb_files = list(parent_dir.glob(f"{metadata['app_name']}_*.deb"))
+        
+        if deb_files:
+            print(f"Generated package: {deb_files[0]}")
+            print(f"Install with: sudo dpkg -i {deb_files[0]}")
+        else:
+            print("Warning: Could not locate generated .deb file")
+            
+    except subprocess.CalledProcessError as e:
+        print(f"Error: Debian package build failed: {e}")
+        sys.exit(1)
+
+
 def main():
     """Main build function."""
     parser = argparse.ArgumentParser(description="Cross-platform build script")
@@ -567,6 +641,8 @@ def main():
                        help="Create release package after building")
     parser.add_argument("--generate-docs", action="store_true",
                        help="Only generate documentation and config files")
+    parser.add_argument("--deb", action="store_true",
+                       help="Build Debian package instead of PyInstaller binary")
     args = parser.parse_args()
 
     # Get metadata and platform info
@@ -576,6 +652,12 @@ def main():
         # Only generate files from templates, exit
         process_templates(metadata)
         print("Documentation generation completed!")
+        return
+
+    if args.deb:
+        # Build Debian package
+        print(f"Building Debian package for {metadata['app_name']} v{metadata['version']}")
+        build_debian_package(metadata)
         return
 
     platform_name = get_platform_info()

@@ -1,0 +1,6 @@
+${APP_NAME} (${VERSION}-1) unstable; urgency=medium
+
+  * Package version ${VERSION}
+  * Automated build from version ${VERSION}
+
+ -- ${ORGANIZATION} <maintainer@example.com>  $(date -R)

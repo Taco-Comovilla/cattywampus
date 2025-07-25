@@ -1,0 +1,39 @@
+Source: cattywampus
+Section: video
+Priority: optional
+Maintainer: Taco Comovilla <maintainer@example.com>
+Build-Depends: debhelper-compat (= 13),
+               python3-all,
+               python3-setuptools,
+               dh-python
+Standards-Version: 4.6.2
+Homepage: https://github.com/Taco-Comovilla/cattywampus
+Vcs-Browser: https://github.com/Taco-Comovilla/cattywampus
+Vcs-Git: https://github.com/Taco-Comovilla/cattywampus.git
+Rules-Requires-Root: no
+
+Package: cattywampus
+Architecture: all
+Depends: ${python3:Depends},
+         ${misc:Depends},
+         python3,
+         python3-langcodes,
+         python3-tomli | python3 (>= 3.11),
+         python3-tomli-w,
+         mkvtoolnix,
+         atomicparsley
+Description: Video metadata cleaner
+ Cattywampus is a command-line tool for removing unwanted metadata from video
+ files. It supports MKV files (using MKVToolNix) and MP4/M4V files (using
+ AtomicParsley).
+ .
+ Key features:
+  * Clean metadata from MKV, MP4, and M4V video files
+  * Support for batch processing of directories
+  * Configurable via TOML configuration files
+  * Cross-platform support for Linux, macOS, and Windows
+  * File manager integration for easy right-click access
+ .
+ The tool automatically detects available external tools (mkvtoolnix and
+ atomicparsley) and processes files accordingly. It can be used both as a
+ command-line utility and through file manager context menus.

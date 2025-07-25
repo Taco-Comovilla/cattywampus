@@ -1,0 +1,11 @@
+cattywampus (1.1.0-1) unstable; urgency=medium
+
+  * Initial Debian packaging (Fixes #30)
+  * Add standard Debian package workflow
+  * Support for installation via apt/dpkg
+  * Package installs binary to /usr/bin and is available in PATH
+  * Automatic user configuration setup on installation
+  * File manager integration support
+  * External dependencies properly declared (mkvtoolnix, atomicparsley)
+
+ -- Taco Comovilla <maintainer@example.com>  Fri, 25 Jul 2025 00:00:00 +0000

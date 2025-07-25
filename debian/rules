@@ -1,0 +1,28 @@
+#!/usr/bin/make -f
+# debian/rules for cattywampus
+
+# Output every command that modifies files on the build system.
+export DH_VERBOSE = 1
+
+# Use Python 3 build system
+%:
+	dh $@ --with python3 --buildsystem=pybuild
+
+# Override to ensure proper Python setup
+override_dh_auto_build:
+	python3 setup.py build
+
+# Override to install via Python setup
+override_dh_auto_install:
+	python3 setup.py install --root=debian/cattywampus --install-layout=deb
+
+# Skip tests during build since they require external tools
+override_dh_auto_test:
+	# Skip tests - external dependencies not available during build
+
+# Make sure config example is installed in the right place
+override_dh_install:
+	dh_install
+	# Ensure config example is in the right location
+	mkdir -p debian/cattywampus/usr/share/cattywampus
+	cp src/config.example.toml debian/cattywampus/usr/share/cattywampus/

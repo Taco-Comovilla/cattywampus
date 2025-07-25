@@ -1,0 +1,44 @@
+# Log level as an integer
+# Any messages at or above this number will be logged
+# 10=DEBUG, 20=INFO, 30=WARNING, 40=ERROR, 50=CRITICAL
+# see https://docs.python.org/3/library/logging.html#logging-levels
+logLevel = 20
+
+# Direct paths to binaries (leave empty to rely on system PATH)
+# ex. "/usr/bin/mkvmerge" or "C:\\Program Files\\MKVToolNix\\mkvmerge.exe"
+mkvmergePath = ""
+mkvpropeditPath = ""
+atomicParsleyPath = ""
+
+# If setDefaultSubtitle is set to true, the application will look for a subtitle
+# track in the above language, and if one is found, it will set the
+# default_track and enabled_track flags of that track to true (and also unset
+# the default_track flag on every other subtitle track)
+setDefaultSubtitle = false
+
+# If forceDefaultFirstSubtitle is set to true, the first subtitle track will be
+# set as default regardless of language (MKV files only)
+# This overrides language-based subtitle track selection
+forceDefaultFirstSubtitle = false
+
+# If setDefaultAudio is set to true, the application will look for an audio
+# track in the above language, and if one is found, it will set the
+# default_track flag of that track to true (and also unset the default_track
+# flag on every other audio track)
+setDefaultAudio = false
+
+# Use system locale for default subtitle track language
+# When true, automatically detects system language instead of using the 'language' setting
+# Falls back to 'language' setting if system locale detection fails
+useSystemLocale = true
+
+# The language (for setting default subtitle track)
+# Only used when useSystemLocale is false or system locale detection fails
+# Should be a valid BCP 47/IETF language subtag
+# https://en.wikipedia.org/wiki/IETF_language_tag
+language = ""
+
+# File type filtering - only process specific file types
+# Cannot enable both options simultaneously
+onlyMkv = false  # Only process MKV files (ignore MP4/M4V files)
+onlyMp4 = false  # Only process MP4/M4V files (ignore MKV files)

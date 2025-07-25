@@ -162,6 +162,52 @@ The script will:
 
 Refer to link:README.adoc#installing-${APP_NAME}[README]
 
+=== Step 5: Building Debian Packages (Linux only)
+
+For creating Debian packages that can be installed via `apt` or `dpkg`:
+
+==== Install Debian Packaging Tools
+
+[source,shell]
+----
+# Ubuntu/Debian
+sudo apt-get install devscripts debhelper dh-python python3-all python3-dev python3-setuptools
+----
+
+==== Build the Package
+
+[source,shell]
+----
+# Build Debian package
+./build-app --deb
+----
+
+This will:
+
+. Generate Debian packaging files from templates
+. Build the package using `debuild`
+. Create a `.deb` file in the parent directory
+
+==== Install the Package
+
+[source,shell]
+----
+# Install with automatic dependency resolution
+sudo apt-get install -f ../cattywampus_*_all.deb
+
+# Or install directly
+sudo dpkg -i ../cattywampus_*_all.deb
+----
+
+The Debian package provides:
+
+* Binary installed to `/usr/bin/cattywampus` (available in PATH)
+* Automatic user configuration setup during installation
+* Proper dependencies on `mkvtoolnix` and `atomicparsley`
+* Standard package management (upgrade, remove, etc.)
+
+NOTE: This packaging method is intended to eventually replace the custom build/install/uninstall scripts with standard Debian package management.
+
 == Development Environment Setup
 
 === VSCode Setup (Recommended)

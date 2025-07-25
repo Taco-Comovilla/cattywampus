@@ -11,6 +11,13 @@ case "$1" in
     configure)
         echo "Setting up cattywampus user environment..."
         
+        # Install missing Python dependencies that aren't available as system packages
+        echo "Installing Python dependencies..."
+        python3 -m pip install --break-system-packages langcodes>=3.3.0 2>/dev/null || {
+            echo "Warning: Could not install langcodes dependency."
+            echo "You may need to run: python3 -m pip install --user langcodes>=3.3.0"
+        }
+        
         # Get list of all users with home directories (excluding system users)
         USER_LIST=$(getent passwd | awk -F: '$3 >= 1000 && $3 != 65534 { print $1 ":" $6 }')
         

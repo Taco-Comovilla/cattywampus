@@ -1,0 +1,16 @@
+da3b5784424ed951f42f8e2f68f18c27  usr/bin/cattywampus
+8642042311788aa513f5cc32468df155  usr/lib/python3/dist-packages/cattywampus-1.2.0.egg-info/PKG-INFO
+68b329da9893e34099c7d8ad5cb9c940  usr/lib/python3/dist-packages/cattywampus-1.2.0.egg-info/dependency_links.txt
+4f8cff27ec47e2ed545f96c5197504ff  usr/lib/python3/dist-packages/cattywampus-1.2.0.egg-info/entry_points.txt
+04ba90068a70b9e06eed3a197109a398  usr/lib/python3/dist-packages/cattywampus-1.2.0.egg-info/requires.txt
+47f7e9c2f26ef1312c6a0c37b5ad59b6  usr/lib/python3/dist-packages/cattywampus-1.2.0.egg-info/top_level.txt
+65149a1f7aa44804ff95ebf58f46fdda  usr/lib/python3/dist-packages/main.py
+bd127a927c0fa5ca845869a8497c9319  usr/lib/python3/dist-packages/mcconfig.py
+6205f898a73c6cf797dc472ddb0f9010  usr/lib/python3/dist-packages/mclogger.py
+e935d60619941501505a47cde7fc4c8f  usr/lib/python3/dist-packages/mcoptions.py
+1f87ff2e3392671a18c9e1fca7672067  usr/lib/python3/dist-packages/version.py
+30772e81e9711dd32d6dce1729200aac  usr/share/cattywampus/config.example.toml
+3f18e1502d7e7a3fbc11bc9631cf4867  usr/share/doc/cattywampus/LICENSE
+fbd7235b6931659984d557d686e911dc  usr/share/doc/cattywampus/README.adoc.gz
+522600d3f5b7707e6c38f7db6588fac9  usr/share/doc/cattywampus/changelog.Debian.gz
+a1bcff9a337e7f03a84991bd2e85726c  usr/share/doc/cattywampus/copyright

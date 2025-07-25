@@ -1,5 +1,0 @@
-langcodes>=3.3.0
-tomli-w>=1.0.0
-
-[:python_version < "3.11"]
-tomli>=1.2.3

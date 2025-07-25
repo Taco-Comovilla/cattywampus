@@ -4,7 +4,7 @@ Version: 1.2.0
 Summary: Video metadata cleaner
 Home-page: https://github.com/Taco-Comovilla/cattywampus
 Author: Taco Comovilla
-Author-email: maintainer@example.com
+Author-email: tacocomovilla@cattywampus.dev
 License: MIT
 Project-URL: Bug Reports, https://github.com/Taco-Comovilla/cattywampus/issues
 Project-URL: Source, https://github.com/Taco-Comovilla/cattywampus
@@ -25,9 +25,9 @@ Classifier: Topic :: Utilities
 Requires-Python: >=3.9
 Description-Content-Type: text/plain
 License-File: LICENSE
-Requires-Dist: langcodes>=3.3.0
 Requires-Dist: tomli>=1.2.3; python_version < "3.11"
 Requires-Dist: tomli-w>=1.0.0
+Requires-Dist: pycountry>=20.7.3
 Dynamic: author
 Dynamic: author-email
 Dynamic: classifier

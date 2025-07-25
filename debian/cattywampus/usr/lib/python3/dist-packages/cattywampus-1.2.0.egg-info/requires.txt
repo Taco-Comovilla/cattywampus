@@ -1,3 +1,2 @@
-langcodes>=3.3.0
 
 [:python_version < "3.11"]

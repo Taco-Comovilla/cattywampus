@@ -706,8 +706,7 @@ def main():
 
     # Language configuration
     logger.debug(
-        f"  language: {options.lang_object.display_name()} "
-        f"({options.language}/{options.lang3}) - {options.sources['language']}"
+        f"  language: {options.language} -> {options.lang3} - {options.sources['language']}"
     )
 
     # Tool paths

@@ -1,9 +1,9 @@
 Package: cattywampus
 Version: 1.2.0-1
 Architecture: all
-Maintainer: Taco Comovilla <maintainer@example.com>
-Installed-Size: 115
-Depends: python3-tomli | python3-supported-min (>= 3.11), python3-tomli-w, python3:any, python3, python3-langcodes, python3-tomli | python3 (>= 3.11), mkvtoolnix, atomicparsley
+Maintainer: Taco Comovilla <tacocomovilla@cattywampus.dev>
+Installed-Size: 113
+Depends: python3-pycountry, python3-tomli | python3-supported-min (>= 3.11), python3-tomli-w, python3:any, python3, python3-tomli | python3 (>= 3.11), mkvtoolnix, atomicparsley
 Section: video
 Priority: optional
 Homepage: https://github.com/Taco-Comovilla/cattywampus

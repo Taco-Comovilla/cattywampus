@@ -619,13 +619,26 @@ def build_debian_package(metadata):
         
         print("Debian package build completed successfully!")
         
-        # Look for the generated .deb file
+        # Look for the generated .deb file and move it to dist/linux/
         parent_dir = Path("..").resolve()
         deb_files = list(parent_dir.glob(f"{metadata['app_name']}_*.deb"))
         
         if deb_files:
-            print(f"Generated package: {deb_files[0]}")
-            print(f"Install with: sudo dpkg -i {deb_files[0]}")
+            source_deb = deb_files[0]
+            
+            # Create dist/linux directory
+            dist_dir = Path("dist/linux")
+            dist_dir.mkdir(parents=True, exist_ok=True)
+            
+            # Create standardized filename: cattywampus-1.2.0.deb
+            target_filename = f"{metadata['app_name']}-{metadata['version']}.deb"
+            target_path = dist_dir / target_filename
+            
+            # Move the file to the proper location
+            shutil.move(str(source_deb), str(target_path))
+            
+            print(f"Generated package: {target_path}")
+            print(f"Install with: sudo dpkg -i {target_path}")
         else:
             print("Warning: Could not locate generated .deb file")
             
